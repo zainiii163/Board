@@ -1,3 +1,16 @@
-// Root page redirects to the (public) route group homepage.
-// This file exists so the root "/" resolves correctly.
-export { default } from "./(public)/page";
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+
+import PublicHomePage from "./(public)/page";
+
+export default function RootHomePage() {
+    return (
+        <>
+            <Header />
+            <main className="flex-1">
+                <PublicHomePage />
+            </main>
+            <Footer />
+        </>
+    );
+}
