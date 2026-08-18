@@ -39,3 +39,28 @@ apiRouter.use("/auth", authRouter);
 apiRouter.use("/users", usersRouter);
 apiRouter.use("/reports", reportsRouter);
 apiRouter.use("/audit", auditRouter);
+
+apiRouter.get("/books", (_req, res) => {
+  res.json([
+    {
+      title: "FBISE Mathematics Class 9",
+      board: "FBISE",
+      className: "Class 9",
+      price: "Free PDF",
+    },
+    {
+      title: "Board Notes Companion",
+      board: "Punjab",
+      className: "Class 9",
+      price: "Free PDF",
+    },
+  ]);
+});
+
+apiRouter.get("/past-papers", (_req, res) => {
+  res.json([
+    { year: "2026", subject: "Mathematics", board: "FBISE" },
+    { year: "2025", subject: "Physics", board: "Punjab" },
+    { year: "2024", subject: "Chemistry", board: "KPK" },
+  ]);
+});
