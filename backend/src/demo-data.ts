@@ -3,6 +3,26 @@ export type BoardSummary = {
     title: string;
 };
 
+export type SolutionStep = {
+    title: string;
+    content: string;
+};
+
+export type Question = {
+    num: number;
+    question: string;
+    marks: number;
+    difficulty: string;
+    pdfName: string;
+    steps: SolutionStep[];
+};
+
+export type Exercise = {
+    slug: string;
+    title: string;
+    questions: Question[];
+};
+
 export type Board = BoardSummary & {
     classes: {
         slug: string;
@@ -15,7 +35,7 @@ export type Board = BoardSummary & {
                 title: string;
                 summary: string;
                 formulas: string[];
-                exercises: { slug: string; title: string }[];
+                exercises: Exercise[];
             }[];
         }[];
     }[];
@@ -52,8 +72,34 @@ export const BOARD_DATA: Record<string, Board> = {
                                     "A repeating decimal can be rewritten using a rational-form equation.",
                                 ],
                                 exercises: [
-                                    { slug: "exercise-1-1", title: "Exercise 1.1" },
-                                    { slug: "exercise-1-2", title: "Exercise 1.2" },
+                                    {
+                                        slug: "exercise-1-1",
+                                        title: "Exercise 1.1",
+                                        questions: [
+                                            {
+                                                num: 3,
+                                                question: "Express 0.75 as a rational number in the form a/b.",
+                                                marks: 2,
+                                                difficulty: "Easy",
+                                                pdfName: "fbise-9-math-ch1-ex1-1.pdf",
+                                                steps: [
+                                                    {
+                                                        title: "Given",
+                                                        content: "We need to express 0.75 as a rational number in the form a/b.",
+                                                    },
+                                                    {
+                                                        title: "Working",
+                                                        content: "0.75 = 75/100 = 3/4 after simplifying by dividing numerator and denominator by 25.",
+                                                    },
+                                                    {
+                                                        title: "Answer",
+                                                        content: "3/4",
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    { slug: "exercise-1-2", title: "Exercise 1.2", questions: [] },
                                 ],
                             },
                         ],
@@ -131,40 +177,20 @@ export function getQuestionData(
     questionNumber: number,
 ) {
     const exercise = getExerciseBySlug(boardSlug, classSlug, subjectSlug, chapterSlug, exerciseSlug);
-    const question = {
-        num: 3,
-        question: "Express 0.75 as a rational number in the form a/b.",
-        marks: 2,
-        difficulty: "Easy",
-        pdfName: "fbise-9-math-ch1-ex1-1.pdf",
-        steps: [
-            {
-                title: "Given",
-                content: "We need to express 0.75 as a rational number in the form a/b.",
-            },
-            {
-                title: "Working",
-                content: "0.75 = 75/100 = 3/4 after simplifying by dividing numerator and denominator by 25.",
-            },
-            {
-                title: "Answer",
-                content: "3/4",
-            },
-        ],
-    };
+    const question = exercise?.questions.find((item) => item.num === questionNumber);
 
-    if (exercise && questionNumber === 3) {
-        return {
-            board: getBoardBySlug(boardSlug),
-            class: getClassBySlug(boardSlug, classSlug),
-            subject: getSubjectBySlug(boardSlug, classSlug, subjectSlug),
-            chapter: getChapterBySlug(boardSlug, classSlug, subjectSlug, chapterSlug),
-            exercise: exercise,
-            question,
-        };
+    if (!exercise || !question) {
+        return null;
     }
 
-    return null;
+    return {
+        board: getBoardBySlug(boardSlug),
+        class: getClassBySlug(boardSlug, classSlug),
+        subject: getSubjectBySlug(boardSlug, classSlug, subjectSlug),
+        chapter: getChapterBySlug(boardSlug, classSlug, subjectSlug, chapterSlug),
+        exercise,
+        question,
+    };
 }
 
 export const SEARCH_RESULTS = [

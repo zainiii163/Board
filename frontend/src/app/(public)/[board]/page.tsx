@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
-import { apiFetch } from "@/lib/api-client";
+import { apiFetchOrNull } from "@/lib/api-client";
 
 type BoardData = {
   slug: string;
@@ -19,11 +19,11 @@ export default async function BoardPage({
   params: Promise<{ board: string }>;
 }) {
   const { board } = await params;
+  const data = await apiFetchOrNull<BoardData>(`/api/boards/${board}`);
 
-  try {
-    const data = await apiFetch<BoardData>(`/api/boards/${board}`);
+  if (!data) notFound();
 
-    return (
+  return (
       <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: data.title }]} />
         <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -47,7 +47,4 @@ export default async function BoardPage({
         </div>
       </section>
     );
-  } catch {
-    notFound();
-  }
 }

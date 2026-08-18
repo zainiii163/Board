@@ -69,6 +69,15 @@ test("GET /api/classes/9 and /api/subjects/mathematics serve the SRS learning hi
     assert.equal(questionPayload.question.num, 3);
     assert.equal(questionPayload.question.question, "Express 0.75 as a rational number in the form a/b.");
 
+    const classPageResponse = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/fbise/classes/9`,
+    );
+    const classPagePayload = await classPageResponse.json();
+    assert.equal(classPageResponse.status, 200);
+    assert.equal(classPagePayload.board.slug, "fbise");
+    assert.equal(classPagePayload.class.slug, "9");
+    assert.equal(classPagePayload.class.title, "Class 9");
+
     await new Promise<void>((resolve, reject) => {
         server.close((error) => {
             if (error) reject(error);

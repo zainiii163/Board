@@ -2,14 +2,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
-import { apiFetch } from "@/lib/api-client";
+import { apiFetchOrNull } from "@/lib/api-client";
 
 type QuestionData = {
   board: { slug: string; title: string } | null;
   class: { slug: string; title: string } | null;
   subject: { slug: string; title: string } | null;
   chapter: { slug: string; title: string } | null;
-  exercise: { slug: string; title: string } | null;
+  exercise: {
+    slug: string;
+    title: string;
+    questions?: { num: number }[];
+  } | null;
   question: {
     num: number;
     question: string;
@@ -33,11 +37,21 @@ export default async function QuestionPage({
   }>;
 }) {
   const { board, classSlug, subject, chapter, exercise, questionNum } = await params;
+  const data = await apiFetchOrNull<QuestionData>(
+    `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}/exercises/${exercise}/q/${questionNum}`,
+  );
 
-  try {
-    const data = await apiFetch<QuestionData>(`/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}/exercises/${exercise}/q/${questionNum}`);
+  if (!data) notFound();
 
-    return (
+  const questions = data.exercise?.questions ?? [];
+  const currentIndex = questions.findIndex((item) => item.num === data.question.num);
+  const previousQuestion = currentIndex > 0 ? questions[currentIndex - 1] : null;
+  const nextQuestion =
+    currentIndex >= 0 && currentIndex < questions.length - 1
+      ? questions[currentIndex + 1]
+      : null;
+
+  return (
       <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[
@@ -65,9 +79,18 @@ export default async function QuestionPage({
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Previous</p>
-              <Link href={`/${board}/${classSlug}/${subject}/${chapter}/${exercise}`} className="mt-2 inline-block text-sm font-medium text-slate-700 hover:text-sky-700">
-                Back to exercise
-              </Link>
+              {previousQuestion ? (
+                <Link
+                  href={`/${board}/${classSlug}/${subject}/${chapter}/${exercise}/q/${previousQuestion.num}`}
+                  className="mt-2 inline-block text-sm font-medium text-slate-700 hover:text-sky-700"
+                >
+                  Question {previousQuestion.num}
+                </Link>
+              ) : (
+                <Link href={`/${board}/${classSlug}/${subject}/${chapter}/${exercise}`} className="mt-2 inline-block text-sm font-medium text-slate-700 hover:text-sky-700">
+                  Back to exercise
+                </Link>
+              )}
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">PDF</p>
@@ -75,7 +98,16 @@ export default async function QuestionPage({
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Next</p>
-              <p className="mt-2 text-sm font-medium text-slate-700">Question {Number(questionNum) + 1}</p>
+              {nextQuestion ? (
+                <Link
+                  href={`/${board}/${classSlug}/${subject}/${chapter}/${exercise}/q/${nextQuestion.num}`}
+                  className="mt-2 inline-block text-sm font-medium text-slate-700 hover:text-sky-700"
+                >
+                  Question {nextQuestion.num}
+                </Link>
+              ) : (
+                <p className="mt-2 text-sm font-medium text-slate-700">End of exercise</p>
+              )}
             </div>
           </div>
 
@@ -90,7 +122,4 @@ export default async function QuestionPage({
         </div>
       </section>
     );
-  } catch {
-    notFound();
-  }
 }

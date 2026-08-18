@@ -58,18 +58,22 @@ export default async function HomePage() {
             <p className="mt-4 max-w-xl text-base text-sky-100 sm:text-lg">
               Explore solutions, notes, and exam-ready summaries across major boards.
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <form action="/search" method="get" className="mt-6 flex flex-col gap-3 sm:flex-row">
               <div className="flex-1 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-sm">
                 <input
+                  name="q"
                   aria-label="Search content"
                   placeholder="Search notes, chapters, exercises..."
                   className="w-full bg-transparent text-sm text-white placeholder:text-sky-100 focus:outline-none"
                 />
               </div>
-              <button className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-50">
+              <button
+                type="submit"
+                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-50"
+              >
                 Search
               </button>
-            </div>
+            </form>
           </div>
           <div className="rounded-2xl border border-white/15 bg-white/5 p-5 backdrop-blur-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">

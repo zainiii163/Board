@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
-import { apiFetch } from "@/lib/api-client";
+import { apiFetchOrNull } from "@/lib/api-client";
 
 type ClassData = {
   board: { slug: string; title: string } | null;
@@ -22,16 +22,14 @@ export default async function ClassPage({
   params: Promise<{ board: string; classSlug: string }>;
 }) {
   const { board, classSlug } = await params;
+  const data = await apiFetchOrNull<ClassData>(`/api/boards/${board}/classes/${classSlug}`);
+  const klass = data?.class;
 
-  try {
-    const data = await apiFetch<ClassData>(`/api/boards/${board}/classes/${classSlug}`);
+  if (!data || !klass) notFound();
 
-    const boardTitle = data.board?.title ?? "Board";
-    const klass = data.class;
+  const boardTitle = data.board?.title ?? "Board";
 
-    if (!klass) throw new Error("Class unavailable");
-
-    return (
+  return (
       <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[
@@ -76,7 +74,4 @@ export default async function ClassPage({
         </div>
       </section>
     );
-  } catch {
-    notFound();
-  }
 }

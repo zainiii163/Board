@@ -5,3 +5,11 @@ export async function apiFetch<T>(path: string): Promise<T> {
   if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
   return res.json() as Promise<T>;
 }
+
+export async function apiFetchOrNull<T>(path: string): Promise<T | null> {
+  try {
+    return await apiFetch<T>(path);
+  } catch {
+    return null;
+  }
+}

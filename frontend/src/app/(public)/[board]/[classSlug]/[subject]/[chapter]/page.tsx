@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
-import { apiFetch } from "@/lib/api-client";
+import { apiFetchOrNull } from "@/lib/api-client";
 
 type ChapterData = {
   board: { slug: string; title: string } | null;
@@ -28,11 +28,13 @@ export default async function ChapterPage({
   }>;
 }) {
   const { board, classSlug, subject, chapter } = await params;
+  const data = await apiFetchOrNull<ChapterData>(
+    `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}`,
+  );
 
-  try {
-    const data = await apiFetch<ChapterData>(`/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}`);
+  if (!data) notFound();
 
-    return (
+  return (
       <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[
@@ -80,7 +82,4 @@ export default async function ChapterPage({
         </div>
       </section>
     );
-  } catch {
-    notFound();
-  }
 }

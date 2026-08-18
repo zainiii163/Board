@@ -40,8 +40,7 @@ export const getBoardClass = (req: Request, res: Response) => {
     }
 
     return res.json({
-        slug,
-        title: getBoardBySlug(slug)?.title ?? "Board",
+        board: getBoardBySlug(slug),
         class: klass,
     });
 };
