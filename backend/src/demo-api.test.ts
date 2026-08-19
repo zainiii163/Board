@@ -69,6 +69,22 @@ test("GET /api/classes/9 and /api/subjects/mathematics serve the SRS learning hi
     assert.equal(questionPayload.question.num, 3);
     assert.equal(questionPayload.question.question, "Express $0.75$ as a rational number in the form $\\frac{a}{b}$.");
 
+    const q4Response = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/fbise/classes/9/subjects/mathematics/chapters/real-numbers/exercises/exercise-1-1/q/4`,
+    );
+    const q4Payload = await q4Response.json();
+    assert.equal(q4Response.status, 200);
+    assert.equal(q4Payload.question.num, 4);
+    assert.equal(q4Payload.question.question, "Simplify $\\sqrt{12} + \\sqrt{27}$.");
+
+    const q5Response = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/fbise/classes/9/subjects/mathematics/chapters/real-numbers/exercises/exercise-1-1/q/5`,
+    );
+    const q5Payload = await q5Response.json();
+    assert.equal(q5Response.status, 200);
+    assert.equal(q5Payload.question.num, 5);
+    assert.equal(q5Payload.question.question, "Evaluate $\\frac{1}{\\sqrt{2} - 1}$.");
+
     const logsChapterResponse = await fetch(
         `http://127.0.0.1:${address.port}/api/chapters/logarithms`,
     );

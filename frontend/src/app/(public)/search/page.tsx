@@ -40,7 +40,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const results = await getResults(query);
   const filteredResults = results.filter((result) => {
     const matchesBoard =
-      boardFilter === "all" || result.board.toLowerCase() === boardFilter.toLowerCase();
+      boardFilter === "all" || result.board.toLowerCase().includes(boardFilter.toLowerCase());
     const matchesClass =
       classFilter === "all" || result.className.toLowerCase().includes(classFilter.toLowerCase());
     const matchesSubject =

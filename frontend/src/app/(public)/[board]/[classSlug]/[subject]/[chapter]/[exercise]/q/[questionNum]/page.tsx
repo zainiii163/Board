@@ -135,7 +135,7 @@ export default async function QuestionPage({
             {data.question.steps.map((step) => (
               <div key={step.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <h2 className="text-lg font-bold text-slate-900">{step.title}</h2>
-                <p className="mt-2 leading-7 text-slate-700">
+                <p className="mt-2 whitespace-pre-line leading-7 text-slate-700">
                   <MathText text={step.content} />
                 </p>
               </div>

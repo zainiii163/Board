@@ -97,6 +97,44 @@ export const BOARD_DATA: Record<string, Board> = {
                                                     },
                                                 ],
                                             },
+                                            {
+                                                num: 4,
+                                                question: "Simplify $\\sqrt{12} + \\sqrt{27}$.",
+                                                marks: 3,
+                                                difficulty: "Medium",
+                                                pdfName: "fbise-9-math-ch1-ex1-1-q4.pdf",
+                                                steps: [
+                                                    {
+                                                        title: "Working",
+                                                        content: "$\\sqrt{12} = 2\\sqrt{3}$ and $\\sqrt{27} = 3\\sqrt{3}$.\n$2\\sqrt{3} + 3\\sqrt{3} = 5\\sqrt{3}$.",
+                                                    },
+                                                    {
+                                                        title: "Answer",
+                                                        content: "$5\\sqrt{3}$",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                num: 5,
+                                                question: "Evaluate $\\frac{1}{\\sqrt{2} - 1}$.",
+                                                marks: 4,
+                                                difficulty: "Hard",
+                                                pdfName: "fbise-9-math-ch1-ex1-1-q5.pdf",
+                                                steps: [
+                                                    {
+                                                        title: "Rationalize Denominator",
+                                                        content: "Multiply numerator and denominator by $\\sqrt{2} + 1$.\n$\\frac{1}{\\sqrt{2} - 1} \\times \\frac{\\sqrt{2} + 1}{\\sqrt{2} + 1}$",
+                                                    },
+                                                    {
+                                                        title: "Simplify",
+                                                        content: "$\\frac{\\sqrt{2} + 1}{2 - 1} = \\sqrt{2} + 1$",
+                                                    },
+                                                    {
+                                                        title: "Answer",
+                                                        content: "$\\sqrt{2} + 1$",
+                                                    },
+                                                ],
+                                            },
                                         ],
                                     },
                                     { slug: "exercise-1-2", title: "Exercise 1.2", questions: [] },
@@ -287,6 +325,20 @@ export const SEARCH_RESULTS = [
         className: "Class 9",
         subject: "Mathematics",
         path: "/fbise/9/mathematics/logarithms/exercise-3-2",
+    },
+    {
+        title: "Question 4",
+        board: "FBISE",
+        className: "Class 9",
+        subject: "Mathematics",
+        path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/4",
+    },
+    {
+        title: "Question 5",
+        board: "FBISE",
+        className: "Class 9",
+        subject: "Mathematics",
+        path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/5",
     },
 ];
 
