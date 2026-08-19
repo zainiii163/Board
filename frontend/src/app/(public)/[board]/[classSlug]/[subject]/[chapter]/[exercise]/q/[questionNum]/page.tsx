@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { apiFetchOrNull } from "@/lib/api-client";
+import { MathText } from "@/components/content/math-text";
 
 type QuestionData = {
   board: { slug: string; title: string } | null;
@@ -69,7 +70,9 @@ export default async function QuestionPage({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">Question {data.question.num}</p>
-              <h1 className="mt-3 text-3xl font-black text-slate-900">{data.question.question}</h1>
+              <h1 className="mt-3 text-3xl font-black text-slate-900">
+                <MathText text={data.question.question} />
+              </h1>
             </div>
             <div className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
               {data.question.marks} marks • {data.question.difficulty}
@@ -115,7 +118,9 @@ export default async function QuestionPage({
             {data.question.steps.map((step) => (
               <div key={step.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <h2 className="text-lg font-bold text-slate-900">{step.title}</h2>
-                <p className="mt-2 leading-7 text-slate-700">{step.content}</p>
+                <p className="mt-2 leading-7 text-slate-700">
+                  <MathText text={step.content} />
+                </p>
               </div>
             ))}
           </div>

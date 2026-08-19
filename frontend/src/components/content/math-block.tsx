@@ -1,17 +1,16 @@
 "use client";
 
+import 'katex/dist/katex.min.css';
+import { BlockMath, InlineMath } from 'react-katex';
+
 type Props = {
   latex: string;
   display?: boolean;
 };
 
 export function MathBlock({ latex, display = false }: Props) {
-  return (
-    <span
-      className={display ? "block overflow-x-auto py-2 text-center" : ""}
-      data-latex={latex}
-    >
-      {latex}
-    </span>
-  );
+  if (display) {
+    return <BlockMath math={latex} />;
+  }
+  return <InlineMath math={latex} />;
 }

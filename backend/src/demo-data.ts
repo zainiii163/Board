@@ -78,28 +78,87 @@ export const BOARD_DATA: Record<string, Board> = {
                                         questions: [
                                             {
                                                 num: 3,
-                                                question: "Express 0.75 as a rational number in the form a/b.",
+                                                question: "Express $0.75$ as a rational number in the form $\\frac{a}{b}$.",
                                                 marks: 2,
                                                 difficulty: "Easy",
                                                 pdfName: "fbise-9-math-ch1-ex1-1.pdf",
                                                 steps: [
                                                     {
                                                         title: "Given",
-                                                        content: "We need to express 0.75 as a rational number in the form a/b.",
+                                                        content: "We need to express $0.75$ as a rational number in the form $\\frac{a}{b}$.",
                                                     },
                                                     {
                                                         title: "Working",
-                                                        content: "0.75 = 75/100 = 3/4 after simplifying by dividing numerator and denominator by 25.",
+                                                        content: "$0.75 = \\frac{75}{100} = \\frac{3}{4}$ after simplifying by dividing numerator and denominator by $25$.",
                                                     },
                                                     {
                                                         title: "Answer",
-                                                        content: "3/4",
+                                                        content: "$\\frac{3}{4}$",
                                                     },
                                                 ],
                                             },
                                         ],
                                     },
                                     { slug: "exercise-1-2", title: "Exercise 1.2", questions: [] },
+                                ],
+                            },
+                            {
+                                slug: "logarithms",
+                                title: "Logarithms",
+                                summary:
+                                    "Logarithms are the inverse operations to exponentiation. This chapter covers the laws of logarithms and their applications in solving complex calculations.",
+                                formulas: [
+                                    "$\\log_a(xy) = \\log_a x + \\log_a y$",
+                                    "$\\log_a(\\frac{x}{y}) = \\log_a x - \\log_a y$",
+                                    "$\\log_a(x^n) = n \\log_a x$",
+                                ],
+                                exercises: [
+                                    {
+                                        slug: "exercise-3-1",
+                                        title: "Exercise 3.1",
+                                        questions: [
+                                            {
+                                                num: 1,
+                                                question: "Express the following in scientific notation: $5700$",
+                                                marks: 2,
+                                                difficulty: "Easy",
+                                                pdfName: "fbise-9-math-ch3-ex3-1.pdf",
+                                                steps: [
+                                                    {
+                                                        title: "Working",
+                                                        content: "Move the decimal point 3 places to the left to get a number between 1 and 10: $5.700$. So we multiply by $10^3$.",
+                                                    },
+                                                    {
+                                                        title: "Answer",
+                                                        content: "$5.7 \\times 10^3$",
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        slug: "exercise-3-2",
+                                        title: "Exercise 3.2",
+                                        questions: [
+                                            {
+                                                num: 2,
+                                                question: "Find the value of $x$ if $\\log_{10} x = 2.4543$",
+                                                marks: 3,
+                                                difficulty: "Medium",
+                                                pdfName: "fbise-9-math-ch3-ex3-2.pdf",
+                                                steps: [
+                                                    {
+                                                        title: "Working",
+                                                        content: "$x = \\text{antilog}(2.4543)$. Characteristic is $2$ and mantissa is $.4543$. Finding antilog of $.4543$ gives $2846$.",
+                                                    },
+                                                    {
+                                                        title: "Answer",
+                                                        content: "$x = 284.6$",
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    }
                                 ],
                             },
                         ],
@@ -214,6 +273,20 @@ export const SEARCH_RESULTS = [
         className: "Class 9",
         subject: "Mathematics",
         path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/3",
+    },
+    {
+        title: "Logarithms",
+        board: "FBISE",
+        className: "Class 9",
+        subject: "Mathematics",
+        path: "/fbise/9/mathematics/logarithms",
+    },
+    {
+        title: "Exercise 3.2",
+        board: "FBISE",
+        className: "Class 9",
+        subject: "Mathematics",
+        path: "/fbise/9/mathematics/logarithms/exercise-3-2",
     },
 ];
 
