@@ -22,7 +22,7 @@ type SearchPageProps = {
 async function getResults(query: string) {
   try {
     const data = await apiFetch<{ query: string; results: SearchResult[] }>(
-      `/api/search?q=${encodeURIComponent(query || "real")}`,
+      `/api/search?q=${encodeURIComponent(query)}`,
     );
     return data.results;
   } catch {
@@ -32,7 +32,7 @@ async function getResults(query: string) {
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
-  const query = String(params.q ?? "real").trim();
+  const query = String(params.q ?? "").trim();
   const boardFilter = String(params.board ?? "all");
   const classFilter = String(params.class ?? "all");
   const subjectFilter = String(params.subject ?? "all");

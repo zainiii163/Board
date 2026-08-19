@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { apiFetchOrNull } from "@/lib/api-client";
 import { MathText } from "@/components/content/math-text";
+import { PdfViewer } from "@/components/content/pdf-viewer";
 
 type QuestionData = {
   board: { slug: string; title: string } | null;
@@ -25,6 +26,14 @@ type QuestionData = {
   };
 };
 
+type PdfMetadata = {
+  id: string;
+  url: string;
+  filename: string;
+  size: string;
+  uploadedAt: string;
+};
+
 export default async function QuestionPage({
   params,
 }: {
@@ -43,6 +52,11 @@ export default async function QuestionPage({
   );
 
   if (!data) notFound();
+
+  let pdfData = null;
+  if (data.question.pdfName) {
+    pdfData = await apiFetchOrNull<PdfMetadata>(`/api/pdfs/${data.question.pdfName}`);
+  }
 
   const questions = data.exercise?.questions ?? [];
   const currentIndex = questions.findIndex((item) => item.num === data.question.num);
@@ -79,7 +93,7 @@ export default async function QuestionPage({
             </div>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Previous</p>
               {previousQuestion ? (
@@ -95,11 +109,7 @@ export default async function QuestionPage({
                 </Link>
               )}
             </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">PDF</p>
-              <p className="mt-2 text-sm font-medium text-slate-700">{data.question.pdfName}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-right">
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Next</p>
               {nextQuestion ? (
                 <Link
@@ -113,6 +123,13 @@ export default async function QuestionPage({
               )}
             </div>
           </div>
+
+          {pdfData && (
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <h2 className="text-lg font-bold text-slate-900 mb-4">View / Download PDF</h2>
+              <PdfViewer url={pdfData.url} title={pdfData.filename} />
+            </div>
+          )}
 
           <div className="mt-8 space-y-5">
             {data.question.steps.map((step) => (
