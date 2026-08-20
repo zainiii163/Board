@@ -15,7 +15,7 @@ const latestNotes = [
     subject: "Mathematics",
     board: "FBISE",
     className: "Class 9",
-    description: "Quick concept recap and worked examples for rational and irrational numbers.",
+    description: "Quick concept recap and worked examples covering rational and irrational values.",
     path: "/fbise/9/mathematics/real-numbers"
   },
   {
@@ -23,24 +23,24 @@ const latestNotes = [
     subject: "Mathematics",
     board: "FBISE",
     className: "Class 9",
-    description: "Solved decimal-to-rational questions, including Question 3.",
+    description: "Solved decimal-to-rational questions including Question 3, 5, 6 and 7.",
     path: "/fbise/9/mathematics/real-numbers/exercise-1-1"
   },
   {
-    title: "Logarithms",
+    title: "Question 6",
     subject: "Mathematics",
     board: "FBISE",
     className: "Class 9",
-    description: "Log laws and a first worked numerical from Exercise 3.1.",
-    path: "/fbise/9/mathematics/logarithms"
+    description: "Simplify $\\sqrt{18} - \\sqrt{8}$ with a clear factor-by-factor solution.",
+    path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/6"
   },
   {
-    title: "Question 3",
+    title: "Question 7",
     subject: "Mathematics",
     board: "FBISE",
     className: "Class 9",
-    description: "Express 0.75 as a rational number, with Given / Working / Answer steps.",
-    path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/3"
+    description: "Rationalize $\\frac{1}{\\sqrt{5} + 2}$ using the conjugate method.",
+    path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/7"
   },
 ];
 

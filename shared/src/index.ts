@@ -14,6 +14,8 @@ export type ContentStatus = "draft" | "in_review" | "published" | "archived";
 
 export type UserRole = "admin" | "editor" | "teacher" | "student";
 
+export type SearchResultType = "chapter" | "exercise" | "question";
+
 // ── API health ──
 
 export type ApiHealth = {
@@ -25,58 +27,89 @@ export type ApiHealth = {
 // ── Core hierarchy ──
 
 export type BoardSummary = {
-  id: string;
+  id?: number | string;
   slug: string;
   title: string;
 };
 
 export type ClassSummary = {
-  id: string;
+  id?: number | string;
   slug: string;
   title: string;
-  boardId: string;
+  boardId?: number | string;
 };
 
 export type SubjectSummary = {
-  id: string;
+  id?: number | string;
   slug: string;
   title: string;
-  session: string;
-  classId: string;
+  session?: string;
+  classId?: number | string;
 };
 
 export type ChapterSummary = {
-  id: string;
+  id?: number | string;
   slug: string;
   title: string;
-  order: number;
-  status: ContentStatus;
-  subjectId: string;
+  order?: number;
+  status?: ContentStatus;
+  subjectId?: number | string;
 };
 
 export type ExerciseSummary = {
-  id: string;
+  id?: number | string;
   slug: string;
   title: string;
-  order: number;
-  chapterId: string;
+  order?: number;
+  chapterId?: number | string;
 };
 
 export type QuestionSummary = {
-  id: string;
+  id?: number | string;
   number: string;
   title: string;
-  type: QuestionType;
-  difficulty: ContentDifficulty;
-  marks: number;
-  exerciseId: string;
+  type?: QuestionType;
+  difficulty?: ContentDifficulty;
+  marks?: number;
+  exerciseId?: number | string;
 };
 
-// ── Solutions ──
+// ── Question content ──
 
 export type SolutionStep = {
-  label: string;
-  detail: string;
+  title: string;
+  content: string;
+};
+
+export type QuestionContent = {
+  num: number;
+  question: string;
+  marks: number;
+  difficulty: string;
+  pdfName?: string | null;
+  steps: SolutionStep[];
+};
+
+// ── Search / PDFs ──
+
+export type SearchResult = {
+  title: string;
+  board: string;
+  boardSlug: string;
+  className: string;
+  classSlug: string;
+  subject: string;
+  subjectSlug: string;
+  path: string;
+  type: SearchResultType;
+};
+
+export type PdfSummary = {
+  id: string;
+  filename: string;
+  size: string;
+  url: string;
+  uploadedAt: string;
 };
 
 // ── MCQ ──
@@ -84,16 +117,6 @@ export type SolutionStep = {
 export type McqOption = {
   label: string;
   text: string;
-};
-
-// ── PDF ──
-
-export type PdfSummary = {
-  id: string;
-  filename: string;
-  sizeBytes: number;
-  url: string;
-  level: "exercise" | "chapter" | "book";
 };
 
 // ── User ──

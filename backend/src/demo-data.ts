@@ -135,6 +135,44 @@ export const BOARD_DATA: Record<string, Board> = {
                                                     },
                                                 ],
                                             },
+                                            {
+                                                num: 6,
+                                                question: "Simplify $\\sqrt{18} - \\sqrt{8}$.",
+                                                marks: 3,
+                                                difficulty: "Medium",
+                                                pdfName: "fbise-9-math-ch1-ex1-1-q6.pdf",
+                                                steps: [
+                                                    {
+                                                        title: "Break into factors",
+                                                        content: "$\\sqrt{18} = 3\\sqrt{2}$ and $\\sqrt{8} = 2\\sqrt{2}$.",
+                                                    },
+                                                    {
+                                                        title: "Answer",
+                                                        content: "$3\\sqrt{2} - 2\\sqrt{2} = \\sqrt{2}$",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                num: 7,
+                                                question: "Rationalize $\\frac{1}{\\sqrt{5} + 2}$.",
+                                                marks: 4,
+                                                difficulty: "Hard",
+                                                pdfName: "fbise-9-math-ch1-ex1-1-q7.pdf",
+                                                steps: [
+                                                    {
+                                                        title: "Multiply by conjugate",
+                                                        content: "Multiply numerator and denominator by $\\sqrt{5} - 2$.\n$\\frac{1}{\\sqrt{5} + 2} \\times \\frac{\\sqrt{5} - 2}{\\sqrt{5} - 2}$",
+                                                    },
+                                                    {
+                                                        title: "Simplify",
+                                                        content: "$\\frac{\\sqrt{5} - 2}{5 - 4} = \\sqrt{5} - 2$",
+                                                    },
+                                                    {
+                                                        title: "Answer",
+                                                        content: "$\\sqrt{5} - 2$",
+                                                    },
+                                                ],
+                                            },
                                         ],
                                     },
                                     { slug: "exercise-1-2", title: "Exercise 1.2", questions: [] },
@@ -339,6 +377,20 @@ export const SEARCH_RESULTS = [
         className: "Class 9",
         subject: "Mathematics",
         path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/5",
+    },
+    {
+        title: "Question 6",
+        board: "FBISE",
+        className: "Class 9",
+        subject: "Mathematics",
+        path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/6",
+    },
+    {
+        title: "Question 7",
+        board: "FBISE",
+        className: "Class 9",
+        subject: "Mathematics",
+        path: "/fbise/9/mathematics/real-numbers/exercise-1-1/q/7",
     },
 ];
 

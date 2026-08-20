@@ -19,7 +19,7 @@ export const list = async (_req: Request, res: Response) => {
     try {
         const result = await db.query.boards.findMany();
         if (result.length > 0) {
-            return res.json(result);
+            return res.json(result.map(({ slug, title }) => ({ slug, title })));
         }
     } catch (e) {
         console.error("DB fallback", e);
@@ -29,7 +29,7 @@ export const list = async (_req: Request, res: Response) => {
 
 export const getBySlug = async (req: Request, res: Response) => {
     const slug = asString(req.params.slug);
-    
+
     try {
         const board = await db.query.boards.findFirst({
             where: eq(schema.boards.slug, slug),

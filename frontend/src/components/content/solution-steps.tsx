@@ -1,3 +1,7 @@
+import "katex/dist/katex.min.css";
+
+import { MathText } from "./math-text";
+
 type Step = { label: string; detail: string };
 
 export function SolutionSteps({ steps }: { steps: Step[] }) {
@@ -8,7 +12,9 @@ export function SolutionSteps({ steps }: { steps: Step[] }) {
           <p className="text-xs font-semibold uppercase text-muted">
             {step.label}
           </p>
-          <p className="mt-1">{step.detail}</p>
+          <p className="mt-1 leading-7 text-slate-700">
+            <MathText text={step.detail} />
+          </p>
         </li>
       ))}
     </ol>

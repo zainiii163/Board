@@ -1,14 +1,7 @@
 import Link from "next/link";
+import type { SearchResult } from "@boardnotes/shared";
 
 import { apiFetch } from "@/lib/api-client";
-
-type SearchResult = {
-  title: string;
-  board: string;
-  className: string;
-  subject: string;
-  path: string;
-};
 
 type SearchPageProps = {
   searchParams: Promise<{
