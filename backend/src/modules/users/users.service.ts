@@ -1,1 +1,6 @@
-// User management business logic placeholder.
+export {
+  listUsers,
+  getUserById,
+  updateUserRole,
+  deleteUser,
+} from "../auth/auth.service.js";

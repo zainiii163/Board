@@ -1,15 +1,23 @@
+import { apiFetchOrNull } from "@/lib/api-client";
+import { AuthorPageContent } from "@/components/content/author-page-content";
+
+type AuthorData = {
+  slug: string;
+  name: string;
+  title: string;
+  bio: string;
+  boards: string[];
+  noteCount: number;
+  notes: { title: string; path: string; subject: string }[];
+};
+
 export default async function AuthorPage({
   params,
 }: {
   params: Promise<{ authorSlug: string }>;
 }) {
   const { authorSlug } = await params;
-  return (
-    <section className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="text-3xl font-bold capitalize">
-        {authorSlug.replace(/-/g, " ")}
-      </h1>
-      <p className="mt-2 text-muted">Published notes by this author.</p>
-    </section>
-  );
+  const author = await apiFetchOrNull<AuthorData>(`/api/authors/${authorSlug}`);
+
+  return <AuthorPageContent author={author} />;
 }

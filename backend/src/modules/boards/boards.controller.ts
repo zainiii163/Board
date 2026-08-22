@@ -1,7 +1,6 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 
 import {
-    BOARD_LIST,
     getBoardBySlug,
     getClassBySlug,
     getSubjectBySlug,
@@ -9,51 +8,64 @@ import {
     getExerciseBySlug,
     getQuestionData,
 } from "../../demo-data.js";
+import * as boardsService from "./boards.service.js";
+import * as chapterZipService from "./chapter-zip.service.js";
+import type { AuthedRequest } from "../../middleware/auth.middleware.js";
 import { db } from "../../db/index.js";
-import { eq, and } from "drizzle-orm";
+import { useDb } from "../../db/mode.js";
+import { eq } from "drizzle-orm";
 import * as schema from "../../db/schema.js";
+import { ApiError } from "../../utils/api-error.js";
 
 const asString = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] ?? "" : value ?? "";
 
-export const list = async (_req: Request, res: Response) => {
-    try {
-        const result = await db.query.boards.findMany();
-        if (result.length > 0) {
-            return res.json(result.map(({ slug, title }) => ({ slug, title })));
-        }
-    } catch (e) {
-        console.error("DB fallback", e);
+export const list = async (req: Request, res: Response) => {
+    const full = String(req.query.full ?? "") === "1";
+    if (full) {
+        return res.json(await boardsService.listBoards());
     }
-    res.json(BOARD_LIST);
+
+    return res.json(await boardsService.listBoardCatalog());
 };
 
 export const getBySlug = async (req: Request, res: Response) => {
     const slug = asString(req.params.slug);
 
-    try {
-        const board = await db.query.boards.findFirst({
-            where: eq(schema.boards.slug, slug),
-            with: {
-                classes: {
-                    with: {
-                        subjects: {
-                            with: {
-                                chapters: {
-                                    with: {
-                                        exercises: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+    if (useDb()) {
+        try {
+            const board = await db.query.boards.findFirst({
+                where: eq(schema.boards.slug, slug),
+                with: {
+                    classes: {
+                        with: {
+                            subjects: {
+                                with: {
+                                    chapters: {
+                                        with: { exercises: true },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+            if (board) {
+                const filtered = {
+                    ...board,
+                    classes: board.classes.map((klass) => ({
+                        ...klass,
+                        subjects: klass.subjects.map((subject) => ({
+                            ...subject,
+                            chapters: subject.chapters.filter((ch) => ch.status === "published"),
+                        })),
+                    })),
+                };
+                return res.json(filtered);
             }
-        });
-        if (board) {
-            return res.json(board);
+            return res.status(404).json({ message: "Board not found" });
+        } catch (e) {
+            console.error("DB read failed", e);
         }
-    } catch (e) {
-        console.error("DB fallback", e);
     }
 
     const board = getBoardBySlug(slug);
@@ -64,30 +76,48 @@ export const getBySlug = async (req: Request, res: Response) => {
     return res.json(board);
 };
 
-export const create = (_req: Request, res: Response) =>
-    res.status(201).json({ created: true });
-export const update = (_req: Request, res: Response) => res.json({ updated: true });
-export const remove = (_req: Request, res: Response) => res.json({ deleted: true });
+export const create = async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    try {
+        const created = await boardsService.createBoard(req.body ?? {});
+        res.status(201).json(created);
+    } catch (error) {
+        next(error);
+    }
+};
+export const update = async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    try {
+        const updated = await boardsService.updateBoard(asString(req.params.slug), req.body ?? {});
+        res.json(updated);
+    } catch (error) {
+        next(error);
+    }
+};
+export const remove = async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    try {
+        const result = await boardsService.deleteBoard(asString(req.params.slug));
+        res.json(result);
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const getBoardClass = async (req: Request, res: Response) => {
     const slug = asString(req.params.slug);
     const classSlug = asString(req.params.classSlug);
 
-    try {
-        const klass = await db.query.classes.findFirst({
-            where: eq(schema.classes.slug, classSlug),
-            with: {
-                board: true
-            }
-        });
-        if (klass && klass.board.slug === slug) {
-            return res.json({
-                board: klass.board,
-                class: klass
+    if (useDb()) {
+        try {
+            const klass = await db.query.classes.findFirst({
+                where: eq(schema.classes.slug, classSlug),
+                with: { board: true },
             });
+            if (klass && klass.board.slug === slug) {
+                return res.json({ board: klass.board, class: klass });
+            }
+            return res.status(404).json({ message: "Class not found" });
+        } catch (e) {
+            console.error("DB read failed", e);
         }
-    } catch (e) {
-        console.error("DB fallback", e);
     }
 
     const klass = getClassBySlug(slug, classSlug);
@@ -106,26 +136,29 @@ export const getBoardClassSubject = async (req: Request, res: Response) => {
     const classSlug = asString(req.params.classSlug);
     const subjectSlug = asString(req.params.subject);
 
-    try {
-        const subject = await db.query.subjects.findFirst({
-            where: eq(schema.subjects.slug, subjectSlug),
-            with: {
-                class: {
-                    with: {
-                        board: true
-                    }
-                }
-            }
-        });
-        if (subject && subject.class.slug === classSlug && subject.class.board.slug === slug) {
-            return res.json({
-                board: subject.class.board,
-                class: subject.class,
-                subject,
+    if (useDb()) {
+        try {
+            const subject = await db.query.subjects.findFirst({
+                where: eq(schema.subjects.slug, subjectSlug),
+                with: {
+                    class: { with: { board: true } },
+                    chapters: true,
+                },
             });
+            if (subject && subject.class.slug === classSlug && subject.class.board.slug === slug) {
+                return res.json({
+                    board: subject.class.board,
+                    class: subject.class,
+                    subject: {
+                        ...subject,
+                        chapters: subject.chapters.filter((ch) => ch.status === "published"),
+                    },
+                });
+            }
+            return res.status(404).json({ message: "Subject not found" });
+        } catch (e) {
+            console.error("DB read failed", e);
         }
-    } catch (e) {
-        console.error("DB fallback", e);
     }
 
     const subject = getSubjectBySlug(slug, classSlug, subjectSlug);
@@ -147,31 +180,33 @@ export const getBoardClassSubjectChapter = async (req: Request, res: Response) =
     const subjectSlug = asString(req.params.subject);
     const chapterSlug = asString(req.params.chapter);
 
-    try {
-        const chapter = await db.query.chapters.findFirst({
-            where: eq(schema.chapters.slug, chapterSlug),
-            with: {
-                subject: {
-                    with: {
-                        class: {
-                            with: {
-                                board: true
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        if (chapter && chapter.subject.slug === subjectSlug && chapter.subject.class.slug === classSlug && chapter.subject.class.board.slug === slug) {
-            return res.json({
-                board: chapter.subject.class.board,
-                class: chapter.subject.class,
-                subject: chapter.subject,
-                chapter,
+    if (useDb()) {
+        try {
+            const chapter = await db.query.chapters.findFirst({
+                where: eq(schema.chapters.slug, chapterSlug),
+                with: {
+                    subject: { with: { class: { with: { board: true } } } },
+                    exercises: true,
+                },
             });
+            if (
+                chapter &&
+                chapter.status === "published" &&
+                chapter.subject.slug === subjectSlug &&
+                chapter.subject.class.slug === classSlug &&
+                chapter.subject.class.board.slug === slug
+            ) {
+                return res.json({
+                    board: chapter.subject.class.board,
+                    class: chapter.subject.class,
+                    subject: chapter.subject,
+                    chapter,
+                });
+            }
+            return res.status(404).json({ message: "Chapter not found" });
+        } catch (e) {
+            console.error("DB read failed", e);
         }
-    } catch (e) {
-        console.error("DB fallback", e);
     }
 
     const chapter = getChapterBySlug(slug, classSlug, subjectSlug, chapterSlug);
@@ -195,41 +230,46 @@ export const getBoardClassSubjectChapterExercise = async (req: Request, res: Res
     const chapterSlug = asString(req.params.chapter);
     const exerciseSlug = asString(req.params.exercise);
 
-    try {
-        const exercise = await db.query.exercises.findFirst({
-            where: eq(schema.exercises.slug, exerciseSlug),
-            with: {
-                chapter: {
-                    with: {
-                        subject: {
-                            with: {
-                                class: {
-                                    with: {
-                                        board: true
-                                    }
-                                }
-                            }
-                        }
-                    }
+    if (useDb()) {
+        try {
+            const exercise = await db.query.exercises.findFirst({
+                where: eq(schema.exercises.slug, exerciseSlug),
+                with: {
+                    chapter: {
+                        with: {
+                            subject: { with: { class: { with: { board: true } } } },
+                        },
+                    },
+                    questions: { columns: { num: true, questionText: true } },
                 },
-                questions: {
-                    columns: {
-                        num: true
-                    }
-                }
-            }
-        });
-        if (exercise && exercise.chapter.slug === chapterSlug && exercise.chapter.subject.slug === subjectSlug && exercise.chapter.subject.class.slug === classSlug && exercise.chapter.subject.class.board.slug === slug) {
-            return res.json({
-                board: exercise.chapter.subject.class.board,
-                class: exercise.chapter.subject.class,
-                subject: exercise.chapter.subject,
-                chapter: exercise.chapter,
-                exercise,
             });
+            if (
+                exercise &&
+                exercise.chapter.status === "published" &&
+                exercise.chapter.slug === chapterSlug &&
+                exercise.chapter.subject.slug === subjectSlug &&
+                exercise.chapter.subject.class.slug === classSlug &&
+                exercise.chapter.subject.class.board.slug === slug
+            ) {
+                return res.json({
+                    board: exercise.chapter.subject.class.board,
+                    class: exercise.chapter.subject.class,
+                    subject: exercise.chapter.subject,
+                    chapter: exercise.chapter,
+                    exercise: {
+                        slug: exercise.slug,
+                        title: exercise.title,
+                        questions: exercise.questions.map((q) => ({
+                            num: q.num,
+                            question: q.questionText,
+                        })),
+                    },
+                });
+            }
+            return res.status(404).json({ message: "Exercise not found" });
+        } catch (e) {
+            console.error("DB read failed", e);
         }
-    } catch (e) {
-        console.error("DB fallback", e);
     }
 
     const exercise = getExerciseBySlug(slug, classSlug, subjectSlug, chapterSlug, exerciseSlug);
@@ -258,57 +298,56 @@ export const getBoardClassSubjectChapterExerciseQuestion = async (
     const exerciseSlug = asString(req.params.exercise);
     const num = Number(asString(req.params.questionNum) || "3");
 
-    try {
-        const question = await db.query.questions.findFirst({
-            where: eq(schema.questions.num, num),
-            with: {
-                steps: {
-                    orderBy: (steps, { asc }) => [asc(steps.stepOrder)]
-                },
-                exercise: {
-                    with: {
-                        chapter: {
-                            with: {
-                                subject: {
-                                    with: {
-                                        class: {
-                                            with: {
-                                                board: true
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+    if (useDb()) {
+        try {
+            const question = await db.query.questions.findFirst({
+                where: eq(schema.questions.num, num),
+                with: {
+                    steps: { orderBy: (steps, { asc }) => [asc(steps.stepOrder)] },
+                    exercise: {
+                        with: {
+                            chapter: {
+                                with: {
+                                    subject: { with: { class: { with: { board: true } } } },
+                                },
+                            },
+                            questions: { columns: { num: true } },
                         },
-                        questions: {
-                            columns: {
-                                num: true
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        if (question && question.exercise.slug === exerciseSlug && question.exercise.chapter.slug === chapterSlug && question.exercise.chapter.subject.slug === subjectSlug && question.exercise.chapter.subject.class.slug === classSlug && question.exercise.chapter.subject.class.board.slug === slug) {
-            return res.json({
-                board: question.exercise.chapter.subject.class.board,
-                class: question.exercise.chapter.subject.class,
-                subject: question.exercise.chapter.subject,
-                chapter: question.exercise.chapter,
-                exercise: question.exercise,
-                question: {
-                    num: question.num,
-                    question: question.questionText,
-                    marks: question.marks,
-                    difficulty: question.difficulty,
-                    pdfName: question.pdfName,
-                    steps: question.steps
-                }
+                    },
+                },
             });
+
+            if (
+                question &&
+                question.exercise.slug === exerciseSlug &&
+                question.exercise.chapter.status === "published" &&
+                question.exercise.chapter.slug === chapterSlug &&
+                question.exercise.chapter.subject.slug === subjectSlug &&
+                question.exercise.chapter.subject.class.slug === classSlug &&
+                question.exercise.chapter.subject.class.board.slug === slug
+            ) {
+                return res.json({
+                    board: question.exercise.chapter.subject.class.board,
+                    class: question.exercise.chapter.subject.class,
+                    subject: question.exercise.chapter.subject,
+                    chapter: question.exercise.chapter,
+                    exercise: question.exercise,
+                    question: {
+                        num: question.num,
+                        question: question.questionText,
+                        questionUr: question.questionTextUr ?? undefined,
+                        marks: question.marks,
+                        difficulty: question.difficulty,
+                        pdfName: question.pdfName,
+                        steps: question.steps.map((s) => ({ title: s.title, content: s.content })),
+                        stepsUr: question.stepsUr?.length ? question.stepsUr : undefined,
+                    },
+                });
+            }
+            return res.status(404).json({ message: "Question not found" });
+        } catch (e) {
+            console.error("DB read failed", e);
         }
-    } catch (e) {
-        console.error("DB fallback", e);
     }
 
     const question = getQuestionData(
@@ -325,4 +364,43 @@ export const getBoardClassSubjectChapterExerciseQuestion = async (
     }
 
     return res.json(question);
+};
+
+export const getBoardClassSubjectChapterZipInfo = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        const info = await chapterZipService.getChapterZipInfo(
+            asString(req.params.slug),
+            asString(req.params.classSlug),
+            asString(req.params.subject),
+            asString(req.params.chapter),
+        );
+        res.json(info);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const downloadBoardClassSubjectChapterZip = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try {
+        await chapterZipService.streamChapterZip(
+            asString(req.params.slug),
+            asString(req.params.classSlug),
+            asString(req.params.subject),
+            asString(req.params.chapter),
+            res,
+        );
+    } catch (error) {
+        if (error instanceof ApiError && !res.headersSent) {
+            return next(error);
+        }
+        if (!res.headersSent) next(error);
+    }
 };

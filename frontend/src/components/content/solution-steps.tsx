@@ -12,7 +12,7 @@ export function SolutionSteps({ steps }: { steps: Step[] }) {
           <p className="text-xs font-semibold uppercase text-muted">
             {step.label}
           </p>
-          <p className="mt-1 leading-7 text-slate-700">
+          <p className="mt-1 leading-7 text-foreground/90">
             <MathText text={step.detail} />
           </p>
         </li>

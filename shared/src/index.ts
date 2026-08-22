@@ -122,18 +122,57 @@ export type McqOption = {
 // ── User ──
 
 export type UserSummary = {
-  id: string;
+  id: string | number;
   name: string;
   email: string;
   role: UserRole;
+  emailUpdates?: boolean;
 };
 
 // ── Audit ──
 
 export type AuditEntry = {
-  id: string;
-  userId: string;
+  id: string | number;
+  userId: string | number;
+  userName?: string;
   action: string;
   target: string;
   createdAt: string;
+};
+
+export type AuthResponse = {
+  user: UserSummary;
+  token: string;
+};
+
+export type ReportTicket = {
+  id: number;
+  pageUrl: string;
+  boardSlug: string | null;
+  questionRef: string | null;
+  message: string;
+  status: "open" | "resolved";
+  createdAt: string;
+};
+
+export type ContactMessage = {
+  id: number;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+};
+
+export type Bookmark = {
+  id: number;
+  title: string;
+  path: string;
+  createdAt: string;
+};
+
+export type DashboardStats = {
+  users: number;
+  openReports: number;
+  contactMessages: number;
+  boards: number;
 };

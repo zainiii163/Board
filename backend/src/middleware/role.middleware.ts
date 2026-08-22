@@ -1,13 +1,17 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
+import type { UserRole } from "@boardnotes/shared";
 
-export function requireRole(...roles: string[]) {
-  return (_req: Request, res: Response, next: NextFunction) => {
-    // Placeholder — will check user role from auth context.
-    const userRole = "admin";
-    if (!roles.includes(userRole)) {
-      res.status(403).json({ error: "Forbidden" });
-      return;
+import { ApiError } from "../utils/api-error.js";
+import type { AuthedRequest } from "./auth.middleware.js";
+
+export function requireRole(...roles: UserRole[]) {
+  return (req: AuthedRequest, _res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(ApiError.unauthorized());
     }
-    next();
+    if (!roles.includes(req.user.role as UserRole)) {
+      return next(ApiError.forbidden("You do not have permission for this action."));
+    }
+    return next();
   };
 }

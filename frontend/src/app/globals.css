@@ -9,6 +9,19 @@
   --accent: #087F72;
 }
 
+html.dark {
+  --background: #0f1728;
+  --foreground: #e8edf2;
+  --muted: #94a3b8;
+  --card: #1a2836;
+  --border: #2a3a4a;
+  --accent: #14b8a6;
+}
+
+html[dir="rtl"] body {
+  font-family: var(--font-geist-sans), "Segoe UI", Tahoma, sans-serif;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -33,6 +46,11 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-size: calc(1rem * var(--text-scale, 1));
+}
+
+.question-page {
+  font-size: calc(1rem * var(--text-scale, 1));
 }
 
 a {
@@ -42,4 +60,21 @@ a {
 
 ::selection {
   background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  .question-page {
+    max-width: none;
+    padding: 0;
+  }
 }

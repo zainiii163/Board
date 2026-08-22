@@ -6,6 +6,10 @@
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
     "build": "npm run build -w frontend && npm run build -w backend",
+    "build:frontend": "npm run build -w frontend",
+    "build:backend": "npm run build -w backend",
+    "test": "npm test -w backend",
+    "db:migrate": "npm run db:migrate -w backend",
     "lint": "npm run lint -w frontend"
   }
 }

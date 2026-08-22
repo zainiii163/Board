@@ -16,12 +16,43 @@ test("GET /api/boards returns the four demo boards", async () => {
     const payload = await response.json();
 
     assert.equal(response.status, 200);
-    assert.deepEqual(payload, [
-        { slug: "fbise", title: "Federal Board (FBISE)" },
-        { slug: "punjab", title: "Punjab Board" },
-        { slug: "kpk", title: "KPK Board" },
-        { slug: "sindh", title: "Sindh Board" },
-    ]);
+    assert.equal(payload.length, 4);
+    assert.deepEqual(
+        payload.map((board: { slug: string; title: string; ready: boolean; chapterCount: number }) => ({
+            slug: board.slug,
+            title: board.title,
+            ready: board.ready,
+            chapterCount: board.chapterCount,
+        })),
+        [
+            { slug: "fbise", title: "Federal Board (FBISE)", ready: true, chapterCount: 2 },
+            { slug: "punjab", title: "Punjab Board", ready: true, chapterCount: 1 },
+            { slug: "kpk", title: "KPK Board", ready: true, chapterCount: 1 },
+            { slug: "sindh", title: "Sindh Board", ready: true, chapterCount: 1 },
+        ],
+    );
+
+    const punjabChapter = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/punjab/classes/9/subjects/mathematics/chapters/sets`,
+    );
+    assert.equal(punjabChapter.status, 200);
+    const punjabPayload = await punjabChapter.json();
+    assert.equal(punjabPayload.chapter.slug, "sets");
+    assert.equal(punjabPayload.chapter.title, "Sets");
+
+    const kpkChapter = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/kpk/classes/9/subjects/mathematics/chapters/linear-equations`,
+    );
+    assert.equal(kpkChapter.status, 200);
+    const kpkPayload = await kpkChapter.json();
+    assert.equal(kpkPayload.chapter.slug, "linear-equations");
+
+    const sindhChapter = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/sindh/classes/9/subjects/mathematics/chapters/algebraic-expressions`,
+    );
+    assert.equal(sindhChapter.status, 200);
+    const sindhPayload = await sindhChapter.json();
+    assert.equal(sindhPayload.chapter.slug, "algebraic-expressions");
 
     await new Promise<void>((resolve, reject) => {
         server.close((error) => {
@@ -99,6 +130,14 @@ test("GET /api/classes/9 and /api/subjects/mathematics serve the SRS learning hi
     assert.equal(logsQuestionResponse.status, 200);
     assert.equal(logsQuestionPayload.question.num, 2);
     assert.ok(logsQuestionPayload.question.question.includes("\\log_{10}"));
+
+    const logsQ1Response = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/fbise/classes/9/subjects/mathematics/chapters/logarithms/exercises/exercise-3-1/q/2`,
+    );
+    assert.equal(logsQ1Response.status, 200);
+    const logsQ1Payload = await logsQ1Response.json();
+    assert.equal(logsQ1Payload.question.num, 2);
+    assert.ok(logsQ1Payload.question.question.includes("\\log_2 8"));
 
     const classPageResponse = await fetch(
         `http://127.0.0.1:${address.port}/api/boards/fbise/classes/9`,

@@ -1,0 +1,68 @@
+import type { MetadataRoute } from "next";
+
+const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+const demoPaths = [
+  "/fbise",
+  "/fbise/9",
+  "/fbise/9/mathematics",
+  "/fbise/9/mathematics/real-numbers",
+  "/fbise/9/mathematics/real-numbers/exercise-1-1",
+  "/fbise/9/mathematics/real-numbers/exercise-1-1/q/3",
+  "/fbise/9/mathematics/real-numbers/exercise-1-1/q/4",
+  "/fbise/9/mathematics/real-numbers/exercise-1-1/q/5",
+  "/fbise/9/mathematics/real-numbers/exercise-1-1/q/6",
+  "/fbise/9/mathematics/real-numbers/exercise-1-1/q/7",
+  "/fbise/9/mathematics/logarithms",
+  "/fbise/9/mathematics/logarithms/exercise-3-1",
+  "/fbise/9/mathematics/logarithms/exercise-3-1/q/1",
+  "/fbise/9/mathematics/logarithms/exercise-3-1/q/2",
+  "/fbise/9/mathematics/logarithms/exercise-3-2",
+  "/fbise/9/mathematics/logarithms/exercise-3-2/q/1",
+  "/fbise/9/mathematics/logarithms/exercise-3-2/q/2",
+  "/punjab",
+  "/punjab/9",
+  "/punjab/9/mathematics",
+  "/punjab/9/mathematics/sets",
+  "/punjab/9/mathematics/sets/exercise-1-1",
+  "/punjab/9/mathematics/sets/exercise-1-1/q/1",
+  "/punjab/9/mathematics/sets/exercise-1-1/q/2",
+  "/punjab/9/mathematics/sets/exercise-1-1/q/3",
+  "/kpk",
+  "/kpk/9",
+  "/kpk/9/mathematics",
+  "/kpk/9/mathematics/linear-equations",
+  "/kpk/9/mathematics/linear-equations/exercise-2-1",
+  "/kpk/9/mathematics/linear-equations/exercise-2-1/q/1",
+  "/sindh",
+  "/sindh/9",
+  "/sindh/9/mathematics",
+  "/sindh/9/mathematics/algebraic-expressions",
+  "/sindh/9/mathematics/algebraic-expressions/exercise-1-1",
+  "/sindh/9/mathematics/algebraic-expressions/exercise-1-1/q/1",
+  "/search",
+  "/authors",
+  "/authors/ahmed-khan",
+  "/authors/sara-malik",
+  "/books",
+  "/formulas",
+  "/past-papers",
+  "/about",
+  "/contact",
+  "/privacy",
+  "/terms",
+  "/copyright",
+];
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
+  return [
+    { url: BASE, lastModified: now, changeFrequency: "daily", priority: 1 },
+    ...demoPaths.map((path) => ({
+      url: `${BASE}${path}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: path.includes("/q/") ? 0.8 : 0.9,
+    })),
+  ];
+}

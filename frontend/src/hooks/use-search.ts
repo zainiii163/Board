@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { apiFetch } from "@/lib/api-client";
+
 export function useSearch() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<unknown[]>([]);
@@ -11,11 +13,10 @@ export function useSearch() {
     setQuery(q);
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/search?q=${encodeURIComponent(q)}`
+      const data = await apiFetch<{ results: unknown[] }>(
+        `/api/search?q=${encodeURIComponent(q)}`,
       );
-      const data = await res.json();
-      setResults(data);
+      setResults(data.results ?? data);
     } finally {
       setLoading(false);
     }

@@ -1,36 +1,63 @@
-import type { Request, Response } from "express";
+import multer from "multer";
+import type { Response, NextFunction } from "express";
 
-const buildPdfResponse = (filename: string) => ({
-  id: filename,
-  url: `/demo-pdfs/${filename}`,
-  filename,
-  size: "1.2 MB",
-  uploadedAt: new Date().toISOString(),
+import * as pdfsService from "./pdfs.service.js";
+import type { AuthedRequest } from "../../middleware/auth.middleware.js";
+import { ApiError } from "../../utils/api-error.js";
+
+const multerUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype !== "application/pdf" && !file.originalname.toLowerCase().endsWith(".pdf")) {
+      cb(new Error("Only PDF files allowed"));
+      return;
+    }
+    cb(null, true);
+  },
 });
 
-export const list = (_req: Request, res: Response) => {
-  const demoFiles = [
-    "fbise-9-math-ch1-ex1-1.pdf",
-    "fbise-9-math-ch1-ex1-1-q4.pdf",
-    "fbise-9-math-ch1-ex1-1-q5.pdf",
-    "fbise-9-math-ch1-ex1-1-q6.pdf",
-    "fbise-9-math-ch1-ex1-1-q7.pdf",
-    "fbise-9-math-ch3-ex3-1.pdf",
-    "fbise-9-math-ch3-ex3-2.pdf",
-  ].map(buildPdfResponse);
+export const uploadMiddleware = multerUpload.single("file");
 
-  res.json(demoFiles);
-};
-
-export const getById = (req: Request, res: Response) => {
-  const filename = String(req.params.id ?? "").trim();
-
-  if (!filename) {
-    return res.status(400).json({ message: "PDF filename is required" });
+export const list = async (_req: AuthedRequest, res: Response, next: NextFunction) => {
+  try {
+    res.json(await pdfsService.listPdfs());
+  } catch (error) {
+    next(error);
   }
-
-  return res.json(buildPdfResponse(filename));
 };
 
-export const upload = (_req: Request, res: Response) => res.status(201).json({ uploaded: true });
-export const remove = (_req: Request, res: Response) => res.json({ deleted: true });
+export const getById = async (req: AuthedRequest, res: Response, next: NextFunction) => {
+  try {
+    const pdf = await pdfsService.getPdf(String(req.params.id));
+    res.json(pdf);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const upload = async (req: AuthedRequest, res: Response, next: NextFunction) => {
+  try {
+    if (!req.file) throw ApiError.badRequest("PDF file is required.");
+    const saved = await pdfsService.savePdfUpload(req.file.originalname, req.file.buffer);
+    res.status(201).json(saved);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const remove = async (req: AuthedRequest, res: Response, next: NextFunction) => {
+  try {
+    const result = await pdfsService.deletePdf(String(req.params.id));
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const storageInfo = (_req: AuthedRequest, res: Response) => {
+  res.json({
+    mode: pdfsService.getStorageMode(),
+    r2: pdfsService.isUsingR2(),
+  });
+};
