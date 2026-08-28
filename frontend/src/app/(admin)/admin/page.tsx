@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { apiAuthFetch } from "@/lib/api-client";
+import { apiAuthFetch, apiFetch } from "@/lib/api-client";
 import { BoardCoveragePanel } from "@/components/admin/board-coverage-panel";
 import { useAuth } from "@/lib/auth-context";
 import type { ContentStatus, DashboardStats } from "@boardnotes/shared";
@@ -16,10 +16,13 @@ type ChapterSummary = {
   boardTitle?: string;
 };
 
+type PortalStats = { books: number; categories: number; users: number };
+
 export default function AdminDashboard() {
   const { isEditor, isTeacher } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [chapters, setChapters] = useState<ChapterSummary[]>([]);
+  const [portalStats, setPortalStats] = useState<PortalStats | null>(null);
 
   useEffect(() => {
     if (isEditor) {
@@ -30,6 +33,7 @@ export default function AdminDashboard() {
         .then(setChapters)
         .catch(() => setChapters([]));
     }
+    apiFetch<PortalStats>("/api/portal/stats").then(setPortalStats).catch(() => {});
   }, [isEditor, isTeacher]);
 
   if (isTeacher) {
@@ -77,6 +81,9 @@ export default function AdminDashboard() {
               <Link href="/admin/uploads" className="rounded-full border border-border px-4 py-2 text-sm font-semibold">
                 Upload PDFs
               </Link>
+              <Link href="/admin/resources" className="rounded-full border border-border px-4 py-2 text-sm font-semibold">
+                Resources
+              </Link>
               <Link href="/admin/questions" className="rounded-full border border-border px-4 py-2 text-sm font-semibold">
                 Manage questions
               </Link>
@@ -93,6 +100,8 @@ export default function AdminDashboard() {
   const cards = [
     { label: "Boards", value: stats?.boards ?? "—", href: "/admin/boards" },
     { label: "Users", value: stats?.users ?? "—", href: "/admin/users" },
+    { label: "Portal Resources", value: portalStats?.books ?? "—", href: "/admin/resources" },
+    { label: "Portal Categories", value: portalStats?.categories ?? "—", href: "/categories" },
     { label: "Open reports", value: stats?.openReports ?? "—", href: "/admin/reports" },
     { label: "Contact messages", value: stats?.contactMessages ?? "—", href: "/admin/contact" },
   ];
@@ -103,7 +112,7 @@ export default function AdminDashboard() {
       <h1 className="mt-2 font-serif text-3xl font-black text-foreground">Admin Dashboard</h1>
       <p className="mt-2 text-muted">Manage content, users, and student feedback.</p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {cards.map((card) => (
           <Link
             key={card.label}
@@ -122,6 +131,9 @@ export default function AdminDashboard() {
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/admin/content-review" className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white">
               Content review queue
+            </Link>
+            <Link href="/admin/resources" className="rounded-full border border-border px-4 py-2 text-sm font-semibold">
+              Manage resources
             </Link>
             <Link href="/admin/chapters" className="rounded-full border border-border px-4 py-2 text-sm font-semibold">
               Manage chapters

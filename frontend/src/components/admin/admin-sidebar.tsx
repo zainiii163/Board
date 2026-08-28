@@ -19,6 +19,8 @@ const links = [
   { label: "Authors", href: "/admin/authors", roles: ["admin", "editor"] },
   { label: "MCQs", href: "/admin/mcqs", roles: ["admin", "editor", "teacher"] },
   { label: "Books", href: "/admin/books", roles: ["admin", "editor", "teacher"] },
+  { label: "Portal Resources", href: "/admin/resources", roles: ["admin", "editor", "teacher"] },
+  { label: "Categories", href: "/admin/categories", roles: ["admin", "editor"] },
   { label: "Past Papers", href: "/admin/past-papers", roles: ["admin", "editor", "teacher"] },
   { label: "Exam Dates", href: "/admin/exams", roles: ["admin", "editor"] },
   { label: "Uploads", href: "/admin/uploads", roles: ["admin", "editor", "teacher"] },

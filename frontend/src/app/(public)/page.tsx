@@ -1,39 +1,34 @@
-import { apiFetch, apiFetchOrNull } from "@/lib/api-client";
-import { HomeResumeCard } from "@/components/content/home-resume-card";
-import { SavedOfflineCard } from "@/components/content/saved-offline-card";
-import { HomeBoardsSection, HomeHero, HomeLatestSection } from "@/components/content/home-sections";
-import { ExamCountdown } from "@/components/content/exam-countdown";
+import { apiFetchOrNull } from "@/lib/api-client";
+import { PortalHome } from "@/components/portal/portal-home";
+import {
+  type PortalCategory,
+  type PortalResource,
+  type PortalStats,
+} from "@/components/portal/portal-types";
 
-async function getBoards() {
-  try {
-    return await apiFetch<
-      { slug: string; title: string; ready?: boolean; chapterCount?: number; classCount?: number }[]
-    >("/api/boards");
-  } catch {
-    return [];
-  }
-}
+type CategoriesResponse = { categories: PortalCategory[]; tree: PortalCategory[] };
+type ResourcesPage = { resources: PortalResource[]; total: number };
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [boards, exams] = await Promise.all([
-    getBoards(),
-    apiFetchOrNull<{ id: number; boardSlug: string; boardTitle: string; classSlug: string; classTitle: string; title: string; examDate: string }[]>("/api/exams"),
+  const [cats, stats, latest, trending] = await Promise.all([
+    apiFetchOrNull<CategoriesResponse>("/api/categories"),
+    apiFetchOrNull<PortalStats>("/api/portal/stats"),
+    apiFetchOrNull<PortalResource[]>("/api/resources/latest?limit=8"),
+    apiFetchOrNull<ResourcesPage>("/api/resources?sort=downloads&limit=8"),
   ]);
 
+  const categoryNameById: Record<string, string> = {};
+  for (const c of cats?.categories ?? []) categoryNameById[String(c.id)] = c.name;
+
   return (
-    <section className="mx-auto w-full max-w-[1200px] px-4 pb-20 pt-8 sm:px-6 lg:px-8">
-      <HomeHero />
-
-      <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="space-y-6">
-          <HomeResumeCard />
-          <SavedOfflineCard />
-        </div>
-        {exams && exams.length > 0 && <ExamCountdown exams={exams} />}
-      </div>
-
-      <HomeBoardsSection boards={boards} />
-      <HomeLatestSection />
-    </section>
+    <PortalHome
+      categories={cats?.tree ?? []}
+      stats={stats}
+      latest={latest}
+      trending={trending?.resources ?? null}
+      categoryNameById={categoryNameById}
+    />
   );
 }

@@ -5,6 +5,8 @@ import type { SearchResult } from "@boardnotes/shared";
 
 import { PageHeading } from "@/components/layout/page-heading";
 import { useLocale } from "@/lib/locale-context";
+import { ResourceCard } from "@/components/portal/resource-card";
+import { type PortalResource } from "@/components/portal/portal-types";
 
 type Props = {
   query: string;
@@ -12,9 +14,19 @@ type Props = {
   classFilter: string;
   subjectFilter: string;
   results: SearchResult[];
+  portalResources?: PortalResource[];
+  portalCategoryNames?: Record<string, string>;
 };
 
-export function SearchPageContent({ query, boardFilter, classFilter, subjectFilter, results }: Props) {
+export function SearchPageContent({
+  query,
+  boardFilter,
+  classFilter,
+  subjectFilter,
+  results,
+  portalResources = [],
+  portalCategoryNames = {},
+}: Props) {
   const { tr } = useLocale();
 
   const filteredResults = results.filter((result) => {
@@ -87,6 +99,27 @@ export function SearchPageContent({ query, boardFilter, classFilter, subjectFilt
       </form>
 
       <div className="mt-8">
+        {portalResources.length > 0 && (
+          <>
+            <div className="mb-4 flex items-end justify-between">
+              <h2 className="font-serif text-xl font-bold text-foreground">{tr("searchResources")}</h2>
+              <span className="text-xs font-semibold text-muted">
+                {portalResources.length} {tr("resourcesCount")}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {portalResources.map((r) => (
+                <ResourceCard
+                  key={r.id}
+                  resource={r}
+                  categoryName={portalCategoryNames[String(r.id)] ?? (r.board ?? r.subject)}
+                />
+              ))}
+            </div>
+            <div className="my-8 h-px bg-border" />
+          </>
+        )}
+
         <p className="mb-4 text-sm text-muted">
           {tr("showingResults")} {filteredResults.length} {countLabel} {tr("forQuery")} “
           {query || tr("allLabel")}”

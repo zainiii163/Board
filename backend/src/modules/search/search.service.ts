@@ -3,6 +3,7 @@ import type { SearchResult } from "@boardnotes/shared";
 import { BOARD_DATA } from "../../demo-data.js";
 import { db } from "../../db/index.js";
 import { useDb } from "../../db/mode.js";
+import { portalStore } from "../../store/portal-store.js";
 
 const asLower = (value: string) => value.toLowerCase().trim();
 
@@ -155,5 +156,23 @@ export async function searchContent(query: string) {
     ? await searchDatabase(normalizedQuery)
     : searchDemoData(normalizedQuery);
   const finalResults = normalizedQuery ? results : results.slice(0, 10);
-  return { query, results: finalResults, total: finalResults.length };
+
+  const resources = portalStore
+    .listResources({ q: query, sort: "popular" })
+    .slice(0, 6)
+    .map((r) => ({
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      subject: r.subject,
+      author: r.author,
+      categorySlug: portalStore.getCategory(r.categoryId)?.slug ?? "",
+      categoryName: portalStore.getCategory(r.categoryId)?.name ?? "",
+      board: r.board,
+      fileUrl: r.fileUrl,
+      downloads: r.downloads,
+      addedAt: r.addedAt,
+    }));
+
+  return { query, results: finalResults, resources, total: finalResults.length };
 }
