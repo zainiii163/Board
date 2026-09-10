@@ -11,6 +11,6 @@ FROM base AS runner
 ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build -w backend
+RUN ./node_modules/.bin/tsc -p backend/tsconfig.json
 EXPOSE 4000
 CMD ["node", "backend/dist/server.js"]
