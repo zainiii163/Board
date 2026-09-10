@@ -5,6 +5,8 @@ import { apiFetch } from "@/lib/api-client";
 import { AdBanner } from "@/components/portal/ad-banner";
 import { type PortalResource } from "@/components/portal/portal-types";
 
+export const dynamic = "force-dynamic";
+
 type SearchPageProps = {
   searchParams: Promise<{
     q?: string;

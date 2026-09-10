@@ -1,0 +1,6 @@
+node_modules
+.git
+.next
+frontend/.next
+*.md
+.env*

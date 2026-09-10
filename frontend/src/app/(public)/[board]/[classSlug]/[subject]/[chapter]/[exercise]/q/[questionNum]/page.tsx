@@ -4,6 +4,8 @@ import type { PdfSummary } from "@boardnotes/shared";
 import { QuestionPageView } from "@/components/content/question-page-view";
 import { apiFetchOrNull } from "@/lib/api-client";
 
+export const dynamic = "force-dynamic";
+
 type QuestionData = {
   board: { slug: string; title: string } | null;
   class: { slug: string; title: string } | null;

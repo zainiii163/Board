@@ -1,6 +1,8 @@
 import { apiFetchOrNull } from "@/lib/api-client";
 import { AuthorPageContent } from "@/components/content/author-page-content";
 
+export const dynamic = "force-dynamic";
+
 type AuthorData = {
   slug: string;
   name: string;

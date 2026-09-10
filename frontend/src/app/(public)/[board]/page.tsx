@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { BoardPageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull } from "@/lib/api-client";
 
+export const dynamic = "force-dynamic";
+
 type BoardData = {
   slug: string;
   title: string;

@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ChapterPageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull } from "@/lib/api-client";
 
+export const dynamic = "force-dynamic";
+
 type ChapterData = {
   board: { slug: string; title: string } | null;
   class: { slug: string; title: string } | null;

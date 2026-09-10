@@ -4,6 +4,8 @@ import type { PdfSummary } from "@boardnotes/shared";
 import { ExercisePageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull, pdfUrl } from "@/lib/api-client";
 
+export const dynamic = "force-dynamic";
+
 type ExerciseData = {
   board: { slug: string; title: string } | null;
   class: { slug: string; title: string } | null;
