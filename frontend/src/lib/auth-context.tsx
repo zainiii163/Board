@@ -9,7 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { AuthResponse, UserSummary } from "@boardnotes/shared";
+import type { AuthResponse, UserSummary } from "@/lib/shared-types";
 
 import { apiAuthFetch, apiPost, setAuthToken, getAuthToken } from "@/lib/api-client";
 

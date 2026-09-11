@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiAuthFetch, apiPatch } from "@/lib/api-client";
-import type { ReportTicket } from "@boardnotes/shared";
+import type { ReportTicket } from "@/lib/shared-types";
 
 export default function ReportsPage() {
   const [reports, setReports] = useState<ReportTicket[]>([]);

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { apiAuthFetch, apiFetch } from "@/lib/api-client";
 import { BoardCoveragePanel } from "@/components/admin/board-coverage-panel";
 import { useAuth } from "@/lib/auth-context";
-import type { ContentStatus, DashboardStats } from "@boardnotes/shared";
+import type { ContentStatus, DashboardStats } from "@/lib/shared-types";
 
 type ChapterSummary = {
   id: number;

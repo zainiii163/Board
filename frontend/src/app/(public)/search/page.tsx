@@ -1,4 +1,4 @@
-import type { SearchResult } from "@boardnotes/shared";
+import type { SearchResult } from "@/lib/shared-types";
 
 import { SearchPageContent } from "@/components/content/search-page-content";
 import { apiFetch } from "@/lib/api-client";

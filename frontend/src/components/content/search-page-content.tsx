@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { SearchResult } from "@boardnotes/shared";
+import type { SearchResult } from "@/lib/shared-types";
 
 import { PageHeading } from "@/components/layout/page-heading";
 import { useLocale } from "@/lib/locale-context";

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { PdfSummary } from "@boardnotes/shared";
+import type { PdfSummary } from "@/lib/shared-types";
 
 import { LocalizedBreadcrumbs } from "@/components/layout/localized-breadcrumbs";
 import { MathText } from "@/components/content/math-text";

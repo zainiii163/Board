@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiAuthFetch } from "@/lib/api-client";
-import type { AuditEntry } from "@boardnotes/shared";
+import type { AuditEntry } from "@/lib/shared-types";
 
 export default function AuditLogPage() {
   const [logs, setLogs] = useState<AuditEntry[]>([]);

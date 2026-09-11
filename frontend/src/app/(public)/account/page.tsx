@@ -7,7 +7,7 @@ import { AccountGuard } from "@/components/auth/account-guard";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale } from "@/lib/locale-context";
 import { apiAuthFetch, apiDelete, apiPatch, apiPost, apiPut } from "@/lib/api-client";
-import type { Bookmark } from "@boardnotes/shared";
+import type { Bookmark } from "@/lib/shared-types";
 
 type Classroom = {
   id: number;

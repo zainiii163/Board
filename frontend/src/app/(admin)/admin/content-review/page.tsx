@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiAuthFetch, apiPatch } from "@/lib/api-client";
-import type { ContentStatus } from "@boardnotes/shared";
+import type { ContentStatus } from "@/lib/shared-types";
 
 type Chapter = {
   id: number;

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiAuthFetch, apiDelete, apiPut } from "@/lib/api-client";
-import type { UserRole, UserSummary } from "@boardnotes/shared";
+import type { UserRole, UserSummary } from "@/lib/shared-types";
 
 const roles: UserRole[] = ["admin", "editor", "teacher", "student"];
 

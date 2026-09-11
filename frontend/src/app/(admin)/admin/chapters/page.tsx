@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { apiAuthFetch, apiDelete, apiPatch, apiPost, apiPut } from "@/lib/api-client";
 import { HierarchyPicker } from "@/components/admin/hierarchy-picker";
 import { useAuth } from "@/lib/auth-context";
-import type { ContentStatus } from "@boardnotes/shared";
+import type { ContentStatus } from "@/lib/shared-types";
 
 type ChapterDefinition = {
   term: string;

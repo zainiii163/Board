@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import type { PdfSummary } from "@boardnotes/shared";
+import type { PdfSummary } from "@/lib/shared-types";
 
 import { ExercisePageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull, pdfUrl } from "@/lib/api-client";

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import type { PdfSummary } from "@boardnotes/shared";
+import type { PdfSummary } from "@/lib/shared-types";
 
 import { QuestionPageView } from "@/components/content/question-page-view";
 import { apiFetchOrNull } from "@/lib/api-client";

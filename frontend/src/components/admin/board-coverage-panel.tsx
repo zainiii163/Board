@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { apiAuthFetch, apiFetch } from "@/lib/api-client";
-import type { ContentStatus } from "@boardnotes/shared";
+import type { ContentStatus } from "@/lib/shared-types";
 
 type BoardCatalog = {
   slug: string;

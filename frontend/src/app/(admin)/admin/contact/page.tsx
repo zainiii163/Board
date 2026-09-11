@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiAuthFetch } from "@/lib/api-client";
-import type { ContactMessage } from "@boardnotes/shared";
+import type { ContactMessage } from "@/lib/shared-types";
 
 export default function AdminContactPage() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
