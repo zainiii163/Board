@@ -15,23 +15,26 @@ export function ResourceCard({
   resource,
   categoryName,
   hot = false,
+  index = 0,
 }: {
   resource: PortalResource;
   categoryName?: string;
   hot?: boolean;
+  index?: number;
 }) {
   const { tr } = useLocale();
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className={`group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5 animate-fade-in-up stagger-${Math.min(index + 1, 6)}`}>
       <Link
         href={`/books/${resource.slug}`}
         className="relative block aspect-[4/5] overflow-hidden bg-slate-200"
         aria-label={resource.title}
       >
-        <CoverArt title={resource.title} className="h-full w-full transition-transform duration-300 group-hover:scale-[1.03]" />
+        <CoverArt title={resource.title} className="h-full w-full transition-transform duration-500 ease-out group-hover:scale-110" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         {hot && (
-          <span className="absolute left-2 top-2 rounded bg-red-600 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow">
+          <span className="absolute left-2 top-2 rounded bg-gradient-to-r from-red-500 to-orange-500 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-lg">
             {tr("hotBadge")}
           </span>
         )}
@@ -43,7 +46,7 @@ export function ResourceCard({
         </p>
         <Link
           href={`/books/${resource.slug}`}
-          className="line-clamp-2 text-[15px] font-bold leading-snug text-foreground transition hover:text-accent"
+          className="line-clamp-2 text-[15px] font-bold leading-snug text-foreground transition-colors duration-200 hover:text-accent"
         >
           {resource.title}
         </Link>
@@ -52,8 +55,8 @@ export function ResourceCard({
           {tr("addedBy")} {resource.author}
         </p>
         <div className="mt-auto flex items-center justify-between pt-2 text-xs font-semibold text-muted">
-          <span className="inline-flex items-center gap-1">
-            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+          <span className="inline-flex items-center gap-1 transition-colors duration-200 group-hover:text-accent">
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <path d="M7 10l5 5 5-5" />
               <path d="M12 15V3" />
