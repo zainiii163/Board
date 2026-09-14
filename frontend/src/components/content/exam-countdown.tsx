@@ -31,7 +31,7 @@ export function ExamCountdown({ exams }: { exams: Exam[] }) {
   const [now, setNow] = useState(0);
 
   useEffect(() => {
-    setNow(Date.now());
+    queueMicrotask(() => setNow(Date.now()));
     const timer = window.setInterval(() => setNow(Date.now()), 60_000);
     return () => window.clearInterval(timer);
   }, []);

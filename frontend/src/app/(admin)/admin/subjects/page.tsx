@@ -28,10 +28,7 @@ export default function ManageSubjectsPage() {
   }, []);
 
   useEffect(() => {
-    if (!classId) {
-      setSubjects([]);
-      return;
-    }
+    if (!classId) return;
     apiAuthFetch<SubjectRecord[]>(`/api/subjects?classId=${classId}`).then(setSubjects).catch(() => setSubjects([]));
   }, [classId]);
 
@@ -83,6 +80,7 @@ export default function ManageSubjectsPage() {
           value={classId}
           onChange={(e) => {
             setClassId(Number(e.target.value) || "");
+            setSubjects([]);
             setEditingSlug(null);
             setForm({ boardSlug: "fbise", classSlug: "9", title: "", slug: "" });
           }}

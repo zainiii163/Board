@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { createApp } from "./app.js";
 
-test("GET /api/boards returns the four demo boards", async () => {
+test("GET /api/boards returns the demo boards", async () => {
     const app = createApp();
     const server = app.listen(0);
 
@@ -16,7 +16,7 @@ test("GET /api/boards returns the four demo boards", async () => {
     const payload = await response.json();
 
     assert.equal(response.status, 200);
-    assert.equal(payload.length, 4);
+    assert.equal(payload.length, 6);
     assert.deepEqual(
         payload.map((board: { slug: string; title: string; ready: boolean; chapterCount: number }) => ({
             slug: board.slug,
@@ -25,12 +25,39 @@ test("GET /api/boards returns the four demo boards", async () => {
             chapterCount: board.chapterCount,
         })),
         [
-            { slug: "fbise", title: "Federal Board (FBISE)", ready: true, chapterCount: 2 },
-            { slug: "punjab", title: "Punjab Board", ready: true, chapterCount: 1 },
-            { slug: "kpk", title: "KPK Board", ready: true, chapterCount: 1 },
-            { slug: "sindh", title: "Sindh Board", ready: true, chapterCount: 1 },
+            { slug: "fbise", title: "Federal Board (FBISE)", ready: true, chapterCount: 9 },
+            { slug: "punjab", title: "Punjab Board", ready: true, chapterCount: 8 },
+            { slug: "kpk", title: "KPK Board", ready: true, chapterCount: 8 },
+            { slug: "sindh", title: "Sindh Board", ready: true, chapterCount: 8 },
+            { slug: "oxford", title: "Oxford Board", ready: true, chapterCount: 8 },
+            { slug: "cambridge", title: "Cambridge Board", ready: true, chapterCount: 8 },
         ],
     );
+
+    const levelClassResponse = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/fbise/classes/5`,
+    );
+    const levelClassPayload = await levelClassResponse.json();
+    assert.equal(levelClassResponse.status, 200);
+    assert.equal(levelClassPayload.class.slug, "5");
+    assert.equal(levelClassPayload.class.title, "Class 5");
+
+    const levelChapterResponse = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/oxford/classes/11/subjects/mathematics/chapters/trigonometry`,
+    );
+    const levelChapterPayload = await levelChapterResponse.json();
+    assert.equal(levelChapterResponse.status, 200);
+    assert.equal(levelChapterPayload.chapter.slug, "trigonometry");
+    const levelChapterExercise = levelChapterPayload.chapter.exercises[0];
+    assert.equal(levelChapterExercise.title, "Exercise 1.1");
+
+    const levelQuestionResponse = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/cambridge/classes/10/subjects/mathematics/chapters/quadratic-equations/exercises/exercise-1-1/q/2`,
+    );
+    const levelQuestionPayload = await levelQuestionResponse.json();
+    assert.equal(levelQuestionResponse.status, 200);
+    assert.equal(levelQuestionPayload.question.num, 2);
+    assert.ok(levelQuestionPayload.question.question.includes("\\sqrt{b^2 - 4ac}"));
 
     const punjabChapter = await fetch(
         `http://127.0.0.1:${address.port}/api/boards/punjab/classes/9/subjects/mathematics/chapters/sets`,
@@ -53,6 +80,20 @@ test("GET /api/boards returns the four demo boards", async () => {
     assert.equal(sindhChapter.status, 200);
     const sindhPayload = await sindhChapter.json();
     assert.equal(sindhPayload.chapter.slug, "algebraic-expressions");
+
+    const oxfordChapter = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/oxford/classes/9/subjects/mathematics/chapters/number-systems`,
+    );
+    assert.equal(oxfordChapter.status, 200);
+    const oxfordPayload = await oxfordChapter.json();
+    assert.equal(oxfordPayload.chapter.slug, "number-systems");
+
+    const cambridgeChapter = await fetch(
+        `http://127.0.0.1:${address.port}/api/boards/cambridge/classes/9/subjects/mathematics/chapters/algebra`,
+    );
+    assert.equal(cambridgeChapter.status, 200);
+    const cambridgePayload = await cambridgeChapter.json();
+    assert.equal(cambridgePayload.chapter.slug, "algebra");
 
     await new Promise<void>((resolve, reject) => {
         server.close((error) => {

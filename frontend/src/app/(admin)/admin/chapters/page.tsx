@@ -147,7 +147,12 @@ export default function ManageChaptersPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setLoading(false));
+    apiAuthFetch<Chapter[]>("/api/chapters")
+      .then((data) => {
+        setChapters(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   async function createChapter(e: React.FormEvent) {

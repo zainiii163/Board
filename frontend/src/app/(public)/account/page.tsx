@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { AccountGuard } from "@/components/auth/account-guard";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale } from "@/lib/locale-context";
-import { apiAuthFetch, apiDelete, apiPatch, apiPost, apiPut } from "@/lib/api-client";
+import { apiAuthFetch, apiDelete, apiPatch, apiPost } from "@/lib/api-client";
 import type { Bookmark } from "@/lib/shared-types";
 
 type Classroom = {
@@ -52,13 +52,10 @@ function AccountContent() {
   const [joinMessage, setJoinMessage] = useState("");
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [classroomDetails, setClassroomDetails] = useState<ClassroomDetail[]>([]);
-  const [emailUpdates, setEmailUpdates] = useState(Boolean(user?.emailUpdates));
+  const [emailUpdatesOverride, setEmailUpdatesOverride] = useState<boolean | null>(null);
   const [prefMessage, setPrefMessage] = useState("");
   const [prefSaving, setPrefSaving] = useState(false);
-
-  useEffect(() => {
-    setEmailUpdates(Boolean(user?.emailUpdates));
-  }, [user?.emailUpdates]);
+  const emailUpdates = emailUpdatesOverride ?? Boolean(user?.emailUpdates);
 
   async function loadClassrooms() {
     const rooms = await apiAuthFetch<Classroom[]>("/api/classrooms/mine");
@@ -70,16 +67,33 @@ function AccountContent() {
   }
 
   useEffect(() => {
-    setLastPath(localStorage.getItem(LAST_PATH_KEY));
-    apiAuthFetch<Bookmark[]>("/api/bookmarks")
-      .then(setBookmarks)
-      .finally(() => setLoading(false));
-    apiAuthFetch<QuizScore[]>("/api/quiz/scores").then(setQuizScores).catch(() => setQuizScores([]));
-    apiAuthFetch<ProgressEntry[]>("/api/progress").then(setProgress).catch(() => setProgress([]));
-    loadClassrooms().catch(() => {
-      setClassrooms([]);
-      setClassroomDetails([]);
-    });
+    (async () => {
+      setLastPath(localStorage.getItem(LAST_PATH_KEY));
+      try {
+        const [bookmarks, scores, progress, rooms] = await Promise.all([
+          apiAuthFetch<Bookmark[]>("/api/bookmarks"),
+          apiAuthFetch<QuizScore[]>("/api/quiz/scores"),
+          apiAuthFetch<ProgressEntry[]>("/api/progress"),
+          apiAuthFetch<Classroom[]>("/api/classrooms/mine"),
+        ]);
+        setBookmarks(bookmarks);
+        setQuizScores(scores);
+        setProgress(progress);
+        setClassrooms(rooms);
+        const details = await Promise.all(
+          rooms.map((room) => apiAuthFetch<ClassroomDetail>(`/api/classrooms/${room.id}`)),
+        );
+        setClassroomDetails(details);
+      } catch {
+        setBookmarks([]);
+        setQuizScores([]);
+        setProgress([]);
+        setClassrooms([]);
+        setClassroomDetails([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
   async function joinClassroom(e: React.FormEvent) {
@@ -96,16 +110,17 @@ function AccountContent() {
   }
 
   async function toggleEmailUpdates(next: boolean) {
+    setEmailUpdatesOverride(next);
     setPrefSaving(true);
     setPrefMessage("");
     try {
       await apiPatch<{ user: { emailUpdates?: boolean } }>("/api/auth/preferences", { emailUpdates: next });
-      setEmailUpdates(next);
       await refreshUser();
       setPrefMessage(next ? tr("emailUpdatesOn") : tr("emailUpdatesOff"));
     } catch (err) {
       setPrefMessage(err instanceof Error ? err.message : "Could not update preference.");
     } finally {
+      setEmailUpdatesOverride(null);
       setPrefSaving(false);
     }
   }

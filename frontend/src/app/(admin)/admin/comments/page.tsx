@@ -25,7 +25,12 @@ export default function ModerateCommentsPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setLoading(false));
+    apiAuthFetch<Comment[]>("/api/comments/moderation")
+      .then((data) => {
+        setComments(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
   async function approve(id: number) {

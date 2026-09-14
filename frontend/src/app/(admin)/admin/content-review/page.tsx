@@ -27,10 +27,15 @@ export default function ContentReviewPage() {
   }
 
   useEffect(() => {
-    load().catch(() => {
-      setQueue([]);
-      setLoading(false);
-    });
+    apiAuthFetch<Chapter[]>("/api/chapters?status=in_review")
+      .then((data) => {
+        setQueue(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setQueue([]);
+        setLoading(false);
+      });
   }, []);
 
   async function approve(id: number) {

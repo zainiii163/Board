@@ -12,10 +12,12 @@ export function TextSizeControl() {
   const [index, setIndex] = useState(1);
 
   useEffect(() => {
-    const saved = Number(localStorage.getItem(KEY));
-    if (Number.isFinite(saved) && saved >= 0 && saved < levels.length) {
-      setIndex(saved);
-    }
+    queueMicrotask(() => {
+      const saved = Number(localStorage.getItem(KEY));
+      if (Number.isFinite(saved) && saved >= 0 && saved < levels.length) {
+        setIndex(saved);
+      }
+    });
   }, []);
 
   useEffect(() => {

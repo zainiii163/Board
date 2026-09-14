@@ -25,7 +25,9 @@ export default function ManageClassesPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setClasses([]));
+    apiAuthFetch<ClassRecord[]>("/api/classes")
+      .then(setClasses)
+      .catch(() => setClasses([]));
   }, []);
 
   async function save(e: React.FormEvent) {

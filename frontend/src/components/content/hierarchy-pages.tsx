@@ -11,7 +11,9 @@ import { ChapterZipDownload } from "@/components/content/chapter-zip-download";
 import { ProgressTracker } from "@/components/content/progress-tracker";
 import { SubjectFaq } from "@/components/content/subject-faq";
 import { MathText } from "@/components/content/math-text";
-import { DriveLinkButton } from "@/components/content/drive-link-button";
+import { PdfSection } from "@/components/content/pdf-section";
+import { DownloadGate } from "@/components/content/download-gate";
+import { AdBanner } from "@/components/portal/ad-banner";
 import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedList } from "@/lib/i18n";
 
@@ -352,10 +354,20 @@ type ExercisePageContentProps = {
   exerciseTitle: string;
   questions: { num: number; question: string }[];
   pdfDownloadUrl?: string | null;
+  exercises?: { slug: string; title: string }[];
 };
 
 export function ExercisePageContent(props: ExercisePageContentProps) {
   const { tr } = useLocale();
+
+  const exerciseList = props.exercises ?? [];
+  const currentIndex = exerciseList.findIndex((e) => e.slug === props.exercise);
+  const prevExercise = currentIndex > 0 ? exerciseList[currentIndex - 1] : null;
+  const nextExercise =
+    currentIndex >= 0 && currentIndex < exerciseList.length - 1 ? exerciseList[currentIndex + 1] : null;
+
+  const exercisePath = (slug: string) =>
+    `/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}/${slug}`;
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -376,32 +388,20 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
             <h1 className="mt-3 text-3xl font-black text-foreground">{props.exerciseTitle}</h1>
           </div>
           {props.pdfDownloadUrl ? (
-            <>
-              <a
-                href={props.pdfDownloadUrl}
-                download
-                className="rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-              >
-                {tr("downloadPdf")}
-              </a>
-              <div className="mt-2">
-                <DriveLinkButton href={props.pdfDownloadUrl} label="Open in Google Drive" />
-              </div>
-            </>
+            <DownloadGate url={props.pdfDownloadUrl} />
           ) : (
-            <div className="group relative">
-              <span className="rounded-xl border border-border px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
-                {tr("downloadPdf")}
-              </span>
-              <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <svg viewBox="0 0 24 24" className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </div>
-            </div>
+            <span className="rounded-xl border border-border px-4 py-3 text-sm font-semibold text-muted">
+              {tr("downloadPdf")}
+            </span>
           )}
         </div>
-        <div className="mt-8 rounded-2xl border border-border bg-background p-5">
+
+        {/* Ad — above question list */}
+        <div className="mt-6">
+          <AdBanner size="leaderboard" className="mx-auto" />
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-border bg-background p-5">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">{tr("questionList")}</p>
           <div className="mt-4 space-y-3">
             {props.questions.length === 0 ? (
@@ -420,6 +420,40 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
             )}
           </div>
         </div>
+
+        {/* Embed exercise-specific PDF for seamless reading */}
+        {props.pdfDownloadUrl && <PdfSection url={props.pdfDownloadUrl} title={props.exerciseTitle} />}
+
+        {/* Ad — below PDF */}
+        <div className="mt-4">
+          <AdBanner size="inline" className="mx-auto" />
+        </div>
+
+        {/* Prev / Next exercise navigation */}
+        <nav className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-5">
+          {prevExercise ? (
+            <Link
+              href={exercisePath(prevExercise.slug)}
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition hover:border-accent/40 hover:text-accent"
+            >
+              <span aria-hidden="true">←</span>
+              {tr("previous")} · {prevExercise.title}
+            </Link>
+          ) : (
+            <span className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-muted/50">{tr("previous")}</span>
+          )}
+          {nextExercise ? (
+            <Link
+              href={exercisePath(nextExercise.slug)}
+              className="inline-flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-bold text-accent transition hover:bg-accent/20"
+            >
+              {tr("next")} · {nextExercise.title}
+              <span aria-hidden="true">→</span>
+            </Link>
+          ) : (
+            <span className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-muted/50">{tr("next")}</span>
+          )}
+        </nav>
       </div>
     </section>
   );

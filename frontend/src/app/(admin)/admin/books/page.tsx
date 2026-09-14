@@ -42,7 +42,9 @@ export default function ManageBooksPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setBooks([]));
+    apiAuthFetch<Book[]>("/api/books")
+      .then(setBooks)
+      .catch(() => setBooks([]));
   }, []);
 
   function resetForm() {

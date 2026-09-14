@@ -25,7 +25,9 @@ export default function ManageBoardsPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setBoards([]));
+    apiAuthFetch<BoardRecord[]>("/api/boards?full=1")
+      .then(setBoards)
+      .catch(() => setBoards([]));
   }, []);
 
   async function save(e: React.FormEvent) {

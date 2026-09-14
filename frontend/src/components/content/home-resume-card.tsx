@@ -24,12 +24,17 @@ export function HomeResumeCard() {
   const [progress, setProgress] = useState<ProgressEntry | null>(null);
 
   useEffect(() => {
-    setLastPath(localStorage.getItem(LAST_PATH_KEY));
-    if (user) {
-      apiAuthFetch<ProgressEntry[]>("/api/progress")
-        .then((rows) => setProgress(rows[0] ?? null))
-        .catch(() => setProgress(null));
-    }
+    (async () => {
+      setLastPath(localStorage.getItem(LAST_PATH_KEY));
+      if (user) {
+        try {
+          const rows = await apiAuthFetch<ProgressEntry[]>("/api/progress");
+          setProgress(rows[0] ?? null);
+        } catch {
+          setProgress(null);
+        }
+      }
+    })();
   }, [user]);
 
   if (!lastPath && !progress) return null;

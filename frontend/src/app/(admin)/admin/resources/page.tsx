@@ -26,15 +26,17 @@ export default function ManageResourcesPage() {
   }, []);
 
   useEffect(() => {
-    load();
     apiFetch<{ categories: CatInfo[] }>("/api/portal/categories")
       .then((d) => setCategories(d.categories))
       .catch(() => {});
-  }, [load]);
+  }, []);
 
   useEffect(() => {
-    load(filterCat || undefined);
-  }, [filterCat, load]);
+    const url = `/api/resources?limit=200&sort=latest${filterCat ? `&category=${filterCat}` : ""}`;
+    apiAuthFetch<ResourcesPage>(url)
+      .then((data) => { setResources(data.resources); setTotal(data.total); })
+      .catch(() => {});
+  }, [filterCat]);
 
   async function toggleStatus(resource: PortalResource) {
     setBusyId(resource.id);

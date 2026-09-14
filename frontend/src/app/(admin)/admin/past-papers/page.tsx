@@ -40,7 +40,9 @@ export default function ManagePastPapersPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setPapers([]));
+    apiAuthFetch<PastPaper[]>("/api/past-papers")
+      .then(setPapers)
+      .catch(() => setPapers([]));
   }, []);
 
   function resetForm() {

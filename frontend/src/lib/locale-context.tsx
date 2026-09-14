@@ -25,6 +25,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("boardnotes_locale") as Locale | null;
+    // Applying the persisted locale on mount must stay synchronous (pre-paint) to
+    // avoid a brief RTL/LTR flash and a hydration mismatch on the <html> dir/lang.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved === "en" || saved === "ur") setLocale(saved);
   }, []);
 

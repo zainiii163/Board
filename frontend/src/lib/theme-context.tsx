@@ -18,6 +18,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("boardnotes_theme") as Theme | null;
+    // Applying the persisted theme on mount must stay synchronous (pre-paint) to
+    // avoid a light-mode flash for dark-mode users.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved === "light" || saved === "dark") setTheme(saved);
   }, []);
 

@@ -30,7 +30,15 @@ export default function ManageUploadsPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setFiles([]));
+    Promise.all([
+      apiAuthFetch<PdfFile[]>("/api/pdfs"),
+      apiAuthFetch<{ mode: "local" | "r2" }>("/api/pdfs/storage/info"),
+    ])
+      .then(([data, info]) => {
+        setFiles(data);
+        setStorageMode(info.mode);
+      })
+      .catch(() => setFiles([]));
   }, []);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {

@@ -29,17 +29,7 @@ export function AdBanner({ size = "inline", className = "", label }: { size?: Ad
   );
 }
 
-export function AdSenseBanner({
-  className,
-  slot,
-  format = "auto",
-  responsive = true,
-}: {
-  className?: string;
-  slot?: string;
-  format?: string;
-  responsive?: boolean;
-}) {
+export function AdSenseBanner({ className }: { className?: string }) {
   return (
     <div className={`flex items-center justify-center py-4 ${className ?? ""}`}>
       {/* 

@@ -30,7 +30,9 @@ export default function ManageAuthorsPage() {
   }
 
   useEffect(() => {
-    load().catch(() => setAuthors([]));
+    apiAuthFetch<AuthorRecord[]>("/api/authors")
+      .then(setAuthors)
+      .catch(() => setAuthors([]));
   }, []);
 
   async function save(e: React.FormEvent) {

@@ -53,10 +53,15 @@ export default function ManageExamsPage() {
   }
 
   useEffect(() => {
-    load().catch(() => {
-      setExams([]);
-      setLoading(false);
-    });
+    apiFetch<Exam[]>("/api/exams/all")
+      .then((data) => {
+        setExams(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setExams([]);
+        setLoading(false);
+      });
   }, []);
 
   function resetForm() {

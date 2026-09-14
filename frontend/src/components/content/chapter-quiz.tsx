@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { MathText } from "@/components/content/math-text";
 import { useAuth } from "@/lib/auth-context";
 import { useLocale } from "@/lib/locale-context";
-import { apiAuthFetch, apiFetch, apiPost } from "@/lib/api-client";
+import { apiFetch, apiPost } from "@/lib/api-client";
 import Link from "next/link";
 
 type QuizQuestion = {

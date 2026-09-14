@@ -11,7 +11,7 @@ export function SavedOfflineCard() {
   const [entries, setEntries] = useState<OfflineChapterRecord[]>([]);
 
   useEffect(() => {
-    setEntries(listOfflineChapters());
+    queueMicrotask(() => setEntries(listOfflineChapters()));
   }, []);
 
   if (entries.length === 0) return null;

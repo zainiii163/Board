@@ -6,7 +6,6 @@ import Link from "next/link";
 import { apiFetch, apiAuthFetch } from "@/lib/api-client";
 
 type CatInfo = { id: number; slug: string; name: string; nameUr: string; icon: string; gradient: string; parentId: number | null; order: number };
-type ResourceCount = { categoryId: number; count: number };
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<CatInfo[]>([]);

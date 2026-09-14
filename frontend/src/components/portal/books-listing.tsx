@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { apiFetch } from "@/lib/api-client";
 import { useLocale } from "@/lib/locale-context";
@@ -31,26 +31,24 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  const fetchResources = useCallback(async (cat: string, subcat: string, sort: string, page: number) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ limit: "120", sort });
-      const useCat = subcat || cat;
-      if (useCat) params.set("category", useCat);
-      const data = await apiFetch<{ resources: PortalResource[]; total: number }>(`/api/resources?${params}`);
-      setResources(data.resources);
-      setTotal(data.total);
-    } catch {
-      setResources([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchResources(filter.category, filter.subcategory, filter.sort, filter.page);
-  }, [filter.category, filter.subcategory, filter.sort, fetchResources]);
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({ limit: "120", sort: filter.sort });
+        const useCat = filter.subcategory || filter.category;
+        if (useCat) params.set("category", useCat);
+        const data = await apiFetch<{ resources: PortalResource[]; total: number }>(`/api/resources?${params}`);
+        if (!cancelled) { setResources(data.resources); setTotal(data.total); }
+      } catch {
+        if (!cancelled) { setResources([]); setTotal(0); }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [filter.category, filter.subcategory, filter.sort]);
 
   const categoryNameById = useMemo(
     () => Object.fromEntries(categories.map((c) => [String(c.id), c.name])),
@@ -59,7 +57,7 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
 
   const selectedTopCat = useMemo(
     () => categories.find((c) => c.slug === filter.category),
-    [categories, filter.category, categories],
+    [categories, filter.category],
   );
 
   const paginatedResources = useMemo(() => {

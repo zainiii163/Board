@@ -50,10 +50,7 @@ export default function ManageMcqsPage() {
   }, []);
 
   useEffect(() => {
-    if (!selectedChapter) {
-      setMcqs([]);
-      return;
-    }
+    if (!selectedChapter) return;
     const params = new URLSearchParams({
       board: selectedChapter.boardSlug,
       class: selectedChapter.classSlug,

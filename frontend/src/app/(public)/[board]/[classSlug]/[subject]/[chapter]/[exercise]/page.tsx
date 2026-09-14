@@ -18,6 +18,14 @@ type ExerciseData = {
   };
 };
 
+type ChapterData = {
+  chapter: {
+    slug: string;
+    title: string;
+    exercises: { slug: string; title: string }[];
+  };
+};
+
 type QuestionData = {
   question: { pdfName?: string | null };
 };
@@ -69,6 +77,11 @@ export default async function ExercisePage({
     questions,
   );
 
+  const chapterData = await apiFetchOrNull<ChapterData>(
+    `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}`,
+  );
+  const exercises = chapterData?.chapter.exercises ?? [];
+
   return (
     <ExercisePageContent
       board={board}
@@ -83,6 +96,7 @@ export default async function ExercisePage({
       exerciseTitle={data.exercise.title}
       questions={questions}
       pdfDownloadUrl={pdfDownloadUrl}
+      exercises={exercises}
     />
   );
 }

@@ -34,7 +34,7 @@ export function SaveOfflineButton({
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    setSaved(isChapterSavedOffline(path));
+    queueMicrotask(() => setSaved(isChapterSavedOffline(path)));
   }, [path]);
 
   async function save() {

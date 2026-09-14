@@ -100,7 +100,7 @@ export async function seedBoardMathematicsBackfill(boardSlug: string) {
 }
 
 export async function seedRegionalBoardContent() {
-  for (const boardSlug of ["punjab", "kpk", "sindh"]) {
+  for (const boardSlug of ["punjab", "kpk", "sindh", "oxford", "cambridge"]) {
     await seedBoardMathematicsBackfill(boardSlug);
   }
 }

@@ -141,8 +141,9 @@ export default function ClassroomPage() {
   }
 
   useEffect(() => {
-    loadClassrooms()
+    apiAuthFetch<Classroom[]>("/api/classrooms/mine")
       .then((rooms) => {
+        setClassrooms(rooms);
         if (rooms[0]) return loadDetail(rooms[0].id);
       })
       .catch(() => setClassrooms([]));
@@ -150,11 +151,7 @@ export default function ClassroomPage() {
   }, []);
 
   useEffect(() => {
-    if (!chapterId) {
-      setExercises([]);
-      setExerciseId("");
-      return;
-    }
+    if (!chapterId) return;
     apiAuthFetch<Exercise[]>(`/api/exercises?chapterId=${chapterId}`)
       .then((rows) => {
         setExercises(rows);

@@ -71,8 +71,25 @@ export function ChapterFlashcards({
   }, [user, chapterKey]);
 
   useEffect(() => {
-    loadProgress().catch(() => setMastered(new Set()));
-  }, [loadProgress]);
+    (async () => {
+      try {
+        if (user) {
+          try {
+            const data = await apiAuthFetchWithQuery<FlashcardProgress>("/api/progress/flashcards", {
+              chapterKey,
+            });
+            setMastered(new Set(data.masteredIndices));
+            return;
+          } catch {
+            // fall through to local
+          }
+        }
+        setMastered(new Set(readLocalProgress(chapterKey)));
+      } catch {
+        setMastered(new Set());
+      }
+    })();
+  }, [user, chapterKey]);
 
   if (cards.length === 0) return null;
 
