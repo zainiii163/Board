@@ -17,7 +17,7 @@ export function BoardsMenu() {
 
   return (
     <div
-      className="relative"
+      className="relative pb-2"
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => {
         setOpen(false);
@@ -35,7 +35,7 @@ export function BoardsMenu() {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-30 mt-1 w-[640px] rounded-2xl border border-border bg-card p-3 shadow-2xl animate-scale-in">
+        <div className="absolute left-0 top-full z-30 w-[640px] rounded-2xl border border-border bg-card p-3 shadow-2xl animate-scale-in">
           <div className="flex gap-3">
             {/* Boards column */}
             <div className="w-48 shrink-0 space-y-1">

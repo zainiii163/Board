@@ -169,14 +169,14 @@ function HoverDropdown({ item, activeSlug, onOpen, onClose, onFocused, setDropdo
   }
 
   return (
-    <div className="relative" onMouseEnter={() => onOpen(slug)} onMouseLeave={onClose}>
+    <div className="relative pb-2" onMouseEnter={() => onOpen(slug)} onMouseLeave={onClose}>
       <button type="button" className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
         {item.label}
         <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
         <div
-          className="absolute left-1/2 top-full z-30 mt-1 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-xl animate-scale-in"
+          className="absolute left-1/2 top-full z-30 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-xl animate-scale-in"
           onMouseEnter={onFocused}
           onMouseLeave={onClose}
         >
@@ -208,7 +208,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
   const { user, loading, isStaff, signOut } = useAuth();
-  const { tr, locale, toggleLocale } = useLocale();
+  const { tr, locale } = useLocale();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearClose = useCallback(() => {
@@ -267,11 +267,8 @@ export function Header() {
               className="w-14 bg-transparent text-[10px] font-medium text-foreground outline-none placeholder:text-muted focus:w-20 sm:w-20 sm:text-[11px] sm:focus:w-24 xl:w-24 xl:focus:w-32 transition-all duration-300"
             />
           </form>
-          {/* Lang toggle */}
-          <button type="button" onClick={toggleLocale}
-            className="rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-muted transition-all duration-200 hover:text-foreground sm:px-2" title="Toggle language">
-            {locale === "en" ? "اردو" : "EN"}
-          </button>
+          {/* Spacer */}
+          <span className="w-0.5" />
           <ThemeToggle />
 
           {!loading && user ? (
@@ -327,10 +324,6 @@ export function Header() {
           </form>
 
           <div className="mb-1 mt-3 flex items-center gap-2">
-            <button type="button" onClick={toggleLocale}
-              className="rounded-lg border border-border px-2.5 py-1.5 text-[12px] font-semibold text-muted transition-all duration-200 hover:text-foreground">
-              {locale === "en" ? "اردو" : "EN"}
-            </button>
             <ThemeToggle />
           </div>
 
