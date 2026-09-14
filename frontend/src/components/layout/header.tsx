@@ -215,7 +215,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
-      <nav className="mx-auto flex w-full max-w-[1400px] items-center gap-1 px-3 py-1 sm:px-4 lg:px-6" aria-label="Main">
+      <nav className="mx-auto flex w-full max-w-[1400px] items-center gap-1 overflow-visible px-3 py-1 sm:px-4 lg:px-6" aria-label="Main">
         {/* Logo — far left */}
         <Link href="/" className="mr-2 flex shrink-0 items-center gap-1.5">
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white">B</span>
@@ -228,7 +228,7 @@ export function Header() {
         </div>
 
         {/* All nav items — inline */}
-        <div className="hidden min-w-0 items-center gap-0 xl:flex">
+        <div className="hidden items-center gap-0 xl:flex">
           {NAV_ITEMS.map((item) => (
             <Dropdown
               key={item.label}
