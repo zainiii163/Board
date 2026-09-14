@@ -120,7 +120,7 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
 
   if (item.soon) {
     return (
-      <Link href={`/${slug}`} className="flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold text-foreground/80 transition hover:bg-accent/10 hover:text-accent">
+      <Link href={`/${slug}`} className="flex items-center gap-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold text-foreground/80 transition hover:bg-accent/10 hover:text-accent">
         {item.label}
         <span className="rounded bg-amber-100 px-1 py-px text-[7px] font-bold uppercase leading-none text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
       </Link>
@@ -128,13 +128,13 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
   }
 
   return (
-    <div className="relative pb-2" onMouseEnter={onOpen} onMouseLeave={onClose}>
-      <button type="button" className={`flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition hover:bg-accent/10 hover:text-accent ${isOpen ? "text-accent bg-accent/10" : "text-foreground/80"}`}>
+    <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
+      <button type="button" className={`flex items-center gap-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold transition hover:bg-accent/10 hover:text-accent ${isOpen ? "text-accent bg-accent/10" : "text-foreground/80"}`}>
         {item.label}
-        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+        <svg viewBox="0 0 24 24" className={`h-2 w-2 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
-        <div className="absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-1.5 shadow-2xl" onMouseEnter={onFocused} onMouseLeave={onClose}>
+        <div className="absolute left-1/2 top-full z-50 mt-1 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-1.5 shadow-2xl" onMouseEnter={onFocused} onMouseLeave={onClose}>
           {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && <div className="mb-0.5 mt-1.5 px-2.5 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
@@ -211,8 +211,8 @@ export function Header() {
           <span className="hidden font-serif text-base font-bold text-foreground sm:block">BoardNotes</span>
         </Link>
 
-        {/* Boards + all nav items — single aligned row */}
-        <div className="hidden items-center gap-0 overflow-x-auto scrollbar-none xl:flex">
+        {/* Boards + all nav items */}
+        <div className="hidden items-center gap-0 overflow-visible xl:flex">
           <BoardsMenu />
           {NAV_ITEMS.map((item) => (
             <Dropdown
@@ -228,17 +228,17 @@ export function Header() {
 
         {/* Right side — search + auth */}
         <div className="ml-auto flex items-center gap-1 shrink-0">
-          <form action="/search" role="search" className="hidden items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 sm:flex focus-within:border-accent transition-colors">
+          <form action="/search" role="search" className="hidden items-center gap-1 rounded-full border border-border bg-card px-2 py-0.5 sm:flex focus-within:border-accent transition-colors">
             <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-            <input name="q" autoComplete="off" placeholder={locale === "ur" ? "تلاش…" : "Search…"} aria-label={tr("search")} className="w-16 bg-transparent text-[11px] font-medium text-foreground outline-none placeholder:text-muted focus:w-24 transition-all" />
+            <input name="q" autoComplete="off" placeholder={locale === "ur" ? "تلاش…" : "Search…"} aria-label={tr("search")} className="w-14 bg-transparent text-[10.5px] font-medium text-foreground outline-none placeholder:text-muted focus:w-20 transition-all" />
           </form>
           {!loading && user ? (
             <>
-              {isStaff && <Link href="/admin" className="hidden rounded-md px-1.5 py-1 text-[11px] font-semibold text-accent transition hover:bg-accent/10 lg:inline-block">Admin</Link>}
-              <Link href="/account" className="hidden rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold text-foreground transition hover:bg-card sm:inline-block">{user.name.split(" ")[0]}</Link>
+              {isStaff && <Link href="/admin" className="hidden rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold text-accent transition hover:bg-accent/10 lg:inline-block">Admin</Link>}
+              <Link href="/account" className="hidden rounded-full border border-border px-2 py-0.5 text-[10.5px] font-semibold text-foreground transition hover:bg-card sm:inline-block">{user.name.split(" ")[0]}</Link>
             </>
           ) : (
-            <Link href="/login" className="rounded-full bg-accent px-3 py-1 text-[11px] font-bold text-white shadow-sm transition hover:shadow-md hover:shadow-accent/20">{tr("signUp")}</Link>
+            <Link href="/login" className="rounded-full bg-accent px-2.5 py-0.5 text-[10.5px] font-bold text-white shadow-sm transition hover:shadow-md hover:shadow-accent/20">{tr("signUp")}</Link>
           )}
         </div>
 
