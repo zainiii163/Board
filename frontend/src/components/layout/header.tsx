@@ -19,7 +19,7 @@ function WhatsAppIcon() {
   );
 }
 
-const STATIC_DROPDOWNS: { label: string; groups: { heading?: string; items: { label: string; href: string }[] }[] }[] = [
+const CORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { label: string; href: string }[] }[] }[] = [
   {
     label: "Text Books",
     groups: [
@@ -58,7 +58,7 @@ const STATIC_DROPDOWNS: { label: string; groups: { heading?: string; items: { la
     ],
   },
   {
-    label: "Pairing Schemes",
+    label: "Pairing",
     groups: [
       { items: [
         { label: "9th", href: "/categories/pairing-schemes/9th" },
@@ -92,6 +92,9 @@ const STATIC_DROPDOWNS: { label: string; groups: { heading?: string; items: { la
       ]},
     ],
   },
+];
+
+const MORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { label: string; href: string }[] }[] }[] = [
   {
     label: "Guess Papers",
     groups: [
@@ -150,7 +153,7 @@ function HoverDropdown({ label, groups, activeSlug, onOpen, onClose, onFocused, 
 
   return (
     <div className="relative" onMouseEnter={() => onOpen(slug)} onMouseLeave={onClose}>
-      <button type="button" className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap">
+      <button type="button" className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
         {label}
         <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
@@ -186,10 +189,12 @@ function HoverDropdown({ label, groups, activeSlug, onOpen, onClose, onFocused, 
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
   const { user, loading, isStaff, signOut } = useAuth();
   const { tr, locale, toggleLocale } = useLocale();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
@@ -197,24 +202,32 @@ export function Header() {
 
   const scheduleClose = useCallback((ms = 150) => {
     clearClose();
-    closeTimer.current = setTimeout(() => setDropdownSlug(null), ms);
+    closeTimer.current = setTimeout(() => { setDropdownSlug(null); setMoreOpen(false); }, ms);
   }, [clearClose]);
 
-  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); }, [clearClose]);
+  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); setMoreOpen(false); }, [clearClose]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
-      <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-1 px-3 py-2 sm:px-5 lg:px-8" aria-label="Main">
+      <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-0.5 px-2 py-1.5 sm:px-4 lg:px-6" aria-label="Main">
         {/* Logo */}
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-sm font-bold text-white">B</span>
-          <span className="hidden font-serif text-lg font-bold text-foreground sm:block">BoardNotes</span>
+        <Link href="/" className="flex shrink-0 items-center gap-1.5">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white">B</span>
+          <span className="hidden font-serif text-base font-bold text-foreground sm:block">BoardNotes</span>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden items-center gap-0 xl:flex">
+        {/* Desktop nav — core items */}
+        <div className="hidden min-w-0 items-center gap-0 xl:flex">
           <BoardsMenu />
-          {STATIC_DROPDOWNS.map((dd) => (
+          {CORE_DROPDOWNS.map((dd) => (
             <HoverDropdown
               key={dd.label}
               label={dd.label}
@@ -226,28 +239,60 @@ export function Header() {
               setDropdownSlug={setDropdownSlug}
             />
           ))}
-          {/* Coming Soon items */}
-          {COMING_SOON.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap"
-            >
-              {item.label}
-              <span className="rounded bg-amber-100 px-1 py-0.5 text-[8px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
-            </Link>
-          ))}
+          {/* More dropdown */}
+          <div className="relative" ref={moreRef} onMouseEnter={() => { clearClose(); setMoreOpen(true); setDropdownSlug(null); }} onMouseLeave={() => scheduleClose()}>
+            <button type="button" onClick={() => { setMoreOpen((o) => !o); setDropdownSlug(null); }}
+              className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
+              More
+              <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+            </button>
+            {moreOpen && (
+              <div className="absolute right-0 top-full z-30 mt-1 w-56 rounded-xl border border-border bg-card p-2 shadow-xl"
+                onMouseEnter={clearClose} onMouseLeave={() => scheduleClose()}>
+                {MORE_DROPDOWNS.map((dd) => (
+                  <div key={dd.label} className="relative group/dropdown">
+                    <div className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent cursor-pointer">
+                      {dd.label}
+                      <svg viewBox="0 0 24 24" className="h-3 w-3 -rotate-90" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+                    </div>
+                    <div className="invisible absolute left-full top-0 ml-1 w-48 rounded-xl border border-border bg-card p-2 shadow-xl group-hover/dropdown:visible">
+                      {dd.groups.map((g, gi) => (
+                        <div key={gi}>
+                          {g.heading && <div className="mb-1 mt-1 px-2 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
+                          {g.items.map((item) => (
+                            <Link key={item.href} href={item.href} onClick={() => { setMoreOpen(false); setDropdownSlug(null); }}
+                              className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                              {item.label}
+                            </Link>
+                          ))}
+                          {gi < dd.groups.length - 1 && <div className="my-1 border-t border-border" />}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <div className="my-1 border-t border-border" />
+                {COMING_SOON.map((item) => (
+                  <Link key={item.href} href={item.href} onClick={() => { setMoreOpen(false); setDropdownSlug(null); }}
+                    className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                    {item.label}
+                    <span className="rounded bg-amber-100 px-1 py-0.5 text-[8px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Desktop right */}
-        <div className="hidden items-center gap-1 lg:flex">
+        <div className="flex items-center gap-0.5 shrink-0 sm:gap-1">
           {/* Compact search bar */}
           <form
             action="/search"
             role="search"
-            className="mr-1 hidden items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1.5 md:flex"
+            className="mr-0.5 hidden items-center gap-1 rounded-full border border-border bg-card px-2 py-1 sm:mr-1 sm:flex sm:px-2.5 sm:py-1.5"
           >
-            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0 text-muted sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
             </svg>
@@ -256,32 +301,32 @@ export function Header() {
               autoComplete="off"
               placeholder={locale === "ur" ? "تلاش…" : "Search…"}
               aria-label={tr("search")}
-              className="w-20 bg-transparent text-[11px] font-medium text-foreground outline-none placeholder:text-muted focus:w-28 xl:w-28 transition-all"
+              className="w-14 bg-transparent text-[10px] font-medium text-foreground outline-none placeholder:text-muted focus:w-20 sm:w-20 sm:text-[11px] sm:focus:w-24 xl:w-24 xl:focus:w-32 transition-all"
             />
           </form>
           {/* Lang toggle */}
           <button type="button" onClick={toggleLocale}
-            className="rounded-lg px-2 py-1.5 text-[12px] font-semibold text-muted transition hover:text-foreground" title="Toggle language">
+            className="rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-muted transition hover:text-foreground sm:px-2" title="Toggle language">
             {locale === "en" ? "اردو" : "EN"}
           </button>
           <ThemeToggle />
 
           {!loading && user ? (
             <>
-              {isStaff && <Link href="/admin" className="rounded-lg px-2 py-1.5 text-[12px] font-semibold text-accent transition hover:bg-accent/10">Admin</Link>}
-              <Link href="/account" className="rounded-full border border-border px-3 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-card">{user.name.split(" ")[0]}</Link>
+              {isStaff && <Link href="/admin" className="hidden rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-accent transition hover:bg-accent/10 lg:inline-block">Admin</Link>}
+              <Link href="/account" className="hidden rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-foreground transition hover:bg-card sm:inline-block">{user.name.split(" ")[0]}</Link>
             </>
           ) : (
-            <Link href="/login" className="rounded-full bg-accent px-4 py-1.5 text-[12px] font-bold text-white shadow-sm transition hover:opacity-90">{tr("signUp")}</Link>
+            <Link href="/login" className="rounded-full bg-accent px-3 py-1 text-[11px] font-bold text-white shadow-sm transition hover:opacity-90 sm:px-4 sm:py-1.5 sm:text-[12px]">{tr("signUp")}</Link>
           )}
 
-          {/* Join WhatsApp CTA */}
+          {/* WhatsApp CTA — hidden on small screens */}
           <a
             href={WHATSAPP_CHANNEL_URL}
             target="_blank"
             rel="noopener noreferrer"
             title={tr("joinWhatsApp")}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-3.5 py-1.5 text-[12px] font-bold text-white shadow-sm transition hover:opacity-90"
+            className="hidden items-center gap-1 rounded-full bg-[#25D366] px-2.5 py-1 text-[11px] font-bold text-white shadow-sm transition hover:opacity-90 md:inline-flex lg:px-3 lg:py-1.5 lg:text-[12px]"
           >
             <WhatsAppIcon />
             Join WhatsApp
@@ -290,19 +335,19 @@ export function Header() {
 
         {/* Mobile hamburger */}
         <button type="button" onClick={() => setMenuOpen((o) => !o)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-foreground lg:hidden"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground xl:hidden"
           aria-label={menuOpen ? tr("closeMenu") : tr("openMenu")}>
           <span className="flex flex-col gap-1" aria-hidden="true">
-            <span className={`h-0.5 w-4 bg-current transition-transform ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
-            <span className={`h-0.5 w-4 bg-current transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`h-0.5 w-4 bg-current transition-transform ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
+            <span className={`h-0.5 w-3.5 bg-current transition-transform ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
+            <span className={`h-0.5 w-3.5 bg-current transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`h-0.5 w-3.5 bg-current transition-transform ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
           </span>
         </button>
       </nav>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-border bg-card px-4 py-4 lg:hidden">
+        <div className="border-t border-border bg-card px-4 py-4 xl:hidden">
           {/* Search */}
           <form action="/search" role="search" className="mb-3 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
             <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -345,8 +390,8 @@ export function Header() {
             ))}
           </div>
 
-          {/* Static mobile sections */}
-          {STATIC_DROPDOWNS.map((dd) => (
+          {/* All sections */}
+          {[...CORE_DROPDOWNS, ...MORE_DROPDOWNS].map((dd) => (
             <MobileSection key={dd.label} title={dd.label} groups={dd.groups} onLink={() => setMenuOpen(false)} />
           ))}
 
