@@ -21,7 +21,7 @@ type DropdownItem = { label: string; href: string };
 type DropdownGroup = { heading?: string; items: DropdownItem[] };
 type DropdownDef = { label: string; groups: DropdownGroup[]; soon?: boolean };
 
-const NAV_ITEMS: DropdownDef[] = [
+const CORE_NAV: DropdownDef[] = [
   {
     label: "Text Books",
     groups: [
@@ -106,6 +106,9 @@ const NAV_ITEMS: DropdownDef[] = [
       ]},
     ],
   },
+];
+
+const MORE_NAV: DropdownDef[] = [
   {
     label: "Test",
     groups: [
@@ -143,135 +146,43 @@ const MOBILE_BOARDS = [
   { slug: "cambridge", label: "Cambridge Board" },
 ];
 
-type MoreDropdownProps = {
-  items: DropdownDef[];
-  activeSlug: string | null;
-  onOpen: (slug: string) => void;
-  onClose: () => void;
-  onFocused: () => void;
-  setDropdownSlug: (slug: string | null) => void;
-};
+const ALL_NAV = [...CORE_NAV, ...MORE_NAV];
 
-function MoreDropdown({ items, activeSlug, onOpen, onClose, onFocused, setDropdownSlug }: MoreDropdownProps) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const handleEnter = useCallback(() => {
-    onFocused();
-    setOpen(true);
-  }, [onFocused]);
-
-  const handleLeave = useCallback(() => {
-    setOpen(false);
-    onClose();
-  }, [onClose]);
-
-  return (
-    <div className="relative pb-2" ref={ref} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
-      <button type="button" className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
-        More
-        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-      </button>
-      {open && (
-        <div
-          className="absolute right-0 top-full z-30 w-56 rounded-xl border border-border bg-card p-2 shadow-xl"
-          onMouseEnter={handleEnter}
-          onMouseLeave={handleLeave}
-        >
-          {items.map((item) => (
-            <div key={item.label} className="relative group/nested">
-              {item.soon ? (
-                <Link
-                  href={`/${item.label.toLowerCase().replace(/[^a-z]/g, "-")}`}
-                  onClick={() => { setOpen(false); setDropdownSlug(null); }}
-                  className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent"
-                >
-                  {item.label}
-                  <span className="rounded bg-amber-100 px-1 py-0.5 text-[7px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
-                </Link>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent cursor-pointer">
-                    {item.label}
-                    <svg viewBox="0 0 24 24" className="h-3 w-3 -rotate-90" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-                  </div>
-                  <div className="invisible absolute left-full top-0 ml-1 w-48 rounded-xl border border-border bg-card p-2 shadow-xl group-hover/nested:visible">
-                    {item.groups.map((g, gi) => (
-                      <div key={gi}>
-                        {g.heading && <div className="mb-1 mt-1 px-2 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
-                        {g.items.map((itm) => (
-                          <Link key={itm.href} href={itm.href} onClick={() => { setOpen(false); setDropdownSlug(null); }}
-                            className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent">
-                            {itm.label}
-                          </Link>
-                        ))}
-                        {gi < item.groups.length - 1 && <div className="my-1 border-t border-border" />}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-type DropdownProps = {
+function NavDropdown({ item, isOpen, onOpen, onClose, onFocused }: {
   item: DropdownDef;
-  activeSlug: string | null;
-  onOpen: (slug: string) => void;
+  isOpen: boolean;
+  onOpen: () => void;
   onClose: () => void;
   onFocused: () => void;
-  setDropdownSlug: (slug: string | null) => void;
-};
-
-function HoverDropdown({ item, activeSlug, onOpen, onClose, onFocused, setDropdownSlug }: DropdownProps) {
+}) {
   const slug = item.label.toLowerCase().replace(/[^a-z]/g, "-");
-  const isOpen = activeSlug === slug;
 
   if (item.soon) {
     return (
-      <Link
-        href={`/${slug}`}
-        className="flex items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent lg:px-2"
-      >
+      <Link href={`/${slug}`} className="nav-link">
         {item.label}
-        <span className="rounded bg-amber-100 px-1 py-0.5 text-[7px] font-bold uppercase leading-none text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+        <span className="soon-badge">Soon</span>
       </Link>
     );
   }
 
   return (
-    <div className="relative pb-2" onMouseEnter={() => onOpen(slug)} onMouseLeave={onClose}>
-      <button type="button" className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
+    <div className="nav-item" onMouseEnter={onOpen} onMouseLeave={onClose}>
+      <button type="button" className={`nav-link ${isOpen ? "nav-link-active" : ""}`}>
         {item.label}
-        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform duration-150 ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
-        <div
-          className="absolute left-1/2 top-full z-30 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-xl animate-scale-in"
-          onMouseEnter={onFocused}
-          onMouseLeave={onClose}
-        >
+        <div className="dropdown-panel" onMouseEnter={onFocused} onMouseLeave={onClose}>
           {item.groups.map((g, gi) => (
             <div key={gi}>
-              {g.heading && (
-                <div className="mb-1 mt-1 px-2.5 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>
-              )}
+              {g.heading && <div className="dropdown-heading">{g.heading}</div>}
               {g.items.map((itm) => (
-                <Link
-                  key={itm.href}
-                  href={itm.href}
-                  onClick={() => setDropdownSlug(null)}
-                  className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:translate-x-0.5"
-                >
+                <Link key={itm.href} href={itm.href} onClick={() => onClose()} className="dropdown-item">
                   {itm.label}
                 </Link>
               ))}
-              {gi < item.groups.length - 1 && <div className="my-1 border-t border-border" />}
+              {gi < item.groups.length - 1 && <div className="dropdown-divider" />}
             </div>
           ))}
         </div>
@@ -283,178 +194,222 @@ function HoverDropdown({ item, activeSlug, onOpen, onClose, onFocused, setDropdo
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
   const { user, loading, isStaff, signOut } = useAuth();
   const { tr, locale } = useLocale();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
 
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
   }, []);
 
-  const scheduleClose = useCallback((ms = 150) => {
+  const scheduleClose = useCallback((ms = 200) => {
     clearClose();
-    closeTimer.current = setTimeout(() => { setDropdownSlug(null); }, ms);
+    closeTimer.current = setTimeout(() => { setDropdownSlug(null); setMoreOpen(false); }, ms);
   }, [clearClose]);
 
-  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); }, [clearClose]);
+  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); setMoreOpen(false); }, [clearClose]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
-      <nav className="mx-auto flex w-full max-w-7xl items-center justify-between gap-0.5 px-2 py-1.5 sm:px-4 lg:px-6" aria-label="Main">
-        {/* Logo */}
-        <Link href="/" className="flex shrink-0 items-center gap-1.5 group/logo">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white transition-transform duration-300 group-hover/logo:scale-110">B</span>
-          <span className="hidden font-serif text-base font-bold text-foreground transition-colors duration-200 group-hover/logo:text-accent sm:block">BoardNotes</span>
-        </Link>
+    <>
+      <style>{`
+        .nav-link {
+          display: inline-flex; align-items: center; gap: 4px;
+          padding: 6px 8px; border-radius: 6px;
+          font-size: 12px; font-weight: 600; white-space: nowrap;
+          color: var(--foreground); transition: all 0.15s;
+        }
+        .nav-link:hover, .nav-link-active { background: var(--accent); background: oklch(from var(--accent) l c h / 0.08); color: var(--accent); }
+        .soon-badge {
+          background: oklch(0.85 0.15 80); color: oklch(0.45 0.15 75);
+          padding: 1px 5px; border-radius: 4px; font-size: 9px; font-weight: 700;
+          text-transform: uppercase; line-height: 1.3;
+        }
+        .nav-item { position: relative; }
+        .dropdown-panel {
+          position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+          z-index: 50; min-width: 220px; margin-top: 4px;
+          background: var(--card); border: 1px solid var(--border);
+          border-radius: 12px; padding: 6px; box-shadow: 0 10px 40px oklch(0 0 0 / 0.12);
+        }
+        .dropdown-heading {
+          padding: 4px 10px 2px; font-size: 9px; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+        }
+        .dropdown-item {
+          display: block; padding: 6px 10px; border-radius: 8px;
+          font-size: 13px; font-weight: 500; color: var(--foreground);
+          transition: all 0.12s;
+        }
+        .dropdown-item:hover { background: oklch(from var(--accent) l c h / 0.08); color: var(--accent); transform: translateX(2px); }
+        .dropdown-divider { margin: 4px 0; border-top: 1px solid var(--border); }
+        .more-panel {
+          position: absolute; right: 0; top: 100%; z-index: 50;
+          min-width: 240px; margin-top: 4px;
+          background: var(--card); border: 1px solid var(--border);
+          border-radius: 12px; padding: 6px; box-shadow: 0 10px 40px oklch(0 0 0 / 0.12);
+        }
+        .more-panel .dropdown-item:hover .submenu-icon { opacity: 1; }
+        .submenu-icon { opacity: 0; transition: opacity 0.15s; }
+        .sub-panel {
+          position: absolute; left: 100%; top: -6px; margin-left: 4px;
+          min-width: 200px; background: var(--card); border: 1px solid var(--border);
+          border-radius: 12px; padding: 6px; box-shadow: 0 10px 40px oklch(0 0 0 / 0.12);
+          display: none;
+        }
+        .has-sub:hover .sub-panel { display: block; }
+      `}</style>
+      <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
+        <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-3 py-1.5 sm:px-5 lg:px-8" aria-label="Main">
+          {/* Logo */}
+          <Link href="/" className="flex shrink-0 items-center gap-2 group/logo">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-white transition-transform group-hover/logo:scale-110">B</span>
+            <span className="hidden font-serif text-lg font-bold text-foreground group-hover/logo:text-accent transition-colors sm:block">BoardNotes</span>
+          </Link>
 
-        {/* Desktop nav — core items + More dropdown */}
-        <div className="hidden items-center gap-0 xl:flex">
-          <BoardsMenu />
-          {NAV_ITEMS.slice(0, 7).map((item) => (
-            <HoverDropdown
-              key={item.label}
-              item={item}
-              activeSlug={dropdownSlug}
-              onOpen={openDropdown}
-              onClose={() => scheduleClose()}
-              onFocused={clearClose}
-              setDropdownSlug={setDropdownSlug}
-            />
-          ))}
-          {/* More dropdown for remaining items */}
-          <MoreDropdown
-            items={NAV_ITEMS.slice(7)}
-            activeSlug={dropdownSlug}
-            onOpen={openDropdown}
-            onClose={() => scheduleClose()}
-            onFocused={clearClose}
-            setDropdownSlug={setDropdownSlug}
-          />
-        </div>
-
-        {/* Desktop right */}
-        <div className="flex items-center gap-0.5 shrink-0 sm:gap-1">
-          {/* Compact search bar */}
-          <form
-            action="/search"
-            role="search"
-            className="mr-0.5 hidden items-center gap-1 rounded-full border border-border bg-card px-2 py-1 sm:mr-1 sm:flex sm:px-2.5 sm:py-1.5 transition-all duration-300 focus-within:border-accent focus-within:shadow-md focus-within:shadow-accent/10"
-          >
-            <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0 text-muted sm:h-3.5 sm:w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-            <input
-              name="q"
-              autoComplete="off"
-              placeholder={locale === "ur" ? "تلاش…" : "Search…"}
-              aria-label={tr("search")}
-              className="w-14 bg-transparent text-[10px] font-medium text-foreground outline-none placeholder:text-muted focus:w-20 sm:w-20 sm:text-[11px] sm:focus:w-24 xl:w-24 xl:focus:w-32 transition-all duration-300"
-            />
-          </form>
-          {/* Spacer */}
-          <span className="w-0.5" />
-          <ThemeToggle />
-
-          {!loading && user ? (
-            <>
-              {isStaff && <Link href="/admin" className="hidden rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-accent transition-all duration-200 hover:bg-accent/10 lg:inline-block">Admin</Link>}
-              <Link href="/account" className="hidden rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-foreground transition-all duration-200 hover:border-accent hover:bg-accent hover:text-white sm:inline-block">{user.name.split(" ")[0]}</Link>
-            </>
-          ) : (
-            <Link href="/login" className="rounded-full bg-accent px-3 py-1 text-[11px] font-bold text-white shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 hover:scale-105 sm:px-4 sm:py-1.5 sm:text-[12px]">{tr("signUp")}</Link>
-          )}
-
-          {/* WhatsApp CTA */}
-          <a
-            href={WHATSAPP_CHANNEL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={tr("joinWhatsApp")}
-            className="hidden items-center gap-1 rounded-full bg-[#25D366] px-2.5 py-1 text-[11px] font-bold text-white shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-[#25D366]/20 hover:scale-105 md:inline-flex lg:px-3 lg:py-1.5 lg:text-[12px]"
-          >
-            <WhatsAppIcon />
-            Join WhatsApp
-          </a>
-        </div>
-
-        {/* Mobile hamburger */}
-        <button type="button" onClick={() => setMenuOpen((o) => !o)}
-          className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground xl:hidden"
-          aria-label={menuOpen ? tr("closeMenu") : tr("openMenu")}>
-          <span className="flex flex-col gap-1" aria-hidden="true">
-            <span className={`h-0.5 w-3.5 bg-current transition-all duration-300 ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
-            <span className={`h-0.5 w-3.5 bg-current transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`h-0.5 w-3.5 bg-current transition-all duration-300 ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
-          </span>
-        </button>
-      </nav>
-
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="border-t border-border bg-card px-4 py-4 xl:hidden animate-fade-in">
-          {/* Search */}
-          <form action="/search" role="search" className="mb-3 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 transition-all duration-300 focus-within:border-accent">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-            <input
-              name="q"
-              autoComplete="off"
-              placeholder={tr("portalSearchPlaceholder")}
-              aria-label={tr("search")}
-              className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
-            />
-          </form>
-
-          <div className="mb-1 mt-3 flex items-center gap-2">
-            <ThemeToggle />
-          </div>
-
-          {/* Boards quick links */}
-          <div className="mb-1 mt-3 px-1 text-[10px] font-bold uppercase tracking-wider text-muted">{tr("boards")}</div>
-          <div className="grid grid-cols-2 gap-1">
-            {MOBILE_BOARDS.map((b) => (
-              <Link key={b.slug} href={`/${b.slug}`} onClick={() => setMenuOpen(false)}
-                className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition-all duration-200 hover:border-accent hover:bg-accent/10 hover:text-accent">
-                {b.label}
-              </Link>
+          {/* Desktop nav */}
+          <div className="hidden items-center gap-0 xl:flex">
+            <BoardsMenu />
+            {CORE_NAV.map((item) => (
+              <NavDropdown
+                key={item.label}
+                item={item}
+                isOpen={dropdownSlug === item.label.toLowerCase().replace(/[^a-z]/g, "-")}
+                onOpen={() => { clearClose(); setDropdownSlug(item.label.toLowerCase().replace(/[^a-z]/g, "-")); }}
+                onClose={() => scheduleClose()}
+                onFocused={clearClose}
+              />
             ))}
+            {/* More */}
+            <div className="nav-item" ref={moreRef} onMouseEnter={() => { clearClose(); setMoreOpen(true); setDropdownSlug(null); }} onMouseLeave={() => scheduleClose()}>
+              <button type="button" className={`nav-link ${moreOpen ? "nav-link-active" : ""}`}>
+                More
+                <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform duration-150 ${moreOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+              </button>
+              {moreOpen && (
+                <div className="more-panel" onMouseEnter={clearClose} onMouseLeave={() => scheduleClose()}>
+                  {MORE_NAV.map((item) => {
+                    const slug = item.label.toLowerCase().replace(/[^a-z]/g, "-");
+                    if (item.soon) {
+                      return (
+                        <Link key={slug} href={`/${slug}`} onClick={() => setMoreOpen(false)} className="dropdown-item" style={{ justifyContent: "space-between", display: "flex" }}>
+                          {item.label}
+                          <span className="soon-badge">Soon</span>
+                        </Link>
+                      );
+                    }
+                    return (
+                      <div key={slug} className="has-sub relative">
+                        <div className="dropdown-item" style={{ justifyContent: "space-between", display: "flex", cursor: "default" }}>
+                          {item.label}
+                          <svg viewBox="0 0 24 24" className="submenu-icon h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6" /></svg>
+                        </div>
+                        <div className="sub-panel">
+                          {item.groups.map((g, gi) => (
+                            <div key={gi}>
+                              {g.heading && <div className="dropdown-heading">{g.heading}</div>}
+                              {g.items.map((itm) => (
+                                <Link key={itm.href} href={itm.href} onClick={() => setMoreOpen(false)} className="dropdown-item">
+                                  {itm.label}
+                                </Link>
+                              ))}
+                              {gi < item.groups.length - 1 && <div className="dropdown-divider" />}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* All sections */}
-          {NAV_ITEMS.map((item) => (
-            <MobileSection key={item.label} item={item} onLink={() => setMenuOpen(false)} />
-          ))}
-
-          <div className="mt-3 border-t border-border pt-3">
+          {/* Desktop right */}
+          <div className="flex items-center gap-1 shrink-0">
+            <form action="/search" role="search" className="hidden items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1.5 md:flex focus-within:border-accent transition-colors">
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              <input name="q" autoComplete="off" placeholder={locale === "ur" ? "تلاش…" : "Search…"} aria-label={tr("search")} className="w-20 bg-transparent text-[11px] font-medium text-foreground outline-none placeholder:text-muted focus:w-28 transition-all" />
+            </form>
+            <button type="button" onClick={() => {}} className="rounded-lg px-2 py-1.5 text-[11px] font-semibold text-muted transition hover:text-foreground" title="Toggle language">
+              {locale === "en" ? "اردو" : "EN"}
+            </button>
+            <ThemeToggle />
             {!loading && user ? (
-              <div className="flex flex-col gap-1.5">
-                <Link href="/account" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-accent/10">{user.name}</Link>
-                {isStaff && <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-accent transition-all duration-200 hover:bg-accent/10">{tr("admin")}</Link>}
-                <button type="button" onClick={() => { signOut(); setMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted transition-all duration-200 hover:bg-red-50 hover:text-red-600">{tr("signOut")}</button>
-              </div>
+              <>
+                {isStaff && <Link href="/admin" className="hidden rounded-lg px-2 py-1.5 text-[11px] font-semibold text-accent hover:bg-accent/10 transition lg:inline-block">Admin</Link>}
+                <Link href="/account" className="hidden rounded-full border border-border px-3 py-1 text-[11px] font-semibold text-foreground hover:bg-card transition sm:inline-block">{user.name.split(" ")[0]}</Link>
+              </>
             ) : (
-              <div className="flex flex-col gap-1.5">
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full bg-accent px-5 py-2.5 text-center text-sm font-bold text-white transition-all duration-300 hover:shadow-lg hover:shadow-accent/20">{tr("signUp")} / {tr("signIn")}</Link>
-              </div>
+              <Link href="/login" className="rounded-full bg-accent px-4 py-1.5 text-[11px] font-bold text-white shadow-sm hover:shadow-md hover:shadow-accent/20 transition-all">{tr("signUp")}</Link>
             )}
-            <Link href="/upload" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-center text-sm font-bold text-accent transition-all duration-300 hover:bg-accent hover:text-white">{tr("uploadTitle")}</Link>
-            <a
-              href={WHATSAPP_CHANNEL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMenuOpen(false)}
-              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-center text-sm font-bold text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#25D366]/20"
-            >
+            <a href={WHATSAPP_CHANNEL_URL} target="_blank" rel="noopener noreferrer" className="hidden items-center gap-1.5 rounded-full bg-[#25D366] px-3 py-1.5 text-[11px] font-bold text-white shadow-sm hover:shadow-md hover:shadow-[#25D366]/20 transition-all md:inline-flex">
               <WhatsAppIcon />
-              {tr("joinWhatsApp")}
+              Join WhatsApp
             </a>
           </div>
-        </div>
-      )}
-    </header>
+
+          {/* Mobile hamburger */}
+          <button type="button" onClick={() => setMenuOpen((o) => !o)} className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground xl:hidden" aria-label={menuOpen ? tr("closeMenu") : tr("openMenu")}>
+            <span className="flex flex-col gap-1" aria-hidden="true">
+              <span className={`h-0.5 w-4 bg-current transition-all ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
+              <span className={`h-0.5 w-4 bg-current transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
+              <span className={`h-0.5 w-4 bg-current transition-all ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
+            </span>
+          </button>
+        </nav>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className="border-t border-border bg-card px-4 py-4 xl:hidden">
+            <form action="/search" role="search" className="mb-3 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
+              <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              <input name="q" autoComplete="off" placeholder={tr("portalSearchPlaceholder")} aria-label={tr("search")} className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
+            </form>
+            <div className="mb-1 mt-3 flex items-center gap-2">
+              <button type="button" onClick={() => {}} className="rounded-lg border border-border px-2.5 py-1.5 text-[12px] font-semibold text-muted transition hover:text-foreground">{locale === "en" ? "اردو" : "EN"}</button>
+              <ThemeToggle />
+            </div>
+            <div className="mb-1 mt-3 px-1 text-[10px] font-bold uppercase tracking-wider text-muted">{tr("boards")}</div>
+            <div className="grid grid-cols-2 gap-1">
+              {MOBILE_BOARDS.map((b) => (
+                <Link key={b.slug} href={`/${b.slug}`} onClick={() => setMenuOpen(false)} className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition hover:border-accent hover:bg-accent/10 hover:text-accent">
+                  {b.label}
+                </Link>
+              ))}
+            </div>
+            {ALL_NAV.map((item) => (
+              <MobileSection key={item.label} item={item} onLink={() => setMenuOpen(false)} />
+            ))}
+            <div className="mt-3 border-t border-border pt-3">
+              {!loading && user ? (
+                <div className="flex flex-col gap-1.5">
+                  <Link href="/account" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium">{user.name}</Link>
+                  {isStaff && <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-accent">{tr("admin")}</Link>}
+                  <button type="button" onClick={() => { signOut(); setMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted">{tr("signOut")}</button>
+                </div>
+              ) : (
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full bg-accent px-5 py-2.5 text-center text-sm font-bold text-white">{tr("signUp")} / {tr("signIn")}</Link>
+              )}
+              <Link href="/upload" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-center text-sm font-bold text-accent">{tr("uploadTitle")}</Link>
+              <a href={WHATSAPP_CHANNEL_URL} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="mt-2 flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-center text-sm font-bold text-white">
+                <WhatsAppIcon />
+                {tr("joinWhatsApp")}
+              </a>
+            </div>
+          </div>
+        )}
+      </header>
+    </>
   );
 }
 
@@ -463,29 +418,26 @@ function MobileSection({ item, onLink }: { item: DropdownDef; onLink: () => void
 
   if (item.soon) {
     return (
-      <Link href={`/${item.label.toLowerCase().replace(/[^a-z]/g, "-")}`} onClick={onLink}
-        className="mb-0.5 flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-accent/10">
+      <Link href={`/${item.label.toLowerCase().replace(/[^a-z]/g, "-")}`} onClick={onLink} className="mb-0.5 flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-accent/10">
         {item.label}
-        <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+        <span className="soon-badge">Soon</span>
       </Link>
     );
   }
 
   return (
     <div className="mb-0.5">
-      <button type="button" onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-accent/10">
+      <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-accent/10">
         {item.label}
-        <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+        <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {open && (
-        <div className="ml-3 pb-1 animate-fade-in">
+        <div className="ml-3 pb-1">
           {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && <div className="mb-1 mt-1 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
               {g.items.map((itm) => (
-                <Link key={itm.href} href={itm.href} onClick={onLink}
-                  className="block rounded-lg px-3 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:translate-x-0.5">
+                <Link key={itm.href} href={itm.href} onClick={onLink} className="block rounded-lg px-3 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
                   {itm.label}
                 </Link>
               ))}
