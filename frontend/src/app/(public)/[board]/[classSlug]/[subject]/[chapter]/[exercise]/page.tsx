@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import type { PdfSummary } from "@/lib/shared-types";
 
 import { ExercisePageContent } from "@/components/content/hierarchy-pages";
@@ -38,16 +39,38 @@ async function findExercisePdfDownloadUrl(
   exercise: string,
   questions: { num: number }[],
 ) {
-  for (const question of questions) {
-    const data = await apiFetchOrNull<QuestionData>(
-      `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}/exercises/${exercise}/q/${question.num}`,
+  const batchSize = 5;
+  for (let i = 0; i < questions.length; i += batchSize) {
+    const batch = questions.slice(i, i + batchSize);
+    const results = await Promise.all(
+      batch.map((q) =>
+        apiFetchOrNull<QuestionData>(
+          `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}/exercises/${exercise}/q/${q.num}`,
+        ),
+      ),
     );
-    const pdfName = data?.question.pdfName;
-    if (!pdfName) continue;
-    const pdf = await apiFetchOrNull<PdfSummary>(`/api/pdfs/${pdfName}`);
-    if (pdf?.url) return pdfUrl(pdf.url);
+    for (const data of results) {
+      const pdfName = data?.question.pdfName;
+      if (!pdfName) continue;
+      const pdf = await apiFetchOrNull<PdfSummary>(`/api/pdfs/${pdfName}`);
+      if (pdf?.url) return pdfUrl(pdf.url);
+    }
   }
   return null;
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ board: string; classSlug: string; subject: string; chapter: string; exercise: string }> }): Promise<Metadata> {
+  const { board, classSlug, subject, chapter, exercise } = await params;
+  const data = await apiFetchOrNull<ExerciseData>(
+    `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}/exercises/${exercise}`,
+  );
+  if (!data) return { title: "Exercise Not Found" };
+  const title = `${data.exercise.title} - ${data.chapter?.title ?? ""} | BoardNotes`;
+  return {
+    title,
+    description: `Solved exercise ${data.exercise.title} for ${data.chapter?.title ?? ""}. View questions, download PDFs, and practice with step-by-step solutions.`,
+    openGraph: { title, description: `Solved ${data.exercise.title} - step-by-step solutions` },
+  };
 }
 
 export default async function ExercisePage({
@@ -62,25 +85,24 @@ export default async function ExercisePage({
   }>;
 }) {
   const { board, classSlug, subject, chapter, exercise } = await params;
-  const data = await apiFetchOrNull<ExerciseData>(
-    `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}/exercises/${exercise}`,
-  );
+
+  const [data, chapterData] = await Promise.all([
+    apiFetchOrNull<ExerciseData>(
+      `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}/exercises/${exercise}`,
+    ),
+    apiFetchOrNull<ChapterData>(
+      `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}`,
+    ),
+  ]);
+
   if (!data) notFound();
 
   const questions = data.exercise.questions ?? [];
-  const pdfDownloadUrl = await findExercisePdfDownloadUrl(
-    board,
-    classSlug,
-    subject,
-    chapter,
-    exercise,
-    questions,
-  );
-
-  const chapterData = await apiFetchOrNull<ChapterData>(
-    `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}`,
-  );
   const exercises = chapterData?.chapter.exercises ?? [];
+
+  const pdfDownloadUrl = await findExercisePdfDownloadUrl(
+    board, classSlug, subject, chapter, exercise, questions,
+  );
 
   return (
     <ExercisePageContent

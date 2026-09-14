@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import type { Metadata } from "next";
 
 import { apiFetchOrNull } from "@/lib/api-client";
 import { CoverArt } from "@/components/portal/cover-art";
@@ -23,6 +24,22 @@ type ResourceDetail = {
 };
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await apiFetchOrNull<ResourceDetail>(`/api/resources/${slug}`);
+  if (!data) return { title: "Resource Not Found" };
+  const { resource, category } = data;
+  return {
+    title: `${resource.title} | BoardNotes`,
+    description: resource.description || `Download ${resource.title} - free PDF resource for students.`,
+    openGraph: {
+      title: resource.title,
+      description: resource.description || `Free download: ${resource.title}`,
+      images: resource.coverUrl ? [{ url: resource.coverUrl }] : undefined,
+    },
+  };
+}
 
 export default async function BookDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

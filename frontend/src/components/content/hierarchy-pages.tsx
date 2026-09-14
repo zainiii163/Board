@@ -176,14 +176,18 @@ export function ClassPageContent({
 
       {/* Info cards */}
       <div className="mt-10 grid gap-4 md:grid-cols-3">
-        {infoCards.map((card) => (
-          <div key={card.label} className={`group overflow-hidden rounded-2xl border ${card.border} bg-gradient-to-br ${card.bg} ${card.dark} p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md`}>
+        {infoCards.map((card, i) => (
+          <Link
+            key={card.label}
+            href={`/${board}/${classSlug}/${subjects[0]?.slug ?? ""}`}
+            className={`group overflow-hidden rounded-2xl border ${card.border} bg-gradient-to-br ${card.bg} ${card.dark} p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md animate-fade-in-up stagger-${i + 1}`}
+          >
             <span className={`mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${card.iconBg} text-lg text-white shadow-sm transition-transform duration-300 group-hover:scale-110`}>
               {card.icon}
             </span>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{card.label}</p>
-            <p className="mt-1 font-bold text-foreground">{card.desc}</p>
-          </div>
+            <p className="mt-1 font-bold text-foreground transition-colors duration-200 group-hover:text-accent">{card.desc}</p>
+          </Link>
         ))}
       </div>
     </section>

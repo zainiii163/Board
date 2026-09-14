@@ -2,11 +2,18 @@ import { apiFetchOrNull } from "@/lib/api-client";
 import { BooksListing } from "@/components/portal/books-listing";
 import { AdBanner } from "@/components/portal/ad-banner";
 import { type PortalCategory, type PortalResource } from "@/components/portal/portal-types";
+import type { Metadata } from "next";
 
 type CategoriesResponse = { categories: PortalCategory[]; tree: PortalCategory[] };
 type ResourcesPage = { resources: PortalResource[]; total: number };
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "All Resources | BoardNotes",
+  description: "Browse the complete library of free textbooks, notes, past papers, and study materials for all boards and classes.",
+  openGraph: { title: "All Resources | BoardNotes", description: "Free educational resources for students" },
+};
 
 export default async function BooksPage() {
   const [cats, initial] = await Promise.all([

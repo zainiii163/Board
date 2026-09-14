@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 import { ChapterPageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull } from "@/lib/api-client";
@@ -21,6 +22,20 @@ type ChapterData = {
     exercises: { slug: string; title: string }[];
   };
 };
+
+export async function generateMetadata({ params }: { params: Promise<{ board: string; classSlug: string; subject: string; chapter: string }> }): Promise<Metadata> {
+  const { board, classSlug, subject, chapter } = await params;
+  const data = await apiFetchOrNull<ChapterData>(
+    `/api/boards/${board}/classes/${classSlug}/subjects/${subject}/chapters/${chapter}`,
+  );
+  if (!data) return { title: "Chapter Not Found" };
+  const title = `${data.chapter.title} - ${data.subject?.title ?? ""} | BoardNotes`;
+  return {
+    title,
+    description: `${data.chapter.summary.slice(0, 155)}... Read notes, key formulas, exercises, and solutions for ${data.chapter.title}.`,
+    openGraph: { title, description: `Study notes for ${data.chapter.title}` },
+  };
+}
 
 export default async function ChapterPage({
   params,
