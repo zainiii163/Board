@@ -128,13 +128,13 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
   }
 
   return (
-    <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
+    <div className="relative pb-2" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <button type="button" className={`flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition hover:bg-accent/10 hover:text-accent ${isOpen ? "text-accent bg-accent/10" : "text-foreground/80"}`}>
         {item.label}
         <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
-        <div className="absolute left-1/2 top-full z-50 mt-1 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-1.5 shadow-2xl" onMouseEnter={onFocused} onMouseLeave={onClose}>
+        <div className="absolute left-1/2 top-full z-50 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-1.5 shadow-2xl" onMouseEnter={onFocused} onMouseLeave={onClose}>
           {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && <div className="mb-0.5 mt-1.5 px-2.5 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
