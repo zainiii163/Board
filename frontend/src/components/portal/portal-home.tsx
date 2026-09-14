@@ -6,17 +6,16 @@ import { useLocale } from "@/lib/locale-context";
 import { CategoryCard } from "@/components/portal/category-card";
 import { ResourceCard } from "@/components/portal/resource-card";
 import { AdBanner } from "@/components/portal/ad-banner";
-import { type PortalCategory, type PortalResource, type PortalStats } from "@/components/portal/portal-types";
+import { type PortalCategory, type PortalResource } from "@/components/portal/portal-types";
 
 type Props = {
   categories: PortalCategory[];
-  stats: PortalStats | null;
   latest: PortalResource[] | null;
   trending: PortalResource[] | null;
   categoryNameById: Record<string, string>;
 };
 
-export function PortalHome({ categories, stats, latest, trending, categoryNameById }: Props) {
+export function PortalHome({ categories, latest, trending, categoryNameById }: Props) {
   const { tr } = useLocale();
 
   return (
@@ -32,20 +31,7 @@ export function PortalHome({ categories, stats, latest, trending, categoryNameBy
           <p className="mt-1 max-w-xl text-xs leading-relaxed text-white/85 sm:text-sm">
             {tr("portalHeroDesc")}
           </p>
-          {stats && (
-            <dl className="mt-3 flex gap-5">
-              {[
-                { value: stats.books.toLocaleString(), label: tr("portalStatBooks") },
-                { value: String(stats.categories), label: tr("portalStatCategories") },
-                { value: String(stats.users), label: tr("portalStatUsers") },
-              ].map((s) => (
-                <div key={s.label} className="flex items-baseline gap-1.5">
-                  <dt className="text-base font-black sm:text-lg">{s.value}</dt>
-                  <dd className="text-[9px] font-medium text-white/75">{s.label}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
+
         </div>
       </section>
 

@@ -29,6 +29,7 @@ const CORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { labe
         { label: "Sindh Board", href: "/categories/sindh-text-books" },
         { label: "Balochistan Board", href: "/categories/balochistan-text-books" },
         { label: "KPK Board", href: "/categories/kpk-text-books" },
+        { label: "O/A Level", href: "/categories/textbooks" },
       ]},
       { heading: "International", items: [
         { label: "Oxford", href: "/categories/oxford-text-books" },
@@ -45,6 +46,7 @@ const CORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { labe
         { label: "Sindh Board", href: "/categories/sindh-board-notes" },
         { label: "Balochistan Board", href: "/categories/balochistan-board-notes" },
         { label: "KPK Board", href: "/categories/kpk-board-notes" },
+        { label: "O/A Level", href: "/categories/notes" },
       ]},
       { heading: "International", items: [
         { label: "Cambridge International", href: "/categories/cambridge-intl-notes" },
@@ -75,6 +77,7 @@ const CORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { labe
         { label: "Board Notifications", href: "/categories/board-news-info" },
         { label: "Date Sheets", href: "/categories/date-sheets" },
         { label: "Admission & Exams Schedules", href: "/categories/admission-exam-schedules" },
+        { label: "Rechecking/Supplementary", href: "/categories/board-news-info" },
       ]},
     ],
   },
@@ -118,6 +121,7 @@ const MORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { labe
     label: "Tuition",
     groups: [
       { items: [
+        { label: "Malik Shahid (Maths Teacher)", href: "/tuition" },
         { label: "Online Academy Classes", href: "/categories/online-academy-classes" },
         { label: "Find a Tutor", href: "/categories/find-tutor" },
         { label: "Tuition Request", href: "/categories/tuition-request" },
