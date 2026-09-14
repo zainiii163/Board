@@ -25,28 +25,28 @@ export function PortalHome({ categories, stats, latest, trending, categoryNameBy
       <section className="relative overflow-hidden bg-gradient-to-br from-teal-700 via-accent to-emerald-600 text-white">
         <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-emerald-300/10 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+        <div className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] backdrop-blur">
+            <span className="h-1 w-1 rounded-full bg-amber-300" />
             BoardNotes Study Portal
           </p>
-          <h1 className="font-serif text-2xl font-bold leading-tight text-white sm:whitespace-nowrap sm:text-3xl lg:text-4xl">
+          <h1 className="font-serif text-xl font-bold leading-tight text-white sm:text-2xl lg:text-3xl">
             {tr("portalHeroTitle")}
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/85 sm:text-base">
+          <p className="mt-2 max-w-xl text-xs leading-relaxed text-white/85 sm:text-sm">
             {tr("portalHeroDesc")}
           </p>
 
           {stats && (
-            <dl className="mt-6 grid max-w-sm grid-cols-3 gap-4">
+            <dl className="mt-4 grid max-w-xs grid-cols-3 gap-3">
               {[
                 { value: stats.books.toLocaleString(), label: tr("portalStatBooks") },
                 { value: String(stats.categories), label: tr("portalStatCategories") },
                 { value: String(stats.users), label: tr("portalStatUsers") },
               ].map((s) => (
                 <div key={s.label}>
-                  <dt className="text-xl font-black sm:text-2xl">{s.value}</dt>
-                  <dd className="mt-0.5 text-[10px] font-medium text-white/75">{s.label}</dd>
+                  <dt className="text-lg font-black sm:text-xl">{s.value}</dt>
+                  <dd className="mt-0.5 text-[9px] font-medium text-white/75">{s.label}</dd>
                 </div>
               ))}
             </dl>
@@ -54,7 +54,7 @@ export function PortalHome({ categories, stats, latest, trending, categoryNameBy
 
           <form
             action="/search"
-            className="mt-6 flex max-w-lg items-center gap-2 rounded-full bg-white p-1 shadow-lg"
+            className="mt-4 flex max-w-md items-center gap-2 rounded-full bg-white p-1 shadow-lg"
           >
             <svg
               viewBox="0 0 24 24"
@@ -79,18 +79,6 @@ export function PortalHome({ categories, stats, latest, trending, categoryNameBy
               {tr("startSearching")}
             </button>
           </form>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {categories.slice(0, 6).map((c) => (
-              <Link
-                key={c.slug}
-                href={`/categories/${c.slug}`}
-                className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur transition hover:bg-white/20"
-              >
-                {c.icon} {c.name}
-              </Link>
-            ))}
-          </div>
         </div>
       </section>
 
