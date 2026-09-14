@@ -114,7 +114,7 @@ export const getBoardClass = async (req: Request, res: Response) => {
 
             const klass = await db.query.classes.findFirst({
                 where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, board.id)),
-                with: { board: true },
+                with: { board: true, subjects: true },
             });
             if (klass) {
                 return res.json({ board: klass.board, class: klass });
