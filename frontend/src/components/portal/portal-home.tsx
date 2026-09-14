@@ -214,7 +214,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
       </section>
 
       {/* ─── Why BoardNotes Section ─── */}
-      <section className="border-y border-border bg-card/50">
+      <section className="bg-gradient-to-b from-background via-accent/[0.03] to-background border-y border-border">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
             <div className="mb-2 flex items-center justify-center gap-2">
@@ -226,17 +226,16 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: "🎯", title: "Board Aligned", desc: "Notes strictly aligned with your board's latest syllabus", color: "from-teal-500 to-emerald-500" },
-              { icon: "⚡", title: "Instant Access", desc: "Download PDFs instantly — no signup, no waiting", color: "from-amber-500 to-orange-500" },
-              { icon: "📱", title: "Study Anywhere", desc: "Works perfectly on mobile, tablet, and desktop", color: "from-sky-500 to-blue-500" },
-              { icon: "💯", title: "100% Free", desc: "All notes, papers, and solutions — completely free", color: "from-purple-500 to-pink-500" },
+              { icon: "🎯", title: "Board Aligned", desc: "Notes strictly aligned with your board's latest syllabus", bg: "bg-gradient-to-br from-teal-50 to-emerald-50", darkBg: "dark:from-teal-950/40 dark:to-emerald-950/40", iconBg: "bg-gradient-to-br from-teal-500 to-emerald-500", border: "border-teal-200/60 dark:border-teal-800/40", hoverBorder: "hover:border-teal-400" },
+              { icon: "⚡", title: "Instant Access", desc: "Download PDFs instantly — no signup, no waiting", bg: "bg-gradient-to-br from-amber-50 to-orange-50", darkBg: "dark:from-amber-950/40 dark:to-orange-950/40", iconBg: "bg-gradient-to-br from-amber-500 to-orange-500", border: "border-amber-200/60 dark:border-amber-800/40", hoverBorder: "hover:border-amber-400" },
+              { icon: "📱", title: "Study Anywhere", desc: "Works perfectly on mobile, tablet, and desktop", bg: "bg-gradient-to-br from-sky-50 to-blue-50", darkBg: "dark:from-sky-950/40 dark:to-blue-950/40", iconBg: "bg-gradient-to-br from-sky-500 to-blue-500", border: "border-sky-200/60 dark:border-sky-800/40", hoverBorder: "hover:border-sky-400" },
+              { icon: "💯", title: "100% Free", desc: "All notes, papers, and solutions — completely free", bg: "bg-gradient-to-br from-purple-50 to-pink-50", darkBg: "dark:from-purple-950/40 dark:to-pink-950/40", iconBg: "bg-gradient-to-br from-purple-500 to-pink-500", border: "border-purple-200/60 dark:border-purple-800/40", hoverBorder: "hover:border-purple-400" },
             ].map((item, i) => (
               <div
                 key={item.title}
-                className={`card-hover group relative overflow-hidden rounded-2xl border border-border bg-card p-6 text-center transition-all duration-500 animate-fade-in-up stagger-${i + 1}`}
+                className={`card-hover group relative overflow-hidden rounded-2xl border ${item.border} ${item.bg} ${item.darkBg} p-6 text-center transition-all duration-500 ${item.hoverBorder} animate-fade-in-up stagger-${i + 1}`}
               >
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 transition-opacity duration-500 group-hover:opacity-[0.04]`} />
-                <span className="relative mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-background to-card text-2xl shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:shadow-lg">
+                <span className={`relative mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl ${item.iconBg} text-2xl text-white shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:shadow-xl`}>
                   {item.icon}
                 </span>
                 <h3 className="relative mb-1 text-base font-bold text-foreground transition-colors duration-200 group-hover:text-accent">{item.title}</h3>
