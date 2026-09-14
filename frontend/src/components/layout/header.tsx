@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 import { ThemeToggle } from "@/lib/theme-context";
 import { useLocale } from "@/lib/locale-context";
@@ -143,6 +143,82 @@ const MOBILE_BOARDS = [
   { slug: "cambridge", label: "Cambridge Board" },
 ];
 
+type MoreDropdownProps = {
+  items: DropdownDef[];
+  activeSlug: string | null;
+  onOpen: (slug: string) => void;
+  onClose: () => void;
+  onFocused: () => void;
+  setDropdownSlug: (slug: string | null) => void;
+};
+
+function MoreDropdown({ items, activeSlug, onOpen, onClose, onFocused, setDropdownSlug }: MoreDropdownProps) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const handleEnter = useCallback(() => {
+    onFocused();
+    setOpen(true);
+  }, [onFocused]);
+
+  const handleLeave = useCallback(() => {
+    setOpen(false);
+    onClose();
+  }, [onClose]);
+
+  return (
+    <div className="relative pb-2" ref={ref} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+      <button type="button" className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
+        More
+        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {open && (
+        <div
+          className="absolute right-0 top-full z-30 w-56 rounded-xl border border-border bg-card p-2 shadow-xl"
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+        >
+          {items.map((item) => (
+            <div key={item.label} className="relative group/nested">
+              {item.soon ? (
+                <Link
+                  href={`/${item.label.toLowerCase().replace(/[^a-z]/g, "-")}`}
+                  onClick={() => { setOpen(false); setDropdownSlug(null); }}
+                  className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent"
+                >
+                  {item.label}
+                  <span className="rounded bg-amber-100 px-1 py-0.5 text-[7px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+                </Link>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent cursor-pointer">
+                    {item.label}
+                    <svg viewBox="0 0 24 24" className="h-3 w-3 -rotate-90" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+                  </div>
+                  <div className="invisible absolute left-full top-0 ml-1 w-48 rounded-xl border border-border bg-card p-2 shadow-xl group-hover/nested:visible">
+                    {item.groups.map((g, gi) => (
+                      <div key={gi}>
+                        {g.heading && <div className="mb-1 mt-1 px-2 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
+                        {g.items.map((itm) => (
+                          <Link key={itm.href} href={itm.href} onClick={() => { setOpen(false); setDropdownSlug(null); }}
+                            className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent">
+                            {itm.label}
+                          </Link>
+                        ))}
+                        {gi < item.groups.length - 1 && <div className="my-1 border-t border-border" />}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 type DropdownProps = {
   item: DropdownDef;
   activeSlug: string | null;
@@ -231,10 +307,10 @@ export function Header() {
           <span className="hidden font-serif text-base font-bold text-foreground transition-colors duration-200 group-hover/logo:text-accent sm:block">BoardNotes</span>
         </Link>
 
-        {/* Desktop nav — all items inline */}
-        <div className="hidden min-w-0 items-center gap-0 overflow-x-auto scrollbar-none xl:flex">
+        {/* Desktop nav — core items + More dropdown */}
+        <div className="hidden items-center gap-0 xl:flex">
           <BoardsMenu />
-          {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.slice(0, 7).map((item) => (
             <HoverDropdown
               key={item.label}
               item={item}
@@ -245,6 +321,15 @@ export function Header() {
               setDropdownSlug={setDropdownSlug}
             />
           ))}
+          {/* More dropdown for remaining items */}
+          <MoreDropdown
+            items={NAV_ITEMS.slice(7)}
+            activeSlug={dropdownSlug}
+            onOpen={openDropdown}
+            onClose={() => scheduleClose()}
+            onFocused={clearClose}
+            setDropdownSlug={setDropdownSlug}
+          />
         </div>
 
         {/* Desktop right */}
