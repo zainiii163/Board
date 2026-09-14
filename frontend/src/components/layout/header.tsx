@@ -19,10 +19,124 @@ function WhatsAppIcon() {
   );
 }
 
-type NavDropdownProps = {
-  c: NavCategory | undefined;
+const STATIC_DROPDOWNS: { label: string; groups: { heading?: string; items: { label: string; href: string }[] }[] }[] = [
+  {
+    label: "Text Books",
+    groups: [
+      { heading: "Pakistani Boards", items: [
+        { label: "Federal Board", href: "/categories/textbooks/fbise" },
+        { label: "Punjab Board", href: "/categories/textbooks/punjab" },
+        { label: "Sindh Board", href: "/categories/textbooks/sindh" },
+        { label: "Balochistan Board", href: "/categories/textbooks/balochistan" },
+        { label: "KPK Board", href: "/categories/textbooks/kpk" },
+        { label: "O/A Level", href: "/categories/textbooks/oa-level" },
+      ]},
+      { heading: "International", items: [
+        { label: "Oxford", href: "/categories/textbooks/oxford" },
+        { label: "Cambridge", href: "/categories/textbooks/cambridge" },
+      ]},
+    ],
+  },
+  {
+    label: "Notes",
+    groups: [
+      { heading: "Pakistani Boards", items: [
+        { label: "Federal Board", href: "/categories/notes/fbise" },
+        { label: "Punjab Board", href: "/categories/notes/punjab" },
+        { label: "Sindh Board", href: "/categories/notes/sindh" },
+        { label: "Balochistan Board", href: "/categories/notes/balochistan" },
+        { label: "KPK Board", href: "/categories/notes/kpk" },
+        { label: "O/A Level", href: "/categories/notes/oa-level" },
+      ]},
+      { heading: "International", items: [
+        { label: "Cambridge International", href: "/categories/notes/cambridge" },
+        { label: "Pearson Edexcel", href: "/categories/notes/pearson" },
+        { label: "OxfordAQA", href: "/categories/notes/oxfordaqa" },
+        { label: "City & Guilds", href: "/categories/notes/city-guilds" },
+        { label: "International Baccalaureate", href: "/categories/notes/ib" },
+      ]},
+    ],
+  },
+  {
+    label: "Pairing Schemes",
+    groups: [
+      { items: [
+        { label: "9th", href: "/categories/pairing-schemes/9th" },
+        { label: "10th", href: "/categories/pairing-schemes/10th" },
+        { label: "1st Year", href: "/categories/pairing-schemes/1st-year" },
+        { label: "2nd Year", href: "/categories/pairing-schemes/2nd-year" },
+      ]},
+    ],
+  },
+  {
+    label: "Results",
+    groups: [
+      { items: [
+        { label: "Top Position Holders", href: "/categories/results-news/top-position-holders" },
+        { label: "Result Gazette", href: "/categories/results-news/result-gazette" },
+        { label: "Board Notifications", href: "/categories/results-news/board-notifications" },
+        { label: "Date Sheets", href: "/categories/results-news/date-sheets" },
+        { label: "Admission & Exams Schedules", href: "/categories/results-news/admission-schedules" },
+        { label: "Rechecking/Supplementary", href: "/categories/results-news/rechecking" },
+      ]},
+    ],
+  },
+  {
+    label: "Past Papers",
+    groups: [
+      { items: [
+        { label: "9th", href: "/categories/model-papers/9th" },
+        { label: "10th", href: "/categories/model-papers/10th" },
+        { label: "1st Year", href: "/categories/model-papers/1st-year" },
+        { label: "2nd Year", href: "/categories/model-papers/2nd-year" },
+      ]},
+    ],
+  },
+  {
+    label: "Guess Papers",
+    groups: [
+      { items: [
+        { label: "9th", href: "/categories/guess-papers/9th" },
+        { label: "10th", href: "/categories/guess-papers/10th" },
+        { label: "1st Year", href: "/categories/guess-papers/1st-year" },
+        { label: "2nd Year", href: "/categories/guess-papers/2nd-year" },
+      ]},
+    ],
+  },
+  {
+    label: "Test",
+    groups: [
+      { items: [
+        { label: "9th", href: "/categories/test/9th" },
+        { label: "10th", href: "/categories/test/10th" },
+        { label: "1st Year", href: "/categories/test/1st-year" },
+        { label: "2nd Year", href: "/categories/test/2nd-year" },
+      ]},
+    ],
+  },
+  {
+    label: "Tuition",
+    groups: [
+      { items: [
+        { label: "Malik Shahid (Maths)", href: "/tuition#malik-shahid" },
+        { label: "Online Academy Classes", href: "/tuition#online-classes" },
+        { label: "Find a Tutor", href: "/tuition#find-tutor" },
+        { label: "Tuition Request", href: "/tuition#request" },
+        { label: "Become a Tutor", href: "/tuition#become-tutor" },
+      ]},
+    ],
+  },
+];
+
+const COMING_SOON = [
+  { label: "Online Quizzes", href: "/online-quizzes" },
+  { label: "Whiteboard", href: "/whiteboard" },
+  { label: "Test Generator", href: "/test-generator" },
+];
+
+type DropdownProps = {
   label: string;
-  slug: string;
+  groups: { heading?: string; items: { label: string; href: string }[] }[];
   activeSlug: string | null;
   onOpen: (slug: string) => void;
   onClose: () => void;
@@ -30,24 +144,40 @@ type NavDropdownProps = {
   setDropdownSlug: (slug: string | null) => void;
 };
 
-function NavDropdown({ c, label, slug, activeSlug, onOpen, onClose, onFocused, setDropdownSlug }: NavDropdownProps) {
+function HoverDropdown({ label, groups, activeSlug, onOpen, onClose, onFocused, setDropdownSlug }: DropdownProps) {
+  const slug = label.toLowerCase().replace(/[^a-z]/g, "-");
+  const isOpen = activeSlug === slug;
+
   return (
     <div className="relative" onMouseEnter={() => onOpen(slug)} onMouseLeave={onClose}>
       <button type="button" className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap">
         {label}
-        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${activeSlug === slug ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
-      {activeSlug === slug && c && c.children && c.children.length > 0 && (
-        <div className="absolute left-1/2 top-full z-30 mt-1 w-52 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-xl"
-          onMouseEnter={onFocused} onMouseLeave={onClose}>
-          {c.children.map((ch) => (
-            <Link key={ch.slug} href={`/categories/${ch.slug}`} onClick={() => setDropdownSlug(null)}
-              className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-              <span className="text-sm">{ch.icon}</span>{ch.name}
-            </Link>
+      {isOpen && (
+        <div
+          className="absolute left-1/2 top-full z-30 mt-1 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-xl"
+          onMouseEnter={onFocused}
+          onMouseLeave={onClose}
+        >
+          {groups.map((g, gi) => (
+            <div key={gi}>
+              {g.heading && (
+                <div className="mb-1 mt-1 px-2.5 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>
+              )}
+              {g.items.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setDropdownSlug(null)}
+                  className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              {gi < groups.length - 1 && <div className="my-1 border-t border-border" />}
+            </div>
           ))}
-          <Link href={`/categories/${slug}`} onClick={() => setDropdownSlug(null)}
-            className="mt-1 block rounded-lg bg-accent/10 px-2.5 py-1.5 text-center text-[11px] font-bold text-accent">View All →</Link>
         </div>
       )}
     </div>
@@ -56,30 +186,10 @@ function NavDropdown({ c, label, slug, activeSlug, onOpen, onClose, onFocused, s
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
-  const [navCats, setNavCats] = useState<NavCategory[]>([]);
   const { user, loading, isStaff, signOut } = useAuth();
   const { tr, locale, toggleLocale } = useLocale();
-  const moreRef = useRef<HTMLDivElement>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    apiFetch<{ tree: NavCategory[] }>("/api/portal/nav")
-      .then((d) => setNavCats(d.tree))
-      .catch(() => {});
-  }, []);
-
-  const cat = (slug: string) => navCats.find((c) => c.slug === slug);
-
-  const textbooks = cat("textbooks");
-  const notes = cat("notes");
-  const pairingSchemes = cat("pairing-schemes");
-  const resultsNews = cat("results-news");
-  const modelPapers = cat("model-papers");
-  const guessPapers = cat("guess-papers");
-  const test = cat("test");
-  const tuition = cat("tuition");
 
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
@@ -87,18 +197,10 @@ export function Header() {
 
   const scheduleClose = useCallback((ms = 150) => {
     clearClose();
-    closeTimer.current = setTimeout(() => { setDropdownSlug(null); setMoreOpen(false); }, ms);
+    closeTimer.current = setTimeout(() => setDropdownSlug(null), ms);
   }, [clearClose]);
 
-  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); setMoreOpen(false); }, [clearClose]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); }, [clearClose]);
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
@@ -109,40 +211,32 @@ export function Header() {
           <span className="hidden font-serif text-lg font-bold text-foreground sm:block">BoardNotes</span>
         </Link>
 
-        {/* Desktop nav — core items */}
+        {/* Desktop nav */}
         <div className="hidden items-center gap-0 xl:flex">
           <BoardsMenu />
-          <NavDropdown c={textbooks} label="Text Books" slug="textbooks" activeSlug={dropdownSlug} onOpen={openDropdown} onClose={() => scheduleClose()} onFocused={clearClose} setDropdownSlug={setDropdownSlug} />
-          <NavDropdown c={notes} label="Notes" slug="notes" activeSlug={dropdownSlug} onOpen={openDropdown} onClose={() => scheduleClose()} onFocused={clearClose} setDropdownSlug={setDropdownSlug} />
-          <NavDropdown c={pairingSchemes} label="Pairing" slug="pairing-schemes" activeSlug={dropdownSlug} onOpen={openDropdown} onClose={() => scheduleClose()} onFocused={clearClose} setDropdownSlug={setDropdownSlug} />
-          <NavDropdown c={resultsNews} label="Results" slug="results-news" activeSlug={dropdownSlug} onOpen={openDropdown} onClose={() => scheduleClose()} onFocused={clearClose} setDropdownSlug={setDropdownSlug} />
-          <NavDropdown c={modelPapers} label="Past Papers" slug="model-papers" activeSlug={dropdownSlug} onOpen={openDropdown} onClose={() => scheduleClose()} onFocused={clearClose} setDropdownSlug={setDropdownSlug} />
-          <NavDropdown c={test} label="Test" slug="test" activeSlug={dropdownSlug} onOpen={openDropdown} onClose={() => scheduleClose()} onFocused={clearClose} setDropdownSlug={setDropdownSlug} />
-          {/* More dropdown */}
-          <div className="relative" ref={moreRef}>
-            <button type="button" onClick={() => { setMoreOpen((o) => !o); setDropdownSlug(null); }}
-              className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap">
-              More
-              <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-            </button>
-            {moreOpen && (
-              <div className="absolute right-0 top-full z-30 mt-1 w-52 rounded-xl border border-border bg-card p-2 shadow-xl">
-                {[
-                  { href: "/guess-papers", label: "Guess Papers" },
-                  { href: "/tuition", label: "Tuition" },
-                  { href: "/online-quizzes", label: "Online Quizzes", soon: true },
-                  { href: "/whiteboard", label: "Whiteboard", soon: true },
-                  { href: "/test-generator", label: "Test Generator", soon: true },
-                ].map((l) => (
-                  <Link key={l.href} href={l.href} onClick={() => setMoreOpen(false)}
-                    className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-                    {l.label}
-                    {l.soon && <span className="rounded bg-amber-100 px-1 py-0.5 text-[8px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+          {STATIC_DROPDOWNS.map((dd) => (
+            <HoverDropdown
+              key={dd.label}
+              label={dd.label}
+              groups={dd.groups}
+              activeSlug={dropdownSlug}
+              onOpen={openDropdown}
+              onClose={() => scheduleClose()}
+              onFocused={clearClose}
+              setDropdownSlug={setDropdownSlug}
+            />
+          ))}
+          {/* Coming Soon items */}
+          {COMING_SOON.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap"
+            >
+              {item.label}
+              <span className="rounded bg-amber-100 px-1 py-0.5 text-[8px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+            </Link>
+          ))}
         </div>
 
         {/* Desktop right */}
@@ -180,9 +274,8 @@ export function Header() {
           ) : (
             <Link href="/login" className="rounded-full bg-accent px-4 py-1.5 text-[12px] font-bold text-white shadow-sm transition hover:opacity-90">{tr("signUp")}</Link>
           )}
-          <Link href="/upload" className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 text-[12px] font-bold text-accent transition hover:bg-accent/20 hidden sm:inline-flex">{tr("uploadTitle")}</Link>
 
-          {/* Join Our WhatsApp CTA */}
+          {/* Join WhatsApp CTA */}
           <a
             href={WHATSAPP_CHANNEL_URL}
             target="_blank"
@@ -239,6 +332,9 @@ export function Header() {
             {[
               { slug: "fbise", label: "Federal Board" },
               { slug: "punjab", label: "Punjab Board" },
+              { slug: "sindh", label: "Sindh Board" },
+              { slug: "balochistan", label: "Balochistan Board" },
+              { slug: "kpk", label: "KPK Board" },
               { slug: "oxford", label: "Oxford Board" },
               { slug: "cambridge", label: "Cambridge Board" },
             ].map((b) => (
@@ -249,24 +345,16 @@ export function Header() {
             ))}
           </div>
 
-          <MobileAccordion title="Text Books" c={textbooks} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Notes" c={notes} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Pairing Schemes" c={pairingSchemes} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Result & Board News" c={resultsNews} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Model & Past Papers" c={modelPapers} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Guess Papers" c={guessPapers} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Test" c={test} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Tuition" c={tuition} onLink={() => setMenuOpen(false)} />
+          {/* Static mobile sections */}
+          {STATIC_DROPDOWNS.map((dd) => (
+            <MobileSection key={dd.label} title={dd.label} groups={dd.groups} onLink={() => setMenuOpen(false)} />
+          ))}
 
           <div className="mb-1 mt-3 px-1 text-[10px] font-bold uppercase tracking-wider text-muted">Coming Soon</div>
-          {[
-            { href: "/online-quizzes", label: "Online Quizzes" },
-            { href: "/whiteboard", label: "Whiteboard" },
-            { href: "/test-generator", label: "Test Generator" },
-          ].map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
+          {COMING_SOON.map((item) => (
+            <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
               className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-              {l.label}
+              {item.label}
               <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
             </Link>
           ))}
@@ -301,7 +389,7 @@ export function Header() {
   );
 }
 
-function MobileAccordion({ title, c, onLink }: { title: string; c: NavCategory | undefined; onLink: () => void }) {
+function MobileSection({ title, groups, onLink }: { title: string; groups: { heading?: string; items: { label: string; href: string }[] }[]; onLink: () => void }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="mb-0.5">
@@ -310,16 +398,19 @@ function MobileAccordion({ title, c, onLink }: { title: string; c: NavCategory |
         {title}
         <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
-      {open && c && c.children && (
+      {open && (
         <div className="ml-3 pb-1">
-          {c.children.map((ch) => (
-            <Link key={ch.slug} href={`/categories/${ch.slug}`} onClick={onLink}
-              className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-              <span className="text-sm">{ch.icon}</span>{ch.name}
-            </Link>
+          {groups.map((g, gi) => (
+            <div key={gi}>
+              {g.heading && <div className="mb-1 mt-1 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
+              {g.items.map((item) => (
+                <Link key={item.href} href={item.href} onClick={onLink}
+                  className="block rounded-lg px-3 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           ))}
-          <Link href={`/categories/${c.slug}`} onClick={onLink}
-            className="block px-3 py-1.5 text-[11px] font-bold text-accent">View All →</Link>
         </div>
       )}
     </div>

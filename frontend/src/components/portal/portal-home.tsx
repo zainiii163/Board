@@ -25,60 +25,27 @@ export function PortalHome({ categories, stats, latest, trending, categoryNameBy
       <section className="relative overflow-hidden bg-gradient-to-br from-teal-700 via-accent to-emerald-600 text-white">
         <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-emerald-300/10 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <p className="mb-2 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-0.5 text-[9px] font-bold uppercase tracking-[0.18em] backdrop-blur">
-            <span className="h-1 w-1 rounded-full bg-amber-300" />
-            BoardNotes Study Portal
-          </p>
-          <h1 className="font-serif text-xl font-bold leading-tight text-white sm:text-2xl lg:text-3xl">
+        <div className="relative mx-auto max-w-6xl px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+          <h1 className="font-serif text-lg font-bold leading-tight text-white sm:whitespace-nowrap sm:text-xl lg:text-2xl">
             {tr("portalHeroTitle")}
           </h1>
-          <p className="mt-2 max-w-xl text-xs leading-relaxed text-white/85 sm:text-sm">
+          <p className="mt-1 max-w-xl text-xs leading-relaxed text-white/85 sm:text-sm">
             {tr("portalHeroDesc")}
           </p>
-
           {stats && (
-            <dl className="mt-4 grid max-w-xs grid-cols-3 gap-3">
+            <dl className="mt-3 flex gap-5">
               {[
                 { value: stats.books.toLocaleString(), label: tr("portalStatBooks") },
                 { value: String(stats.categories), label: tr("portalStatCategories") },
                 { value: String(stats.users), label: tr("portalStatUsers") },
               ].map((s) => (
-                <div key={s.label}>
-                  <dt className="text-lg font-black sm:text-xl">{s.value}</dt>
-                  <dd className="mt-0.5 text-[9px] font-medium text-white/75">{s.label}</dd>
+                <div key={s.label} className="flex items-baseline gap-1.5">
+                  <dt className="text-base font-black sm:text-lg">{s.value}</dt>
+                  <dd className="text-[9px] font-medium text-white/75">{s.label}</dd>
                 </div>
               ))}
             </dl>
           )}
-
-          <form
-            action="/search"
-            className="mt-4 flex max-w-md items-center gap-2 rounded-full bg-white p-1 shadow-lg"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="ml-3 h-4 w-4 shrink-0 text-slate-400"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-            <input
-              name="q"
-              placeholder={tr("portalSearchPlaceholder")}
-              className="w-full bg-transparent px-2 py-1.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
-            />
-            <button
-              type="submit"
-              className="rounded-full bg-accent px-5 py-2 text-xs font-bold text-white transition hover:opacity-90"
-            >
-              {tr("startSearching")}
-            </button>
-          </form>
         </div>
       </section>
 
