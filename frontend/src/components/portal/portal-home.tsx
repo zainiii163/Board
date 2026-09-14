@@ -25,25 +25,40 @@ export function PortalHome({ categories, stats, latest, trending, categoryNameBy
       <section className="relative overflow-hidden bg-gradient-to-br from-teal-700 via-accent to-emerald-600 text-white">
         <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-emerald-300/10 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
-          <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur">
+        <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] backdrop-blur">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
             BoardNotes Study Portal
           </p>
-          <h1 className="font-serif text-3xl font-bold leading-tight text-white sm:whitespace-nowrap sm:text-4xl">
+          <h1 className="font-serif text-2xl font-bold leading-tight text-white sm:whitespace-nowrap sm:text-3xl lg:text-4xl">
             {tr("portalHeroTitle")}
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg">
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/85 sm:text-base">
             {tr("portalHeroDesc")}
           </p>
 
+          {stats && (
+            <dl className="mt-6 grid max-w-sm grid-cols-3 gap-4">
+              {[
+                { value: stats.books.toLocaleString(), label: tr("portalStatBooks") },
+                { value: String(stats.categories), label: tr("portalStatCategories") },
+                { value: String(stats.users), label: tr("portalStatUsers") },
+              ].map((s) => (
+                <div key={s.label}>
+                  <dt className="text-xl font-black sm:text-2xl">{s.value}</dt>
+                  <dd className="mt-0.5 text-[10px] font-medium text-white/75">{s.label}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+
           <form
             action="/search"
-            className="mt-8 flex max-w-xl items-center gap-2 rounded-full bg-white p-1.5 shadow-lg"
+            className="mt-6 flex max-w-lg items-center gap-2 rounded-full bg-white p-1 shadow-lg"
           >
             <svg
               viewBox="0 0 24 24"
-              className="ml-3 h-5 w-5 shrink-0 text-slate-400"
+              className="ml-3 h-4 w-4 shrink-0 text-slate-400"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
@@ -55,37 +70,22 @@ export function PortalHome({ categories, stats, latest, trending, categoryNameBy
             <input
               name="q"
               placeholder={tr("portalSearchPlaceholder")}
-              className="w-full bg-transparent px-2 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent px-2 py-1.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
             />
             <button
               type="submit"
-              className="rounded-full bg-accent px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+              className="rounded-full bg-accent px-5 py-2 text-xs font-bold text-white transition hover:opacity-90"
             >
               {tr("startSearching")}
             </button>
           </form>
 
-          {stats && (
-            <dl className="mt-10 grid max-w-lg grid-cols-3 gap-6">
-              {[
-                { value: stats.books.toLocaleString(), label: tr("portalStatBooks") },
-                { value: String(stats.categories), label: tr("portalStatCategories") },
-                { value: String(stats.users), label: tr("portalStatUsers") },
-              ].map((s) => (
-                <div key={s.label}>
-                  <dt className="text-2xl font-black sm:text-3xl">{s.value}</dt>
-                  <dd className="mt-1 text-xs font-medium text-white/75">{s.label}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-
-          <div className="mt-8 flex flex-wrap gap-2">
+          <div className="mt-6 flex flex-wrap gap-2">
             {categories.slice(0, 6).map((c) => (
               <Link
                 key={c.slug}
                 href={`/categories/${c.slug}`}
-                className="rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur transition hover:bg-white/20"
+                className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur transition hover:bg-white/20"
               >
                 {c.icon} {c.name}
               </Link>
