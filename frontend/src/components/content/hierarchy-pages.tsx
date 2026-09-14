@@ -17,6 +17,21 @@ import { AdBanner } from "@/components/portal/ad-banner";
 import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedList } from "@/lib/i18n";
 
+const SUBJECT_COLORS = [
+  { bg: "bg-gradient-to-br from-sky-50 to-blue-50", dark: "dark:from-sky-950/30 dark:to-blue-950/30", border: "border-sky-200/60 dark:border-sky-800/30", icon: "bg-gradient-to-br from-sky-500 to-blue-500", hover: "hover:border-sky-400", tag: "text-sky-600 dark:text-sky-300" },
+  { bg: "bg-gradient-to-br from-emerald-50 to-teal-50", dark: "dark:from-emerald-950/30 dark:to-teal-950/30", border: "border-emerald-200/60 dark:border-emerald-800/30", icon: "bg-gradient-to-br from-emerald-500 to-teal-500", hover: "hover:border-emerald-400", tag: "text-emerald-600 dark:text-emerald-300" },
+  { bg: "bg-gradient-to-br from-amber-50 to-orange-50", dark: "dark:from-amber-950/30 dark:to-orange-950/30", border: "border-amber-200/60 dark:border-amber-800/30", icon: "bg-gradient-to-br from-amber-500 to-orange-500", hover: "hover:border-amber-400", tag: "text-amber-600 dark:text-amber-300" },
+  { bg: "bg-gradient-to-br from-purple-50 to-fuchsia-50", dark: "dark:from-purple-950/30 dark:to-fuchsia-950/30", border: "border-purple-200/60 dark:border-purple-800/30", icon: "bg-gradient-to-br from-purple-500 to-fuchsia-500", hover: "hover:border-purple-400", tag: "text-purple-600 dark:text-purple-300" },
+  { bg: "bg-gradient-to-br from-rose-50 to-pink-50", dark: "dark:from-rose-950/30 dark:to-pink-950/30", border: "border-rose-200/60 dark:border-rose-800/30", icon: "bg-gradient-to-br from-rose-500 to-pink-500", hover: "hover:border-rose-400", tag: "text-rose-600 dark:text-rose-300" },
+  { bg: "bg-gradient-to-br from-cyan-50 to-sky-50", dark: "dark:from-cyan-950/30 dark:to-sky-950/30", border: "border-cyan-200/60 dark:border-cyan-800/30", icon: "bg-gradient-to-br from-cyan-500 to-sky-500", hover: "hover:border-cyan-400", tag: "text-cyan-600 dark:text-cyan-300" },
+  { bg: "bg-gradient-to-br from-indigo-50 to-violet-50", dark: "dark:from-indigo-950/30 dark:to-violet-950/30", border: "border-indigo-200/60 dark:border-indigo-800/30", icon: "bg-gradient-to-br from-indigo-500 to-violet-500", hover: "hover:border-indigo-400", tag: "text-indigo-600 dark:text-indigo-300" },
+  { bg: "bg-gradient-to-br from-red-50 to-rose-50", dark: "dark:from-red-950/30 dark:to-rose-950/30", border: "border-red-200/60 dark:border-red-800/30", icon: "bg-gradient-to-br from-red-500 to-rose-500", hover: "hover:border-red-400", tag: "text-red-600 dark:text-red-300" },
+  { bg: "bg-gradient-to-br from-teal-50 to-emerald-50", dark: "dark:from-teal-950/30 dark:to-emerald-950/30", border: "border-teal-200/60 dark:border-teal-800/30", icon: "bg-gradient-to-br from-teal-500 to-emerald-500", hover: "hover:border-teal-400", tag: "text-teal-600 dark:text-teal-300" },
+  { bg: "bg-gradient-to-br from-yellow-50 to-amber-50", dark: "dark:from-yellow-950/30 dark:to-amber-950/30", border: "border-yellow-200/60 dark:border-yellow-800/30", icon: "bg-gradient-to-br from-yellow-500 to-amber-500", hover: "hover:border-yellow-400", tag: "text-yellow-600 dark:text-yellow-300" },
+];
+
+const CLASS_ICONS = ["📚", "📖", "🎓", "✏️", "📝", "🧮", "🔬", "📐", "🌍", "📊"];
+
 type BoardPageContentProps = {
   board: string;
   title: string;
@@ -29,27 +44,49 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <LocalizedBreadcrumbs items={[{ label: "Home", href: "/" }, { label: title }]} />
-      <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">{tr("boardLabel")}</p>
-        <h1 className="mt-3 text-3xl font-black text-foreground sm:text-4xl">{title}</h1>
-        <p className="mt-3 text-muted">{tr("chooseClassContinue")}</p>
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {classes.length === 0 ? (
-            <p className="text-sm text-muted md:col-span-2 xl:col-span-3">{tr("noClassesYet")}</p>
-          ) : (
-            classes.map((klass) => (
+
+      {/* Colorful header banner */}
+      <div className="hero-gradient relative mt-6 overflow-hidden rounded-3xl px-8 py-10 text-white shadow-xl sm:px-10">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl animate-float" />
+          <div className="absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-emerald-300/10 blur-3xl animate-float-slow" />
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        </div>
+        <div className="relative">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
+            🏫 {tr("boardLabel")}
+          </span>
+          <h1 className="mt-4 text-3xl font-black sm:text-4xl" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.15)" }}>{title}</h1>
+          <p className="mt-2 max-w-lg text-sm text-white/85">{tr("chooseClassContinue")}</p>
+        </div>
+      </div>
+
+      {/* Class cards */}
+      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {classes.length === 0 ? (
+          <p className="text-sm text-muted md:col-span-2 xl:col-span-3">{tr("noClassesYet")}</p>
+        ) : (
+          classes.map((klass, i) => {
+            const color = SUBJECT_COLORS[i % SUBJECT_COLORS.length];
+            const icon = CLASS_ICONS[i % CLASS_ICONS.length];
+            return (
               <Link
                 key={klass.slug}
                 href={`/${board}/${klass.slug}`}
-                className="rounded-2xl border border-border bg-background p-5 transition hover:border-accent/40 hover:bg-accent/10"
+                className={`group relative overflow-hidden rounded-2xl border ${color.border} ${color.bg} ${color.dark} p-6 transition-all duration-400 hover:-translate-y-1 hover:shadow-xl ${color.hover} animate-fade-in-up stagger-${Math.min((i % 6) + 1, 6)}`}
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{tr("classLabel")}</p>
-                <h2 className="mt-2 text-xl font-bold text-foreground">{klass.title}</h2>
+                <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-xl transition-all duration-700 group-hover:scale-150 group-hover:opacity-[0.15]`} />
+                <span className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${color.icon} text-2xl text-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                  {icon}
+                </span>
+                <p className={`text-xs font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("classLabel")}</p>
+                <h2 className="mt-1 text-xl font-black text-foreground transition-colors duration-200 group-hover:text-accent">{klass.title}</h2>
                 <p className="mt-2 text-sm text-muted">{tr("openSubjectsResources")}</p>
+                <span className="absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r opacity-60 transition-all duration-700 group-hover:w-full rounded-full" />
               </Link>
-            ))
-          )}
-        </div>
+            );
+          })
+        )}
       </div>
     </section>
   );
@@ -72,6 +109,12 @@ export function ClassPageContent({
 }: ClassPageContentProps) {
   const { tr } = useLocale();
 
+  const infoCards = [
+    { icon: "📝", label: tr("notes"), desc: tr("conceptSummaries"), bg: "from-sky-50 to-blue-50", dark: "dark:from-sky-950/30 dark:to-blue-950/30", border: "border-sky-200/60 dark:border-sky-800/30", iconBg: "from-sky-500 to-blue-500" },
+    { icon: "📚", label: tr("books"), desc: tr("textbookLinks"), bg: "from-emerald-50 to-teal-50", dark: "dark:from-emerald-950/30 dark:to-teal-950/30", border: "border-emerald-200/60 dark:border-emerald-800/30", iconBg: "from-emerald-500 to-teal-500" },
+    { icon: "📄", label: tr("pastPapers"), desc: tr("solvedPaperSets"), bg: "from-amber-50 to-orange-50", dark: "dark:from-amber-950/30 dark:to-orange-950/30", border: "border-amber-200/60 dark:border-amber-800/30", iconBg: "from-amber-500 to-orange-500" },
+  ];
+
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <LocalizedBreadcrumbs
@@ -81,41 +124,67 @@ export function ClassPageContent({
           { label: classTitle },
         ]}
       />
-      <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">{tr("classLabel")}</p>
-        <h1 className="mt-3 text-3xl font-black text-foreground">{classTitle}</h1>
-        <p className="mt-3 text-muted">{tr("chooseSubjectContinue").replace("{board}", boardTitle)}</p>
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {subjects.length === 0 ? (
-            <p className="text-sm text-muted md:col-span-2 xl:col-span-3">{tr("noSubjectsYet")}</p>
-          ) : (
-            subjects.map((subject) => (
+
+      {/* Colorful header banner */}
+      <div className="hero-gradient relative mt-6 overflow-hidden rounded-3xl px-8 py-10 text-white shadow-xl sm:px-10">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl animate-float" />
+          <div className="absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-emerald-300/10 blur-3xl animate-float-slow" />
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        </div>
+        <div className="relative">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
+              🏫 {boardTitle}
+            </span>
+            <span className="text-white/40">/</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
+              🎓 {tr("classLabel")}
+            </span>
+          </div>
+          <h1 className="mt-4 text-3xl font-black sm:text-4xl" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.15)" }}>{classTitle}</h1>
+          <p className="mt-2 max-w-lg text-sm text-white/85">{tr("chooseSubjectContinue").replace("{board}", boardTitle)}</p>
+        </div>
+      </div>
+
+      {/* Subject cards */}
+      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {subjects.length === 0 ? (
+          <p className="text-sm text-muted md:col-span-2 xl:col-span-3">{tr("noSubjectsYet")}</p>
+        ) : (
+          subjects.map((subject, i) => {
+            const color = SUBJECT_COLORS[i % SUBJECT_COLORS.length];
+            return (
               <Link
                 key={subject.slug}
                 href={`/${board}/${classSlug}/${subject.slug}`}
-                className="rounded-2xl border border-border bg-background p-5 transition hover:border-accent/40 hover:bg-accent/10"
+                className={`group relative overflow-hidden rounded-2xl border ${color.border} ${color.bg} ${color.dark} p-6 transition-all duration-400 hover:-translate-y-1 hover:shadow-xl ${color.hover} animate-fade-in-up stagger-${Math.min((i % 6) + 1, 6)}`}
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{tr("subjectLabel")}</p>
-                <h2 className="mt-2 text-xl font-bold text-foreground">{subject.title}</h2>
+                <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-xl transition-all duration-700 group-hover:scale-150 group-hover:opacity-[0.15]`} />
+                <span className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${color.icon} text-2xl text-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                  📖
+                </span>
+                <p className={`text-xs font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("subjectLabel")}</p>
+                <h2 className="mt-1 text-xl font-black text-foreground transition-colors duration-200 group-hover:text-accent">{subject.title}</h2>
                 <p className="mt-2 text-sm text-muted">{tr("openChaptersNotes")}</p>
+                <span className={`absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r ${color.icon} opacity-60 transition-all duration-700 group-hover:w-full rounded-full`} />
               </Link>
-            ))
-          )}
-        </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-border bg-background p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">{tr("notes")}</p>
-            <p className="mt-2 font-semibold text-foreground">{tr("conceptSummaries")}</p>
+            );
+          })
+        )}
+      </div>
+
+      {/* Info cards */}
+      <div className="mt-10 grid gap-4 md:grid-cols-3">
+        {infoCards.map((card) => (
+          <div key={card.label} className={`group overflow-hidden rounded-2xl border ${card.border} bg-gradient-to-br ${card.bg} ${card.dark} p-5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md`}>
+            <span className={`mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${card.iconBg} text-lg text-white shadow-sm transition-transform duration-300 group-hover:scale-110`}>
+              {card.icon}
+            </span>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{card.label}</p>
+            <p className="mt-1 font-bold text-foreground">{card.desc}</p>
           </div>
-          <div className="rounded-2xl border border-border bg-background p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">{tr("books")}</p>
-            <p className="mt-2 font-semibold text-foreground">{tr("textbookLinks")}</p>
-          </div>
-          <div className="rounded-2xl border border-border bg-background p-4">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">{tr("pastPapers")}</p>
-            <p className="mt-2 font-semibold text-foreground">{tr("solvedPaperSets")}</p>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   );
@@ -146,6 +215,7 @@ export function SubjectPageContent({
 }: SubjectPageContentProps) {
   const { tr, locale } = useLocale();
   const tags = [tr("sloAligned"), tr("examFocused"), tr("stepwiseSolutions"), tr("pdfNotes")] as const;
+  const color = SUBJECT_COLORS[chapters.length % SUBJECT_COLORS.length];
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -157,60 +227,85 @@ export function SubjectPageContent({
           { label: subjectTitle },
         ]}
       />
-      <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">{tr("subjectLabel")}</p>
-            <h1 className="mt-3 text-3xl font-black text-foreground">{subjectTitle}</h1>
+
+      {/* Colorful header banner */}
+      <div className={`${color.bg} ${color.dark} relative mt-6 overflow-hidden rounded-3xl border ${color.border} px-8 py-10 shadow-xl sm:px-10`}>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className={`absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-2xl animate-float`} />
+          <div className={`absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.05] blur-3xl animate-float-slow`} />
+        </div>
+        <div className="relative">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5 text-[10px] font-bold text-muted">🏫 {boardTitle}</span>
+            <span className="text-muted/40">/</span>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5 text-[10px] font-bold text-muted">🎓 {classTitle}</span>
           </div>
-          <div className="rounded-full bg-accent/15 px-3 py-1 text-sm font-semibold text-accent">{tr("sessionYear")}</div>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className={`text-sm font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("subjectLabel")}</p>
+              <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{subjectTitle}</h1>
+            </div>
+            <span className="rounded-full border border-border bg-card/80 px-3 py-1 text-sm font-semibold text-muted backdrop-blur-sm">{tr("sessionYear")}</span>
+          </div>
         </div>
-        <div className="mt-8 flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {chapters.map((chapter) => (
+      </div>
+
+      {/* Tags */}
+      <div className="mt-6 flex flex-wrap gap-2">
+        {tags.map((tag, i) => (
+          <span
+            key={tag}
+            className={`rounded-full border ${color.border} ${color.bg} ${color.dark} px-3 py-1 text-xs font-bold ${color.tag} animate-fade-in-up stagger-${i + 1}`}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+
+      {/* Chapter cards */}
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        {chapters.map((chapter, i) => {
+          const cc = SUBJECT_COLORS[i % SUBJECT_COLORS.length];
+          return (
             <Link
               key={chapter.slug}
               href={`/${board}/${classSlug}/${subject}/${chapter.slug}`}
-              className="rounded-2xl border border-border bg-background p-5 transition hover:border-accent/40 hover:bg-accent/10"
+              className={`group relative overflow-hidden rounded-2xl border ${cc.border} ${cc.bg} ${cc.dark} p-5 transition-all duration-400 hover:-translate-y-1 hover:shadow-xl ${cc.hover} animate-fade-in-up stagger-${Math.min((i % 6) + 1, 6)}`}
             >
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{tr("chapterLabel")}</p>
-              <h2 className="mt-2 text-xl font-bold text-foreground">{chapter.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-muted">
+              <div className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${cc.icon} opacity-[0.08] blur-xl transition-all duration-700 group-hover:scale-150`} />
+              <p className={`text-xs font-bold uppercase tracking-[0.18em] ${cc.tag}`}>{tr("chapterLabel")}</p>
+              <h2 className="mt-1 text-lg font-black text-foreground transition-colors duration-200 group-hover:text-accent">{chapter.title}</h2>
+              <p className="mt-2 text-xs leading-5 text-muted line-clamp-2">
                 {pickLocalized(locale, chapter.summary, chapter.summaryUr)}
               </p>
+              <span className={`absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r ${cc.icon} opacity-60 transition-all duration-700 group-hover:w-full rounded-full`} />
             </Link>
-          ))}
-        </div>
-        <SubjectFaq />
-        <div className="mt-8 rounded-2xl border border-border bg-card p-5">
-          <p className="text-sm text-muted">
-            {authors.length === 0 ? (
-              tr("notesByContributors").replace("{author}", tr("authorLabel"))
-            ) : (
-              <>
-                {tr("notesByContributors").split("{author}")[0]}
-                {authors.map((author, index) => (
-                  <span key={author.slug}>
-                    {index > 0 && (index === authors.length - 1 ? ` ${tr("and")} ` : ", ")}
-                    <Link href={`/authors/${author.slug}`} className="font-semibold text-accent hover:underline">
-                      {author.name}
-                    </Link>
-                  </span>
-                ))}
-                {tr("notesByContributors").split("{author}")[1] ?? ""}
-              </>
-            )}
-          </p>
-        </div>
+          );
+        })}
+      </div>
+
+      <SubjectFaq />
+
+      {/* Authors */}
+      <div className="mt-8 rounded-2xl border border-border bg-card/50 p-5">
+        <p className="text-sm text-muted">
+          {authors.length === 0 ? (
+            tr("notesByContributors").replace("{author}", tr("authorLabel"))
+          ) : (
+            <>
+              {tr("notesByContributors").split("{author}")[0]}
+              {authors.map((author, index) => (
+                <span key={author.slug}>
+                  {index > 0 && (index === authors.length - 1 ? ` ${tr("and")} ` : ", ")}
+                  <Link href={`/authors/${author.slug}`} className="font-semibold text-accent hover:underline">
+                    {author.name}
+                  </Link>
+                </span>
+              ))}
+              {tr("notesByContributors").split("{author}")[1] ?? ""}
+            </>
+          )}
+        </p>
       </div>
     </section>
   );
@@ -239,6 +334,7 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
   const subjectKey = `${props.board}/${props.classSlug}/${props.subject}`;
   const summary = pickLocalized(locale, props.summary, props.summaryUr);
   const formulas = pickLocalizedList(locale, props.formulas, props.formulasUr);
+  const color = SUBJECT_COLORS[0];
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -257,10 +353,25 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
           { label: props.chapterTitle },
         ]}
       />
+
+      {/* Header banner */}
+      <div className={`${color.bg} ${color.dark} relative mt-6 overflow-hidden rounded-3xl border ${color.border} px-8 py-10 shadow-xl sm:px-10`}>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className={`absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-2xl animate-float`} />
+        </div>
+        <div className="relative">
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
+            <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">🏫 {props.boardTitle}</span>
+            <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">🎓 {props.classTitle}</span>
+            <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">📖 {props.subjectTitle}</span>
+          </div>
+          <p className={`mt-3 text-sm font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("chapterLabel")}</p>
+          <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{props.chapterTitle}</h1>
+        </div>
+      </div>
+
       <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">{tr("chapterLabel")}</p>
-        <h1 className="mt-3 text-3xl font-black text-foreground">{props.chapterTitle}</h1>
-        <p className="mt-4 text-base leading-7 text-muted">{summary}</p>
+        <p className="text-base leading-7 text-muted">{summary}</p>
         <ChapterVideo videoUrl={props.videoUrl} title={props.chapterTitle} />
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-border bg-background p-5">
@@ -369,6 +480,8 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
   const exercisePath = (slug: string) =>
     `/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}/${slug}`;
 
+  const color = SUBJECT_COLORS[3];
+
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <LocalizedBreadcrumbs
@@ -381,25 +494,34 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
           { label: props.exerciseTitle },
         ]}
       />
-      <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+      {/* Header banner */}
+      <div className={`${color.bg} ${color.dark} relative mt-6 overflow-hidden rounded-3xl border ${color.border} px-8 py-10 shadow-xl sm:px-10`}>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className={`absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-2xl animate-float`} />
+        </div>
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">{tr("exerciseLabel")}</p>
-            <h1 className="mt-3 text-3xl font-black text-foreground">{props.exerciseTitle}</h1>
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
+              <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">📖 {props.subjectTitle}</span>
+              <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">📑 {props.chapterTitle}</span>
+            </div>
+            <p className={`mt-3 text-sm font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("exerciseLabel")}</p>
+            <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{props.exerciseTitle}</h1>
           </div>
           {props.pdfDownloadUrl ? (
             <DownloadGate url={props.pdfDownloadUrl} />
           ) : (
-            <span className="rounded-xl border border-border px-4 py-3 text-sm font-semibold text-muted">
+            <span className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border bg-card/80 px-4 py-3 text-sm font-semibold text-muted backdrop-blur-sm">
               {tr("downloadPdf")}
             </span>
           )}
         </div>
+      </div>
 
+      <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
         {/* Ad — above question list */}
-        <div className="mt-6">
-          <AdBanner size="leaderboard" className="mx-auto" />
-        </div>
+        <AdBanner size="leaderboard" className="mx-auto" />
 
         <div className="mt-6 rounded-2xl border border-border bg-background p-5">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted">{tr("questionList")}</p>
@@ -407,13 +529,13 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
             {props.questions.length === 0 ? (
               <p className="text-sm text-muted">{tr("noQuestionsYet")}</p>
             ) : (
-              props.questions.map((question) => (
+              props.questions.map((question, i) => (
                 <Link
                   key={question.num}
                   href={`/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}/${props.exercise}/q/${question.num}`}
-                  className="flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground/90 transition hover:border-accent/40 hover:text-accent sm:flex-row sm:items-center sm:justify-between"
+                  className={`flex flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground/90 transition hover:border-accent/40 hover:text-accent animate-fade-in-up stagger-${Math.min((i % 6) + 1, 6)} sm:flex-row sm:items-center sm:justify-between`}
                 >
-                  <span>{tr("questionN").replace("{num}", String(question.num))}</span>
+                  <span className="font-bold text-accent">Q{question.num}</span>
                   <span>{question.question}</span>
                 </Link>
               ))
@@ -421,10 +543,8 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
           </div>
         </div>
 
-        {/* Embed exercise-specific PDF for seamless reading */}
         {props.pdfDownloadUrl && <PdfSection url={props.pdfDownloadUrl} title={props.exerciseTitle} />}
 
-        {/* Ad — below PDF */}
         <div className="mt-4">
           <AdBanner size="inline" className="mx-auto" />
         </div>
