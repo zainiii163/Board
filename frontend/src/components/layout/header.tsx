@@ -1,20 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 
 import { useLocale } from "@/lib/locale-context";
 import { useAuth } from "@/lib/auth-context";
 import { BoardsMenu } from "@/components/layout/boards-menu";
-import { WHATSAPP_CHANNEL_URL } from "@/lib/constants";
-
-function WhatsAppIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" fill="currentColor" aria-hidden="true">
-      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 1.83c2.16 0 4.19.84 5.72 2.37a8.04 8.04 0 0 1 2.37 5.72c0 4.46-3.63 8.08-8.09 8.08-1.49 0-2.94-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.03 8.03 0 0 1-1.24-4.28c0-4.46 3.63-8.08 8.09-8.08Zm-2.85 4.02c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.23.9 2.43 1.03 2.6.13.17 1.77 2.71 4.3 3.8 2.1.9 2.53.72 2.99.68.46-.05 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.17-.46-.29-.24-.12-1.43-.71-1.65-.79-.22-.08-.38-.12-.54.12-.16.24-.62.79-.76.95-.14.17-.28.19-.52.06-.24-.12-1-.37-1.9-1.17-.7-.62-1.17-1.39-1.31-1.63-.16-.24-.02-.37.12-.49.13-.13.28-.35.42-.53.14-.17.19-.29.28-.49.1-.19.05-.36-.02-.5-.06-.13-.52-1.28-.73-1.76-.16-.4-.36-.37-.54-.38h-.46Z" />
-    </svg>
-  );
-}
 
 type DropdownItem = { label: string; href: string };
 type DropdownGroup = { heading?: string; items: DropdownItem[] };
@@ -215,20 +206,16 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
-      <nav className="mx-auto flex w-full max-w-[1400px] items-center gap-1 overflow-visible px-3 py-1 sm:px-4 lg:px-6" aria-label="Main">
-        {/* Logo — far left */}
+      <nav className="mx-auto flex w-full max-w-[1400px] items-center px-3 py-1 sm:px-4 lg:px-6" aria-label="Main">
+        {/* Logo */}
         <Link href="/" className="mr-2 flex shrink-0 items-center gap-1.5">
           <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white">B</span>
           <span className="hidden font-serif text-base font-bold text-foreground sm:block">BoardNotes</span>
         </Link>
 
-        {/* Boards selector */}
-        <div className="hidden shrink-0 xl:block">
+        {/* Boards + all nav items — single aligned row */}
+        <div className="hidden items-center gap-0 overflow-x-auto scrollbar-none xl:flex">
           <BoardsMenu />
-        </div>
-
-        {/* All nav items — inline */}
-        <div className="hidden items-center gap-0 xl:flex">
           {NAV_ITEMS.map((item) => (
             <Dropdown
               key={item.label}
@@ -247,9 +234,6 @@ export function Header() {
             <svg viewBox="0 0 24 24" className="h-3 w-3 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             <input name="q" autoComplete="off" placeholder={locale === "ur" ? "تلاش…" : "Search…"} aria-label={tr("search")} className="w-16 bg-transparent text-[11px] font-medium text-foreground outline-none placeholder:text-muted focus:w-24 transition-all" />
           </form>
-          <button type="button" onClick={() => {}} className="rounded-md px-1.5 py-1 text-[10px] font-semibold text-muted transition hover:text-foreground" title="Toggle language">
-            {locale === "en" ? "اردو" : "EN"}
-          </button>
           {!loading && user ? (
             <>
               {isStaff && <Link href="/admin" className="hidden rounded-md px-1.5 py-1 text-[11px] font-semibold text-accent transition hover:bg-accent/10 lg:inline-block">Admin</Link>}
@@ -258,10 +242,6 @@ export function Header() {
           ) : (
             <Link href="/login" className="rounded-full bg-accent px-3 py-1 text-[11px] font-bold text-white shadow-sm transition hover:shadow-md hover:shadow-accent/20">{tr("signUp")}</Link>
           )}
-          <a href={WHATSAPP_CHANNEL_URL} target="_blank" rel="noopener noreferrer" className="hidden items-center gap-1 rounded-full bg-[#25D366] px-2.5 py-1 text-[11px] font-bold text-white shadow-sm transition hover:shadow-md hover:shadow-[#25D366]/20 md:inline-flex">
-            <WhatsAppIcon />
-            <span className="hidden lg:inline">WhatsApp</span>
-          </a>
         </div>
 
         {/* Mobile hamburger */}
@@ -303,10 +283,6 @@ export function Header() {
               <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full bg-accent px-5 py-2.5 text-center text-sm font-bold text-white">{tr("signUp")} / {tr("signIn")}</Link>
             )}
             <Link href="/upload" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-center text-sm font-bold text-accent">{tr("uploadTitle")}</Link>
-            <a href={WHATSAPP_CHANNEL_URL} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="mt-2 flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-center text-sm font-bold text-white">
-              <WhatsAppIcon />
-              {tr("joinWhatsApp")}
-            </a>
           </div>
         </div>
       )}
