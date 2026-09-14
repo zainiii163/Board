@@ -3,6 +3,7 @@ import { env, isProduction, isR2Configured } from "./config/env.js";
 import { seedDefaultUsers } from "./modules/auth/auth.service.js";
 import { initDbMode } from "./db/mode.js";
 import { seedIfEmpty } from "./db/seed-if-empty.js";
+import { applyMigrations } from "./db/migrate.js";
 
 const app = createApp();
 
@@ -23,6 +24,13 @@ async function start() {
   const dbOk = await initDbMode();
 
   if (dbOk) {
+    if (env.autoMigrate) {
+      try {
+        await applyMigrations();
+      } catch (err) {
+        console.warn("[db] Auto-migration failed:", err instanceof Error ? err.message : err);
+      }
+    }
     try {
       await seedIfEmpty();
     } catch (err) {

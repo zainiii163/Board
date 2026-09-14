@@ -9,6 +9,7 @@ export const env = {
     .filter(Boolean),
   publicApiUrl: (process.env.PUBLIC_API_URL ?? "").replace(/\/$/, ""),
   publicSiteUrl: (process.env.PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, ""),
+  autoMigrate: process.env.AUTO_MIGRATE !== "false",
   r2Bucket: process.env.R2_BUCKET ?? "",
   r2AccessKey: process.env.R2_ACCESS_KEY ?? "",
   r2SecretKey: process.env.R2_SECRET_KEY ?? "",

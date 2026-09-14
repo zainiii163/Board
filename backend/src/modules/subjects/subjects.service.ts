@@ -77,7 +77,8 @@ export async function getSubjectBySlug(slug: string) {
       })),
     };
   }
-  const record = cmsStore.listSubjectsAdmin().find((s) => s.slug === slug);
+  const records = cmsStore.listSubjectsAdmin().filter((s) => s.slug === slug);
+  const record = records.find((s) => s.classSlug === "9") ?? records[0];
   if (!record) throw ApiError.notFound("Subject not found.");
   const chapters = cmsStore
     .listChaptersAdmin()

@@ -57,7 +57,12 @@ test("GET /api/boards returns the demo boards", async () => {
     const levelQuestionPayload = await levelQuestionResponse.json();
     assert.equal(levelQuestionResponse.status, 200);
     assert.equal(levelQuestionPayload.question.num, 2);
-    assert.ok(levelQuestionPayload.question.question.includes("\\sqrt{b^2 - 4ac}"));
+    assert.ok(levelQuestionPayload.question.question.includes("2x^2 - 5x - 3"));
+    assert.ok(
+        levelQuestionPayload.question.steps.some(
+            (step: { content: string }) => step.content.includes("\\frac{5 \\pm \\sqrt{49}}{4}"),
+        ),
+    );
 
     const punjabChapter = await fetch(
         `http://127.0.0.1:${address.port}/api/boards/punjab/classes/9/subjects/mathematics/chapters/sets`,
