@@ -13,7 +13,7 @@ import * as chapterZipService from "./chapter-zip.service.js";
 import type { AuthedRequest } from "../../middleware/auth.middleware.js";
 import { db } from "../../db/index.js";
 import { useDb } from "../../db/mode.js";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import * as schema from "../../db/schema.js";
 import { ApiError } from "../../utils/api-error.js";
 
@@ -107,11 +107,16 @@ export const getBoardClass = async (req: Request, res: Response) => {
 
     if (useDb()) {
         try {
+            const board = await db.query.boards.findFirst({
+                where: eq(schema.boards.slug, slug),
+            });
+            if (!board) return res.status(404).json({ message: "Board not found" });
+
             const klass = await db.query.classes.findFirst({
-                where: eq(schema.classes.slug, classSlug),
+                where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, board.id)),
                 with: { board: true },
             });
-            if (klass && klass.board.slug === slug) {
+            if (klass) {
                 return res.json({ board: klass.board, class: klass });
             }
             return res.status(404).json({ message: "Class not found" });
@@ -138,14 +143,24 @@ export const getBoardClassSubject = async (req: Request, res: Response) => {
 
     if (useDb()) {
         try {
+            const board = await db.query.boards.findFirst({
+                where: eq(schema.boards.slug, slug),
+            });
+            if (!board) return res.status(404).json({ message: "Board not found" });
+
+            const klass = await db.query.classes.findFirst({
+                where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, board.id)),
+            });
+            if (!klass) return res.status(404).json({ message: "Subject not found" });
+
             const subject = await db.query.subjects.findFirst({
-                where: eq(schema.subjects.slug, subjectSlug),
+                where: and(eq(schema.subjects.slug, subjectSlug), eq(schema.subjects.classId, klass.id)),
                 with: {
                     class: { with: { board: true } },
                     chapters: true,
                 },
             });
-            if (subject && subject.class.slug === classSlug && subject.class.board.slug === slug) {
+            if (subject) {
                 return res.json({
                     board: subject.class.board,
                     class: subject.class,
@@ -182,24 +197,28 @@ export const getBoardClassSubjectChapter = async (req: Request, res: Response) =
 
     if (useDb()) {
         try {
-            const chapter = await db.query.chapters.findFirst({
-                where: eq(schema.chapters.slug, chapterSlug),
-                with: {
-                    subject: { with: { class: { with: { board: true } } } },
-                    exercises: true,
-                },
+            const board = await db.query.boards.findFirst({ where: eq(schema.boards.slug, slug) });
+            if (!board) return res.status(404).json({ message: "Board not found" });
+
+            const klass = await db.query.classes.findFirst({
+                where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, board.id)),
             });
-            if (
-                chapter &&
-                chapter.status === "published" &&
-                chapter.subject.slug === subjectSlug &&
-                chapter.subject.class.slug === classSlug &&
-                chapter.subject.class.board.slug === slug
-            ) {
+            if (!klass) return res.status(404).json({ message: "Chapter not found" });
+
+            const subject = await db.query.subjects.findFirst({
+                where: and(eq(schema.subjects.slug, subjectSlug), eq(schema.subjects.classId, klass.id)),
+            });
+            if (!subject) return res.status(404).json({ message: "Chapter not found" });
+
+            const chapter = await db.query.chapters.findFirst({
+                where: and(eq(schema.chapters.slug, chapterSlug), eq(schema.chapters.subjectId, subject.id)),
+                with: { exercises: true },
+            });
+            if (chapter && chapter.status === "published") {
                 return res.json({
-                    board: chapter.subject.class.board,
-                    class: chapter.subject.class,
-                    subject: chapter.subject,
+                    board,
+                    class: klass,
+                    subject,
                     chapter,
                 });
             }
@@ -232,30 +251,36 @@ export const getBoardClassSubjectChapterExercise = async (req: Request, res: Res
 
     if (useDb()) {
         try {
+            const board = await db.query.boards.findFirst({ where: eq(schema.boards.slug, slug) });
+            if (!board) return res.status(404).json({ message: "Board not found" });
+
+            const klass = await db.query.classes.findFirst({
+                where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, board.id)),
+            });
+            if (!klass) return res.status(404).json({ message: "Exercise not found" });
+
+            const subject = await db.query.subjects.findFirst({
+                where: and(eq(schema.subjects.slug, subjectSlug), eq(schema.subjects.classId, klass.id)),
+            });
+            if (!subject) return res.status(404).json({ message: "Exercise not found" });
+
+            const chapter = await db.query.chapters.findFirst({
+                where: and(eq(schema.chapters.slug, chapterSlug), eq(schema.chapters.subjectId, subject.id)),
+            });
+            if (!chapter || chapter.status !== "published") return res.status(404).json({ message: "Exercise not found" });
+
             const exercise = await db.query.exercises.findFirst({
-                where: eq(schema.exercises.slug, exerciseSlug),
+                where: and(eq(schema.exercises.slug, exerciseSlug), eq(schema.exercises.chapterId, chapter.id)),
                 with: {
-                    chapter: {
-                        with: {
-                            subject: { with: { class: { with: { board: true } } } },
-                        },
-                    },
                     questions: { columns: { num: true, questionText: true } },
                 },
             });
-            if (
-                exercise &&
-                exercise.chapter.status === "published" &&
-                exercise.chapter.slug === chapterSlug &&
-                exercise.chapter.subject.slug === subjectSlug &&
-                exercise.chapter.subject.class.slug === classSlug &&
-                exercise.chapter.subject.class.board.slug === slug
-            ) {
+            if (exercise) {
                 return res.json({
-                    board: exercise.chapter.subject.class.board,
-                    class: exercise.chapter.subject.class,
-                    subject: exercise.chapter.subject,
-                    chapter: exercise.chapter,
+                    board,
+                    class: klass,
+                    subject,
+                    chapter,
                     exercise: {
                         slug: exercise.slug,
                         title: exercise.title,
@@ -300,37 +325,47 @@ export const getBoardClassSubjectChapterExerciseQuestion = async (
 
     if (useDb()) {
         try {
+            const board = await db.query.boards.findFirst({ where: eq(schema.boards.slug, slug) });
+            if (!board) return res.status(404).json({ message: "Board not found" });
+
+            const klass = await db.query.classes.findFirst({
+                where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, board.id)),
+            });
+            if (!klass) return res.status(404).json({ message: "Question not found" });
+
+            const subject = await db.query.subjects.findFirst({
+                where: and(eq(schema.subjects.slug, subjectSlug), eq(schema.subjects.classId, klass.id)),
+            });
+            if (!subject) return res.status(404).json({ message: "Question not found" });
+
+            const chapter = await db.query.chapters.findFirst({
+                where: and(eq(schema.chapters.slug, chapterSlug), eq(schema.chapters.subjectId, subject.id)),
+            });
+            if (!chapter || chapter.status !== "published") return res.status(404).json({ message: "Question not found" });
+
+            const exercise = await db.query.exercises.findFirst({
+                where: and(eq(schema.exercises.slug, exerciseSlug), eq(schema.exercises.chapterId, chapter.id)),
+            });
+            if (!exercise) return res.status(404).json({ message: "Question not found" });
+
             const question = await db.query.questions.findFirst({
-                where: eq(schema.questions.num, num),
+                where: and(eq(schema.questions.num, num), eq(schema.questions.exerciseId, exercise.id)),
                 with: {
                     steps: { orderBy: (steps, { asc }) => [asc(steps.stepOrder)] },
                     exercise: {
                         with: {
-                            chapter: {
-                                with: {
-                                    subject: { with: { class: { with: { board: true } } } },
-                                },
-                            },
                             questions: { columns: { num: true } },
                         },
                     },
                 },
             });
 
-            if (
-                question &&
-                question.exercise.slug === exerciseSlug &&
-                question.exercise.chapter.status === "published" &&
-                question.exercise.chapter.slug === chapterSlug &&
-                question.exercise.chapter.subject.slug === subjectSlug &&
-                question.exercise.chapter.subject.class.slug === classSlug &&
-                question.exercise.chapter.subject.class.board.slug === slug
-            ) {
+            if (question) {
                 return res.json({
-                    board: question.exercise.chapter.subject.class.board,
-                    class: question.exercise.chapter.subject.class,
-                    subject: question.exercise.chapter.subject,
-                    chapter: question.exercise.chapter,
+                    board,
+                    class: klass,
+                    subject,
+                    chapter,
                     exercise: question.exercise,
                     question: {
                         num: question.num,
