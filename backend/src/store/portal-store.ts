@@ -154,6 +154,29 @@ const gradients = [
   "from-slate-600 to-slate-800",
 ];
 
+const SUBJECT_COVERS: Record<string, string> = {
+  Physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=500&fit=crop",
+  Chemistry: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&h=500&fit=crop",
+  Mathematics: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&h=500&fit=crop",
+  Biology: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=400&h=500&fit=crop",
+  English: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=500&fit=crop",
+  "Computer Science": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=500&fit=crop",
+  Urdu: "https://images.unsplash.com/photo-1562408590-e32931084e23?w=400&h=500&fit=crop",
+  "Pakistan Studies": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=400&h=500&fit=crop",
+  General: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=500&fit=crop",
+};
+
+const CATEGORY_COVERS: Record<string, string> = {
+  textbooks: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&h=400&fit=crop",
+  notes: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&h=400&fit=crop",
+  "pairing-schemes": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=400&fit=crop",
+  "results-news": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop",
+  "model-papers": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=600&h=400&fit=crop",
+  "guess-papers": "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=600&h=400&fit=crop",
+  test: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&h=400&fit=crop",
+  tuition: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
+};
+
 const categories: PortalCategory[] = [];
 let categoryId = 1;
 
@@ -189,28 +212,6 @@ const AUTHORS = [
 
 const BOARD_TAGS = ["Punjab Board", "FBISE", "Sindh Board", "KPK Board", null];
 
-const SUBJECT_COVERS: Record<string, string> = {
-  Physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=500&fit=crop",
-  Chemistry: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&h=500&fit=crop",
-  Mathematics: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&h=500&fit=crop",
-  Biology: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=400&h=500&fit=crop",
-  English: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=500&fit=crop",
-  "Computer Science": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=500&fit=crop",
-  Urdu: "https://images.unsplash.com/photo-1562408590-e32931084e23?w=400&h=500&fit=crop",
-  "Pakistan Studies": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=400&h=500&fit=crop",
-  General: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=500&fit=crop",
-};
-
-const CATEGORY_COVERS: Record<string, string> = {
-  textbooks: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&h=400&fit=crop",
-  notes: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&h=400&fit=crop",
-  "pairing-schemes": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=400&fit=crop",
-  "results-news": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop",
-  "model-papers": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=600&h=400&fit=crop",
-  "guess-papers": "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=600&h=400&fit=crop",
-  test: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&h=400&fit=crop",
-  tuition: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
-};
 const SUBJECTS = [
   "Physics",
   "Chemistry",

@@ -62,43 +62,44 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
   return (
     <div>
       {/* ─── Hero Banner ─── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-teal-600 via-accent to-emerald-600 animate-gradient-shift hero-pattern text-white">
+      <section className="relative overflow-hidden text-white" style={{ background: "linear-gradient(135deg, #0d6659 0%, #0D9488 40%, #059669 70%, #047857 100%)" }}>
         {/* Floating decorative shapes */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="floating-shape -right-20 -top-20 h-72 w-72 bg-white/10 blur-2xl animate-float" />
-          <div className="floating-shape -bottom-28 -left-20 h-80 w-80 bg-emerald-300/10 blur-3xl animate-float-slow" />
-          <div className="pointer-events-none absolute right-10 top-10 h-40 w-40 rounded-full border border-white/10 animate-spin-slow" />
-          <div className="pointer-events-none absolute bottom-8 left-[15%] h-24 w-24 rounded-full border border-white/5" />
+          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/10 blur-2xl animate-float" />
+          <div className="absolute -bottom-28 -left-20 h-80 w-80 rounded-full bg-emerald-300/15 blur-3xl animate-float-slow" />
+          <div className="absolute right-10 top-10 h-40 w-40 rounded-full border border-white/10 animate-spin-slow" />
+          <div className="absolute bottom-8 left-[15%] h-24 w-24 rounded-full border border-white/8" />
           {/* Grid dots pattern */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
+          <div className="absolute inset-0 opacity-[0.06]" style={{
             backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
             backgroundSize: "24px 24px",
           }} />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
+        <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
           <div className="max-w-2xl">
-            <div className="animate-fade-in-up mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
+            <div className="animate-fade-in-up mb-4 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
               <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
               Trusted by 10,000+ Students
             </div>
-            <h1 className="animate-fade-in-up stagger-1 font-serif text-2xl font-black leading-tight text-white sm:text-3xl lg:text-4xl">
+            <h1 className="animate-fade-in-up stagger-1 font-serif text-2xl font-black leading-tight text-white sm:text-3xl lg:text-4xl" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.15)" }}>
               {tr("portalHeroTitle")}
             </h1>
-            <p className="animate-fade-in-up stagger-2 mt-3 max-w-xl text-sm leading-relaxed text-white/85 sm:text-base">
+            <p className="animate-fade-in-up stagger-2 mt-3 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base" style={{ textShadow: "0 1px 6px rgba(0,0,0,0.1)" }}>
               {tr("portalHeroDesc")}
             </p>
             <div className="animate-fade-in-up stagger-3 mt-6 flex flex-wrap gap-3">
               <Link
                 href="/categories"
-                className="shine-on-hover inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-accent shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-white/20"
+                className="shine-on-hover inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                style={{ color: "#0D9488" }}
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                 {tr("browseCategories")}
               </Link>
               <Link
                 href="/books"
-                className="shine-on-hover inline-flex items-center gap-2 rounded-full border-2 border-white/30 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/60 hover:bg-white/10"
+                className="shine-on-hover inline-flex items-center gap-2 rounded-full border-2 border-white/40 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/70 hover:bg-white/20"
               >
                 {tr("books")} →
               </Link>
@@ -253,7 +254,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
 
       {/* ─── Upload CTA ─── */}
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-teal-700 via-accent to-emerald-600 px-8 py-12 text-white transition-shadow duration-500 hover:shadow-2xl hover:shadow-accent/20 sm:px-12 sm:py-16">
+        <div className="relative overflow-hidden rounded-3xl px-8 py-12 text-white transition-shadow duration-500 hover:shadow-2xl hover:shadow-accent/20 sm:px-12 sm:py-16" style={{ background: "linear-gradient(135deg, #0d6659 0%, #0D9488 40%, #059669 70%, #047857 100%)" }}>
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl animate-float" />
             <div className="absolute -bottom-20 -left-16 h-72 w-72 rounded-full bg-emerald-300/10 blur-3xl animate-float-slow" />
