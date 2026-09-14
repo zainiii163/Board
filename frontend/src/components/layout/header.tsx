@@ -203,11 +203,11 @@ export function Header() {
   }, [clearClose]);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
+    <header className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md print:hidden">
       <nav className="mx-auto flex w-full max-w-[1400px] items-center px-3 py-1 sm:px-4 lg:px-6" aria-label="Main">
         {/* Logo */}
-        <Link href="/" className="mr-2 flex shrink-0 items-center gap-1.5">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white">B</span>
+        <Link href="/" className="mr-2 flex shrink-0 items-center gap-1.5 transition-transform duration-300 hover:scale-105">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-xs font-bold text-white shadow-sm shadow-accent/20">B</span>
           <span className="hidden font-serif text-base font-bold text-foreground sm:block">BoardNotes</span>
         </Link>
 
@@ -238,7 +238,7 @@ export function Header() {
               <Link href="/account" className="hidden rounded-full border border-border px-2 py-0.5 text-[10.5px] font-semibold text-foreground transition hover:bg-card sm:inline-block">{user.name.split(" ")[0]}</Link>
             </>
           ) : (
-            <Link href="/login" className="rounded-full bg-accent px-2.5 py-0.5 text-[10.5px] font-bold text-white shadow-sm transition hover:shadow-md hover:shadow-accent/20">{tr("signUp")}</Link>
+            <Link href="/login" className="shine-on-hover rounded-full bg-accent px-2.5 py-0.5 text-[10.5px] font-bold text-white shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-accent/25 hover:scale-105">{tr("signUp")}</Link>
           )}
         </div>
 

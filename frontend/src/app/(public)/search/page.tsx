@@ -65,6 +65,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       author: r.author,
       description: "",
       fileUrl: r.fileUrl,
+      coverUrl: null,
       sizeLabel: "PDF",
       pages: 0,
       downloads: r.downloads,

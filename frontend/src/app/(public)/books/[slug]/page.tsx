@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 import { apiFetchOrNull } from "@/lib/api-client";
 import { CoverArt } from "@/components/portal/cover-art";
@@ -68,7 +69,18 @@ export default async function BookDetailPage({ params }: { params: Promise<{ slu
       <section className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
           <div className="mx-auto w-56 overflow-hidden rounded-2xl border border-border shadow-lg lg:mx-0 lg:w-full">
-            <CoverArt title={resource.title} gradient={category?.gradient} className="aspect-[4/5] h-full w-full" />
+            {resource.coverUrl ? (
+              <Image
+                src={resource.coverUrl}
+                alt={resource.title}
+                width={280}
+                height={350}
+                className="h-auto w-full object-cover"
+                priority
+              />
+            ) : (
+              <CoverArt title={resource.title} gradient={category?.gradient} className="aspect-[4/5] h-full w-full" />
+            )}
           </div>
 
           <div className="min-w-0">

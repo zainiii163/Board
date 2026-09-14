@@ -35,7 +35,7 @@ export function BoardsMenu() {
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-30 mt-1 w-[640px] rounded-2xl border border-border bg-card p-3 shadow-2xl animate-scale-in">
+        <div className="absolute left-0 top-full z-30 mt-1 w-[640px] rounded-2xl border border-border bg-card p-3 shadow-2xl animate-scale-in backdrop-blur-sm">
           <div className="flex gap-3">
             {/* Boards column */}
             <div className="w-48 shrink-0 space-y-1">
@@ -45,10 +45,10 @@ export function BoardsMenu() {
                   type="button"
                   onMouseEnter={() => setActiveSlug(board.slug)}
                   onClick={() => setActiveSlug(board.slug)}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[13px] font-semibold transition ${
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[13px] font-semibold transition-all duration-200 ${
                     activeSlug === board.slug
                       ? "bg-accent/10 text-accent"
-                      : "text-foreground hover:bg-background hover:text-accent"
+                      : "text-foreground hover:bg-background hover:text-accent hover:pl-4"
                   }`}
                 >
                   {board.label}
