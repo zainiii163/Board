@@ -134,12 +134,12 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
         <svg viewBox="0 0 24 24" className={`h-2 w-2 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
-        <div className="absolute left-1/2 top-full z-50 mt-1 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-1.5 shadow-2xl" onMouseEnter={onFocused} onMouseLeave={onClose}>
+        <div className="absolute left-1/2 top-full z-50 mt-1 w-56 -translate-x-1/2 rounded-xl border border-border bg-card p-1.5 shadow-2xl animate-scale-in backdrop-blur-sm" onMouseEnter={onFocused} onMouseLeave={onClose}>
           {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && <div className="mb-0.5 mt-1.5 px-2.5 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
               {g.items.map((itm) => (
-                <Link key={itm.href} href={itm.href} onClick={onClose} className="block rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                <Link key={itm.href} href={itm.href} onClick={onClose} className="block rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:pl-3.5">
                   {itm.label}
                 </Link>
               ))}

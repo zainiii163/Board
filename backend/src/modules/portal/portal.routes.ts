@@ -26,12 +26,14 @@ portalRouter.get("/nav", (_req, res) => {
       nameUr: top.nameUr,
       icon: top.icon,
       gradient: top.gradient,
+      imageUrl: top.imageUrl,
       children: portalStore.getChildren(top.id).map((child) => ({
         slug: child.slug,
         name: child.name,
         nameUr: child.nameUr,
         icon: child.icon,
         gradient: child.gradient,
+        imageUrl: child.imageUrl,
       })),
     })),
   });

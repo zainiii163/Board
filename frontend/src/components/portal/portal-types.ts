@@ -6,6 +6,7 @@ export type PortalCategory = {
   parentId: number | null;
   icon: string;
   gradient: string;
+  imageUrl?: string | null;
   children?: PortalCategory[];
 };
 
@@ -20,6 +21,7 @@ export type PortalResource = {
   author: string;
   description: string;
   fileUrl: string | null;
+  coverUrl: string | null;
   sizeLabel: string;
   pages: number;
   downloads: number;

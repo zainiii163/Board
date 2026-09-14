@@ -11,6 +11,7 @@ export type PortalCategory = {
   parentId: number | null;
   icon: string;
   gradient: string;
+  imageUrl: string | null;
   order: number;
   status: CategoryStatus;
 };
@@ -26,6 +27,7 @@ export type PortalResource = {
   author: string;
   description: string;
   fileUrl: string | null;
+  coverUrl: string | null;
   sizeLabel: string;
   pages: number;
   downloads: number;
@@ -155,17 +157,17 @@ const gradients = [
 const categories: PortalCategory[] = [];
 let categoryId = 1;
 
-function addCategory(slug: string, name: string, nameUr: string, parentId: number | null, icon: string, gradient: string, order: number) {
-  categories.push({ id: categoryId++, slug, name, nameUr, parentId, icon, gradient, order, status: "published" });
+function addCategory(slug: string, name: string, nameUr: string, parentId: number | null, icon: string, gradient: string, order: number, imageUrl?: string | null) {
+  categories.push({ id: categoryId++, slug, name, nameUr, parentId, icon, gradient, imageUrl: imageUrl ?? null, order, status: "published" });
 }
 
 CATEGORY_DEFS.forEach((def, index) => {
   const childList = CHILD_DEFS[def.slug] ?? [];
   if (childList.length === 0) {
-    addCategory(def.slug, def.name, def.nameUr, null, def.icon, def.gradient, index);
+    addCategory(def.slug, def.name, def.nameUr, null, def.icon, def.gradient, index, CATEGORY_COVERS[def.slug] ?? null);
     return;
   }
-  addCategory(def.slug, def.name, def.nameUr, null, def.icon, def.gradient, index);
+  addCategory(def.slug, def.name, def.nameUr, null, def.icon, def.gradient, index, CATEGORY_COVERS[def.slug] ?? null);
   const parentId = categories.find((c) => c.slug === def.slug)!.id;
   childList.forEach((child, childIndex) => {
     addCategory(child.slug, child.name, child.nameUr, parentId, child.icon, child.gradient ?? pick(gradients), childIndex);
@@ -175,17 +177,40 @@ CATEGORY_DEFS.forEach((def, index) => {
 // ── Resources ─────────────────────────────────────────────────────────────
 
 const AUTHORS = [
-  "Taleem360 Admin",
-  "Smart Notes Research",
-  "Lahore Notes Center",
-  "Sadaf Baloch",
-  "Assistant Academy",
-  "Study Pakista",
-  "Imran Qureshi",
   "BoardNotes Editorial",
+  "Smart Study Group",
+  "Lahore Board Academy",
+  "Dr. Ahmad Khan",
+  "Prof. Saima Malik",
+  "Elite Education Hub",
+  "City College Notes",
+  "Academic Publishing",
 ];
 
 const BOARD_TAGS = ["Punjab Board", "FBISE", "Sindh Board", "KPK Board", null];
+
+const SUBJECT_COVERS: Record<string, string> = {
+  Physics: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=500&fit=crop",
+  Chemistry: "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=400&h=500&fit=crop",
+  Mathematics: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400&h=500&fit=crop",
+  Biology: "https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=400&h=500&fit=crop",
+  English: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=500&fit=crop",
+  "Computer Science": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=500&fit=crop",
+  Urdu: "https://images.unsplash.com/photo-1562408590-e32931084e23?w=400&h=500&fit=crop",
+  "Pakistan Studies": "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=400&h=500&fit=crop",
+  General: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&h=500&fit=crop",
+};
+
+const CATEGORY_COVERS: Record<string, string> = {
+  textbooks: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&h=400&fit=crop",
+  notes: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&h=400&fit=crop",
+  "pairing-schemes": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&h=400&fit=crop",
+  "results-news": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop",
+  "model-papers": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=600&h=400&fit=crop",
+  "guess-papers": "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=600&h=400&fit=crop",
+  test: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&h=400&fit=crop",
+  tuition: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
+};
 const SUBJECTS = [
   "Physics",
   "Chemistry",
@@ -243,15 +268,17 @@ function pushResource(input: {
   description: string;
   sizeLabel: string;
   pages: number;
+  coverUrl?: string | null;
 }) {
   const category = categories.find((c) => c.slug === input.categorySlug) ?? categories[0];
   const dayOffset = intBetween(1, 75);
   const added = new Date(Date.now() - dayOffset * 86400000 - intBetween(0, 20) * 3600000).toISOString();
   const fileUrl = SAMPLE_PDFS[fileIndex % SAMPLE_PDFS.length];
   fileIndex += 1;
+  const baseSlug = slugify(`${input.subject} ${input.title}`);
   resources.push({
     id: resourceId++,
-    slug: makeSlugs(input.title, input.subject),
+    slug: resources.some((r) => r.slug === baseSlug) ? `${baseSlug}-${intBetween(1, 99)}` : baseSlug,
     title: input.title,
     categoryId: category.id,
     board: input.board ?? pick(BOARD_TAGS),
@@ -260,6 +287,7 @@ function pushResource(input: {
     author: pick(AUTHORS),
     description: input.description,
     fileUrl,
+    coverUrl: input.coverUrl ?? null,
     sizeLabel: input.sizeLabel,
     pages: input.pages,
     downloads: intBetween(340, 9800),
@@ -292,6 +320,7 @@ for (const [leafSlug, board] of Object.entries(BOARD_TEXTBOOK)) {
         description: `Official ${board} ${ORDINALS[cls]} ${subject} textbook in PDF format for reading online and download.`,
         sizeLabel: `${intBetween(8, 42)} MB`,
         pages: intBetween(180, 320),
+        coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
       });
     }
   }
@@ -336,6 +365,7 @@ for (const [leafSlug, board] of Object.entries(BOARD_NOTES)) {
         description: NOTE_DESCRIPTIONS[subject] ?? NOTE_DESCRIPTIONS.Physics,
         sizeLabel: `${intBetween(1, 6)} MB`,
         pages: intBetween(6, 32),
+        coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
       });
     }
   }
@@ -359,6 +389,7 @@ for (const [slug, cls] of Object.entries(PAIRING_MAP)) {
       description: `Official ${ORDINALS[cls]} ${subject} pairing scheme for the annual board exams 2026 with section-wise marks distribution.`,
       sizeLabel: `${intBetween(1, 4)} MB`,
       pages: intBetween(4, 14),
+      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -381,6 +412,7 @@ for (const [slug, cls] of Object.entries(MODEL_MAP)) {
       description: `Official model paper for ${ORDINALS[cls]} ${subject} board exam 2026 with detailed solutions.`,
       sizeLabel: `${intBetween(2, 8)} MB`,
       pages: intBetween(12, 30),
+      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
     pushResource({
       title: `${ORDINALS[cls]} ${subject} Past Paper 2025 (Annual) PDF`,
@@ -390,6 +422,7 @@ for (const [slug, cls] of Object.entries(MODEL_MAP)) {
       description: `${ORDINALS[cls]} ${subject} past paper from the 2025 annual board examination with answer key.`,
       sizeLabel: `${intBetween(2, 8)} MB`,
       pages: intBetween(10, 28),
+      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -412,6 +445,7 @@ for (const [slug, cls] of Object.entries(GUESS_MAP)) {
       description: `Most important ${subject} questions predicted for the ${ORDINALS[cls]} board exam 2026, with marking scheme.`,
       sizeLabel: `${intBetween(1, 6)} MB`,
       pages: intBetween(8, 24),
+      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
     pushResource({
       title: `${ORDINALS[cls]} ${subject} Important Topics 2026 PDF`,
@@ -421,6 +455,7 @@ for (const [slug, cls] of Object.entries(GUESS_MAP)) {
       description: `Key ${subject} topics and chapter summaries for ${ORDINALS[cls]} exam preparation 2026.`,
       sizeLabel: `${intBetween(1, 4)} MB`,
       pages: intBetween(6, 18),
+      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -443,6 +478,7 @@ for (const [slug, cls] of Object.entries(TEST_MAP)) {
       description: `Chapterwise test papers for ${subject} — print-ready with mark allocation for ${ORDINALS[cls]} class.`,
       sizeLabel: `${intBetween(3, 12)} MB`,
       pages: intBetween(15, 45),
+      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
     pushResource({
       title: `${ORDINALS[cls]} ${subject} Full & Half Book Test PDF`,
@@ -452,6 +488,7 @@ for (const [slug, cls] of Object.entries(TEST_MAP)) {
       description: `Full book and half book test papers for ${subject} ${ORDINALS[cls]} with objective and subjective sections.`,
       sizeLabel: `${intBetween(2, 9)} MB`,
       pages: intBetween(10, 38),
+      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -480,6 +517,7 @@ for (const entry of TUITION_RESOURCES) {
     description: entry.description,
     sizeLabel: `${intBetween(1, 4)} MB`,
     pages: intBetween(2, 10),
+    coverUrl: SUBJECT_COVERS[entry.subject] ?? CATEGORY_COVERS.tuition,
   });
 }
 
@@ -514,6 +552,7 @@ for (const news of NEWS_RESOURCES) {
     description: news.description,
     sizeLabel: `${intBetween(1, 8)} MB`,
     pages: intBetween(4, 20),
+    coverUrl: CATEGORY_COVERS[news.cat] ?? CATEGORY_COVERS["results-news"],
   });
 }
 

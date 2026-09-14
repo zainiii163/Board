@@ -12,6 +12,7 @@ function toPublicCategory(category: PortalCategory) {
     parentId: category.parentId,
     icon: category.icon,
     gradient: category.gradient,
+    imageUrl: category.imageUrl,
   };
 }
 
@@ -27,6 +28,7 @@ function toPublicResource(resource: PortalResource) {
     author: resource.author,
     description: resource.description,
     fileUrl: resource.fileUrl,
+    coverUrl: resource.coverUrl,
     sizeLabel: resource.sizeLabel,
     pages: resource.pages,
     downloads: resource.downloads,
