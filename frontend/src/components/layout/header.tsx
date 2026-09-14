@@ -202,8 +202,6 @@ export function Header() {
     closeTimer.current = setTimeout(() => setDropdownSlug(null), ms);
   }, [clearClose]);
 
-  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); }, [clearClose]);
-
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
       <nav className="mx-auto flex w-full max-w-[1400px] items-center px-3 py-1 sm:px-4 lg:px-6" aria-label="Main">

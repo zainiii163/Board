@@ -28,7 +28,7 @@ export function BoardsMenu() {
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap"
+        className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-semibold text-foreground/80 transition hover:bg-accent/10 hover:text-accent whitespace-nowrap"
       >
         {tr("boards")}
         <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
