@@ -14,7 +14,7 @@ export default async function CategoriesPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="mb-10">
-        <h1 className="font-serif text-3xl font-bold text-foreground sm:text-4xl">Browse Categories</h1>
+        <h1 className="font-serif text-3xl font-bold text-foreground sm:text-4xl">Categories</h1>
         <p className="mt-2 max-w-xl text-sm text-muted sm:text-base">
           Every study resource, from textbooks to entry-test prep, organized into clean categories.
         </p>

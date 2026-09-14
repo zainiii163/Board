@@ -4,6 +4,7 @@ import { SearchShortcut } from "@/components/layout/search-shortcut";
 import { PwaInstallPrompt } from "@/components/layout/pwa-install-prompt";
 import { OfflineBanner } from "@/components/layout/offline-banner";
 import { ServiceWorkerRegister } from "@/components/layout/service-worker-register";
+import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 
 export default function PublicLayout({
   children,
@@ -19,6 +20,7 @@ export default function PublicLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <PwaInstallPrompt />
+      <WhatsAppButton />
     </div>
   );
 }

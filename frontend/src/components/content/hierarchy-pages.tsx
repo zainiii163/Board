@@ -11,6 +11,7 @@ import { ChapterZipDownload } from "@/components/content/chapter-zip-download";
 import { ProgressTracker } from "@/components/content/progress-tracker";
 import { SubjectFaq } from "@/components/content/subject-faq";
 import { MathText } from "@/components/content/math-text";
+import { DriveLinkButton } from "@/components/content/drive-link-button";
 import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedList } from "@/lib/i18n";
 
@@ -375,17 +376,29 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
             <h1 className="mt-3 text-3xl font-black text-foreground">{props.exerciseTitle}</h1>
           </div>
           {props.pdfDownloadUrl ? (
-            <a
-              href={props.pdfDownloadUrl}
-              download
-              className="rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              {tr("downloadPdf")}
-            </a>
+            <>
+              <a
+                href={props.pdfDownloadUrl}
+                download
+                className="rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                {tr("downloadPdf")}
+              </a>
+              <div className="mt-2">
+                <DriveLinkButton href={props.pdfDownloadUrl} label="Open in Google Drive" />
+              </div>
+            </>
           ) : (
-            <span className="rounded-xl border border-border px-4 py-3 text-sm font-semibold text-muted">
-              {tr("downloadPdf")}
-            </span>
+            <div className="group relative">
+              <span className="rounded-xl border border-border px-4 py-3 text-sm font-semibold text-muted cursor-not-allowed">
+                {tr("downloadPdf")}
+              </span>
+              <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <svg viewBox="0 0 24 24" className="h-6 w-6 text-red-500" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </div>
+            </div>
           )}
         </div>
         <div className="mt-8 rounded-2xl border border-border bg-background p-5">

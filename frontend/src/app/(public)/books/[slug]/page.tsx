@@ -7,6 +7,7 @@ import { ResourceCard } from "@/components/portal/resource-card";
 import { ResourceActions } from "@/components/portal/resource-actions";
 import { PdfViewer } from "@/components/content/pdf-viewer";
 import { AdBanner } from "@/components/portal/ad-banner";
+import { DriveLinkButton } from "@/components/content/drive-link-button";
 import {
   type PortalCategory,
   type PortalResource,
@@ -95,6 +96,12 @@ export default async function BookDetailPage({ params }: { params: Promise<{ slu
             )}
 
             <ResourceActions slug={resource.slug} fileUrl={resource.fileUrl} downloads={resource.downloads} />
+            
+            {resource.fileUrl && (
+              <div className="mt-3">
+                <DriveLinkButton href={resource.fileUrl} label="Open in Google Drive" />
+              </div>
+            )}
 
             <p className="mt-6 text-sm leading-relaxed text-muted">{resource.description}</p>
           </div>

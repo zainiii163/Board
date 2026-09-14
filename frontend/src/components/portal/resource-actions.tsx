@@ -21,19 +21,41 @@ export function ResourceActions({ slug, fileUrl, downloads }: Props) {
   const [count, setCount] = useState(downloads);
   const [copied, setCopied] = useState(false);
   const [pageUrl, setPageUrl] = useState("");
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     setPageUrl(window.location.href);
   }, []);
 
   async function handleDownload() {
-    try {
-      await apiFetch(`/api/resources/${slug}/download`, { method: "POST" });
-      setCount((c) => c + 1);
-    } catch {
-      // tracking is best-effort
-    }
-    if (fileUrl) window.open(pdfUrl(fileUrl), "_blank");
+    if (countdown !== null) return; // Already counting down
+    
+    setIsDownloading(true);
+    setCountdown(30); // 30 second countdown
+
+    // Countdown timer
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === null || prev <= 1) {
+          clearInterval(timer);
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    // After countdown, proceed with download
+    setTimeout(async () => {
+      try {
+        await apiFetch(`/api/resources/${slug}/download`, { method: "POST" });
+        setCount((c) => c + 1);
+      } catch {
+        // tracking is best-effort
+      }
+      if (fileUrl) window.open(pdfUrl(fileUrl), "_blank");
+      setIsDownloading(false);
+    }, 30000);
   }
 
   async function handleCopy() {
@@ -56,14 +78,19 @@ export function ResourceActions({ slug, fileUrl, downloads }: Props) {
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-90"
+              disabled={countdown !== null}
+              className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-sm transition ${
+                countdown !== null 
+                  ? "bg-muted cursor-not-allowed opacity-70" 
+                  : "bg-accent hover:opacity-90"
+              }`}
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                 <path d="M7 10l5 5 5-5" />
                 <path d="M12 15V3" />
               </svg>
-              {tr("downloadPdf")}
+              {countdown !== null ? `Please wait ${countdown}s...` : tr("downloadPdf")}
             </button>
             <a
               href="#pdf-reader"

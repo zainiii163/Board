@@ -55,23 +55,51 @@ export function Header() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const NavDropdown = ({ c, label, slug }: { c: NavCategory | undefined; label: string; slug: string }) => (
+  const NavDropdown = ({ c, label, slug, customItems }: { c: NavCategory | undefined; label: string; slug: string; customItems?: Array<{ label: string; href?: string; group?: string; soon?: boolean }> }) => (
     <div className="relative" onMouseEnter={() => openDropdown(slug)} onMouseLeave={() => scheduleClose()}>
       <button type="button" className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap">
         {label}
         <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${dropdownSlug === slug ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
-      {dropdownSlug === slug && c && c.children && c.children.length > 0 && (
-        <div className="absolute left-1/2 top-full z-30 mt-1 w-52 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-xl"
+      {dropdownSlug === slug && (
+        <div className="absolute left-1/2 top-full z-30 mt-1 min-w-64 -translate-x-1/2 rounded-xl border border-border bg-card p-3 shadow-xl"
           onMouseEnter={clearClose} onMouseLeave={() => scheduleClose()}>
-          {c.children.map((ch) => (
-            <Link key={ch.slug} href={`/categories/${ch.slug}`} onClick={() => setDropdownSlug(null)}
-              className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-              <span className="text-sm">{ch.icon}</span>{ch.name}
-            </Link>
-          ))}
-          <Link href={`/categories/${slug}`} onClick={() => setDropdownSlug(null)}
-            className="mt-1 block rounded-lg bg-accent/10 px-2.5 py-1.5 text-center text-[11px] font-bold text-accent">View All →</Link>
+          {customItems ? (
+            <div className="space-y-3">
+              {customItems.map((item, idx) => (
+                item.group ? (
+                  <div key={idx}>
+                    <div className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-wider text-muted">{item.group}</div>
+                    <div className="space-y-0.5">
+                      {customItems.filter(i => i.group === item.group).map((groupItem, groupIdx) => (
+                        <Link key={groupIdx} href={groupItem.href || "#"} onClick={() => setDropdownSlug(null)}
+                          className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                          {groupItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : !item.group && (
+                  <Link key={idx} href={item.href || "#"} onClick={() => setDropdownSlug(null)}
+                    className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                    {item.label}
+                    {item.soon && <span className="rounded bg-amber-100 px-1 py-0.5 text-[8px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>}
+                  </Link>
+                )
+              ))}
+            </div>
+          ) : c && c.children && c.children.length > 0 ? (
+            <>
+              {c.children.map((ch) => (
+                <Link key={ch.slug} href={`/categories/${ch.slug}`} onClick={() => setDropdownSlug(null)}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                  <span className="text-sm">{ch.icon}</span>{ch.name}
+                </Link>
+              ))}
+              <Link href={`/categories/${slug}`} onClick={() => setDropdownSlug(null)}
+                className="mt-1 block rounded-lg bg-accent/10 px-2.5 py-1.5 text-center text-[11px] font-bold text-accent">View All →</Link>
+            </>
+          ) : null}
         </div>
       )}
     </div>
@@ -87,47 +115,145 @@ export function Header() {
         </Link>
 
         {/* Desktop nav — core items */}
-        <div className="hidden items-center gap-0 xl:flex">
-          <NavDropdown c={textbooks} label="Text Books" slug="textbooks" />
-          <NavDropdown c={notes} label="Notes" slug="notes" />
-          <NavDropdown c={pairingSchemes} label="Pairing" slug="pairing-schemes" />
-          <NavDropdown c={resultsNews} label="Results" slug="results-news" />
-          <NavDropdown c={modelPapers} label="Past Papers" slug="model-papers" />
-          <NavDropdown c={guessPapers} label="Guess Papers" slug="guess-papers" />
-          <NavDropdown c={test} label="Test" slug="test" />
-          <NavDropdown c={tuition} label="Tuition" slug="tuition" />
-          {/* More dropdown for coming soon */}
-          <div className="relative" ref={moreRef}>
-            <button type="button" onClick={() => { setMoreOpen((o) => !o); setDropdownSlug(null); }}
-              className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap">
-              More
-              <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-            </button>
-            {moreOpen && (
-              <div className="absolute right-0 top-full z-30 mt-1 w-48 rounded-xl border border-border bg-card p-2 shadow-xl">
-                {[
-                  { href: "/online-quizzes", label: "Online Quizzes", soon: true },
-                  { href: "/whiteboard", label: "Whiteboard", soon: true },
-                  { href: "/test-generator", label: "Test Generator", soon: true },
-                ].map((l) => (
-                  <Link key={l.href} href={l.href} onClick={() => setMoreOpen(false)}
-                    className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-                    {l.label}
-                    {l.soon && <span className="rounded bg-amber-100 px-1 py-0.5 text-[8px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="hidden items-center gap-0 lg:flex overflow-x-auto">
+          <NavDropdown 
+            label="Text Books" 
+            slug="textbooks" 
+            customItems={[
+              { group: "Group 1", label: "Federal Board", href: "/categories/federal-board" },
+              { group: "Group 1", label: "Punjab Board", href: "/categories/punjab-board" },
+              { group: "Group 1", label: "Sindh Board", href: "/categories/sindh-board" },
+              { group: "Group 1", label: "Balochistan Board", href: "/categories/balochistan-board" },
+              { group: "Group 1", label: "KPK Board", href: "/categories/kpk-board" },
+              { group: "Group 1", label: "O/A level", href: "/categories/o-a-level" },
+              { group: "Group 2", label: "Oxford", href: "/categories/oxford" },
+              { group: "Group 2", label: "Cambridge", href: "/categories/cambridge" },
+            ]}
+          />
+          <NavDropdown 
+            label="Notes" 
+            slug="notes" 
+            customItems={[
+              { group: "Group 1", label: "Federal Board", href: "/categories/federal-board-notes" },
+              { group: "Group 1", label: "Punjab Board", href: "/categories/punjab-board-notes" },
+              { group: "Group 1", label: "Sindh Board", href: "/categories/sindh-board-notes" },
+              { group: "Group 1", label: "Balochistan Board", href: "/categories/balochistan-board-notes" },
+              { group: "Group 1", label: "KPK Board", href: "/categories/kpk-board-notes" },
+              { group: "Group 1", label: "O/A level", href: "/categories/o-a-level-notes" },
+              { group: "Group 2", label: "Cambridge International Education", href: "/categories/cambridge-international" },
+              { group: "Group 2", label: "Pearson Edexcel", href: "/categories/pearson-edexcel" },
+              { group: "Group 2", label: "OxfordAQA", href: "/categories/oxford-aqa" },
+              { group: "Group 2", label: "City & Guilds", href: "/categories/city-guilds" },
+              { group: "Group 2", label: "International Baccalaureate (IBO)", href: "/categories/ibo" },
+            ]}
+          />
+          <NavDropdown 
+            label="Online Quizzes" 
+            slug="online-quizzes" 
+            customItems={[
+              { label: "Coming Soon", soon: true },
+            ]}
+          />
+          <NavDropdown 
+            label="Pairing Schemes" 
+            slug="pairing-schemes" 
+            customItems={[
+              { label: "9th", href: "/categories/pairing-9th" },
+              { label: "10th", href: "/categories/pairing-10th" },
+              { label: "1st Year", href: "/categories/pairing-1st-year" },
+              { label: "2nd Year", href: "/categories/pairing-2nd-year" },
+            ]}
+          />
+          <NavDropdown 
+            label="Result & Board News" 
+            slug="results-news" 
+            customItems={[
+              { label: "Top Position Holders", href: "/categories/top-position-holders" },
+              { label: "Result Gazette", href: "/categories/result-gazette" },
+              { label: "Board Notifications", href: "/categories/board-notifications" },
+              { label: "Date Sheets", href: "/categories/date-sheets" },
+              { label: "Admission & Exams Schedules", href: "/categories/admission-exams" },
+              { label: "Rechecking/Supplementary Information", href: "/categories/rechecking-supplementary" },
+            ]}
+          />
+          <NavDropdown 
+            label="Model & Past Papers" 
+            slug="model-papers" 
+            customItems={[
+              { label: "9th", href: "/categories/model-9th" },
+              { label: "10th", href: "/categories/model-10th" },
+              { label: "1st Year", href: "/categories/model-1st-year" },
+              { label: "2nd Year", href: "/categories/model-2nd-year" },
+            ]}
+          />
+          <NavDropdown 
+            label="Guess Paper & Important Topic" 
+            slug="guess-papers" 
+            customItems={[
+              { label: "9th", href: "/categories/guess-9th" },
+              { label: "10th", href: "/categories/guess-10th" },
+              { label: "1st Year", href: "/categories/guess-1st-year" },
+              { label: "2nd Year", href: "/categories/guess-2nd-year" },
+            ]}
+          />
+          <NavDropdown 
+            label="Test" 
+            slug="test" 
+            customItems={[
+              { label: "9th", href: "/categories/test-9th" },
+              { label: "10th", href: "/categories/test-10th" },
+              { label: "1st Year", href: "/categories/test-1st-year" },
+              { label: "2nd Year", href: "/categories/test-2nd-year" },
+            ]}
+          />
+          <NavDropdown 
+            label="Tuition" 
+            slug="tuition" 
+            customItems={[
+              { label: "Malik Shahid (Maths Teacher)", href: "/categories/malik-shahid" },
+              { label: "Online Academy Classes", href: "/categories/online-academy" },
+              { label: "Find a Tutor", href: "/categories/find-tutor" },
+              { label: "Tuition Request", href: "/categories/tuition-request" },
+              { label: "Become a Tutor", href: "/categories/become-tutor" },
+            ]}
+          />
+          <NavDropdown 
+            label="Whiteboard" 
+            slug="whiteboard" 
+            customItems={[
+              { label: "Coming Soon", soon: true },
+            ]}
+          />
+          <NavDropdown 
+            label="Test Generator" 
+            slug="test-generator" 
+            customItems={[
+              { label: "Coming Soon", soon: true },
+            ]}
+          />
         </div>
 
         {/* Desktop right */}
-        <div className="hidden items-center gap-1 lg:flex">
-          {/* Lang toggle */}
-          <button type="button" onClick={toggleLocale}
-            className="rounded-lg px-2 py-1.5 text-[12px] font-semibold text-muted transition hover:text-foreground" title="Toggle language">
-            {locale === "en" ? "اردو" : "EN"}
-          </button>
+        <div className="hidden items-center gap-1 md:flex">
+          {/* Compact search bar */}
+          <form action="/search" className="flex items-center gap-1 rounded-full border border-border bg-card px-2 py-1">
+            <svg
+              viewBox="0 0 24 24"
+              className="h-3 w-3 shrink-0 text-muted"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input
+              name="q"
+              placeholder="Search..."
+              className="w-24 bg-transparent px-1 py-0.5 text-[10px] text-foreground outline-none placeholder:text-muted focus:w-32 transition-all"
+            />
+          </form>
           <ThemeToggle />
 
           {!loading && user ? (
@@ -157,34 +283,74 @@ export function Header() {
       {menuOpen && (
         <div className="border-t border-border bg-card px-4 py-4 lg:hidden">
           <div className="mb-3 flex items-center gap-2">
-            <button type="button" onClick={toggleLocale}
-              className="rounded-lg border border-border px-2.5 py-1.5 text-[12px] font-semibold text-muted transition hover:text-foreground">
-              {locale === "en" ? "اردو" : "EN"}
-            </button>
             <ThemeToggle />
           </div>
 
-          <MobileAccordion title="Text Books" c={textbooks} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Notes" c={notes} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Pairing Schemes" c={pairingSchemes} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Result & Board News" c={resultsNews} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Model & Past Papers" c={modelPapers} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Guess Papers" c={guessPapers} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Test" c={test} onLink={() => setMenuOpen(false)} />
-          <MobileAccordion title="Tuition" c={tuition} onLink={() => setMenuOpen(false)} />
-
-          <div className="mb-1 mt-3 px-1 text-[10px] font-bold uppercase tracking-wider text-muted">Coming Soon</div>
-          {[
-            { href: "/online-quizzes", label: "Online Quizzes" },
-            { href: "/whiteboard", label: "Whiteboard" },
-            { href: "/test-generator", label: "Test Generator" },
-          ].map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-              {l.label}
-              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
-            </Link>
-          ))}
+          <MobileMenuSection title="Text Books" items={[
+            { group: "Group 1", label: "Federal Board", href: "/categories/federal-board" },
+            { group: "Group 1", label: "Punjab Board", href: "/categories/punjab-board" },
+            { group: "Group 1", label: "Sindh Board", href: "/categories/sindh-board" },
+            { group: "Group 1", label: "Balochistan Board", href: "/categories/balochistan-board" },
+            { group: "Group 1", label: "KPK Board", href: "/categories/kpk-board" },
+            { group: "Group 1", label: "O/A level", href: "/categories/o-a-level" },
+            { group: "Group 2", label: "Oxford", href: "/categories/oxford" },
+            { group: "Group 2", label: "Cambridge", href: "/categories/cambridge" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Notes" items={[
+            { group: "Group 1", label: "Federal Board", href: "/categories/federal-board-notes" },
+            { group: "Group 1", label: "Punjab Board", href: "/categories/punjab-board-notes" },
+            { group: "Group 1", label: "Sindh Board", href: "/categories/sindh-board-notes" },
+            { group: "Group 1", label: "Balochistan Board", href: "/categories/balochistan-board-notes" },
+            { group: "Group 1", label: "KPK Board", href: "/categories/kpk-board-notes" },
+            { group: "Group 1", label: "O/A level", href: "/categories/o-a-level-notes" },
+            { group: "Group 2", label: "Cambridge International Education", href: "/categories/cambridge-international" },
+            { group: "Group 2", label: "Pearson Edexcel", href: "/categories/pearson-edexcel" },
+            { group: "Group 2", label: "OxfordAQA", href: "/categories/oxford-aqa" },
+            { group: "Group 2", label: "City & Guilds", href: "/categories/city-guilds" },
+            { group: "Group 2", label: "International Baccalaureate (IBO)", href: "/categories/ibo" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Online Quizzes" items={[{ label: "Coming Soon", soon: true }]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Pairing Schemes" items={[
+            { label: "9th", href: "/categories/pairing-9th" },
+            { label: "10th", href: "/categories/pairing-10th" },
+            { label: "1st Year", href: "/categories/pairing-1st-year" },
+            { label: "2nd Year", href: "/categories/pairing-2nd-year" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Result & Board News" items={[
+            { label: "Top Position Holders", href: "/categories/top-position-holders" },
+            { label: "Result Gazette", href: "/categories/result-gazette" },
+            { label: "Board Notifications", href: "/categories/board-notifications" },
+            { label: "Date Sheets", href: "/categories/date-sheets" },
+            { label: "Admission & Exams Schedules", href: "/categories/admission-exams" },
+            { label: "Rechecking/Supplementary Information", href: "/categories/rechecking-supplementary" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Model & Past Papers" items={[
+            { label: "9th", href: "/categories/model-9th" },
+            { label: "10th", href: "/categories/model-10th" },
+            { label: "1st Year", href: "/categories/model-1st-year" },
+            { label: "2nd Year", href: "/categories/model-2nd-year" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Guess Paper & Important Topic" items={[
+            { label: "9th", href: "/categories/guess-9th" },
+            { label: "10th", href: "/categories/guess-10th" },
+            { label: "1st Year", href: "/categories/guess-1st-year" },
+            { label: "2nd Year", href: "/categories/guess-2nd-year" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Test" items={[
+            { label: "9th", href: "/categories/test-9th" },
+            { label: "10th", href: "/categories/test-10th" },
+            { label: "1st Year", href: "/categories/test-1st-year" },
+            { label: "2nd Year", href: "/categories/test-2nd-year" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Tuition" items={[
+            { label: "Malik Shahid (Maths Teacher)", href: "/tuition/malik-shahid" },
+            { label: "Online Academy Classes", href: "/tuition/online-academy" },
+            { label: "Find a Tutor", href: "/tuition/find-tutor" },
+            { label: "Tuition Request", href: "/tuition/request" },
+            { label: "Become a Tutor", href: "/tuition/become-tutor" },
+          ]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Whiteboard" items={[{ label: "Coming Soon", soon: true }]} onLink={() => setMenuOpen(false)} />
+          <MobileMenuSection title="Test Generator" items={[{ label: "Coming Soon", soon: true }]} onLink={() => setMenuOpen(false)} />
 
           <div className="mt-3 border-t border-border pt-3">
             {!loading && user ? (
@@ -225,6 +391,48 @@ function MobileAccordion({ title, c, onLink }: { title: string; c: NavCategory |
           ))}
           <Link href={`/categories/${c.slug}`} onClick={onLink}
             className="block px-3 py-1.5 text-[11px] font-bold text-accent">View All →</Link>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileMenuSection({ title, items, onLink }: { title: string; items: Array<{ label: string; href?: string; soon?: boolean; group?: string }>; onLink: () => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mb-0.5">
+      <button type="button" onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-accent/10">
+        {title}
+        <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+      </button>
+      {open && (
+        <div className="ml-3 pb-1">
+          {items.some(item => item.group) ? (
+            <div className="space-y-3">
+              {items.filter(item => item.group).map((item, idx) => (
+                <div key={idx}>
+                  <div className="mb-1.5 px-2 text-[10px] font-bold uppercase tracking-wider text-muted">{item.group}</div>
+                  <div className="space-y-0.5">
+                    {items.filter(i => i.group === item.group).map((groupItem, groupIdx) => (
+                      <Link key={groupIdx} href={groupItem.href || "#"} onClick={onLink}
+                        className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                        {groupItem.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            items.map((item, idx) => (
+              <Link key={idx} href={item.href || "#"} onClick={onLink}
+                className="flex items-center justify-between rounded-lg px-3 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
+                {item.label}
+                {item.soon && <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>}
+              </Link>
+            ))
+          )}
         </div>
       )}
     </div>
