@@ -5,6 +5,7 @@ import { PwaInstallPrompt } from "@/components/layout/pwa-install-prompt";
 import { OfflineBanner } from "@/components/layout/offline-banner";
 import { ServiceWorkerRegister } from "@/components/layout/service-worker-register";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
+import { FloatingDarkToggle } from "@/components/layout/floating-dark-toggle";
 
 export default function PublicLayout({
   children,
@@ -21,6 +22,7 @@ export default function PublicLayout({
       <Footer />
       <PwaInstallPrompt />
       <WhatsAppButton />
+      <FloatingDarkToggle />
     </div>
   );
 }
