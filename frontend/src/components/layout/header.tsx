@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 
 import { ThemeToggle } from "@/lib/theme-context";
 import { useLocale } from "@/lib/locale-context";
@@ -17,7 +17,11 @@ function WhatsAppIcon() {
   );
 }
 
-const CORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { label: string; href: string }[] }[] }[] = [
+type DropdownItem = { label: string; href: string };
+type DropdownGroup = { heading?: string; items: DropdownItem[] };
+type DropdownDef = { label: string; groups: DropdownGroup[]; soon?: boolean };
+
+const NAV_ITEMS: DropdownDef[] = [
   {
     label: "Text Books",
     groups: [
@@ -55,6 +59,7 @@ const CORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { labe
       ]},
     ],
   },
+  { label: "Online Quizzes", groups: [], soon: true },
   {
     label: "Pairing",
     groups: [
@@ -90,9 +95,6 @@ const CORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { labe
       ]},
     ],
   },
-];
-
-const MORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { label: string; href: string }[] }[] }[] = [
   {
     label: "Guess Papers",
     groups: [
@@ -127,17 +129,22 @@ const MORE_DROPDOWNS: { label: string; groups: { heading?: string; items: { labe
       ]},
     ],
   },
+  { label: "Whiteboard", groups: [], soon: true },
+  { label: "Test Generator", groups: [], soon: true },
 ];
 
-const COMING_SOON = [
-  { label: "Online Quizzes", href: "/online-quizzes" },
-  { label: "Whiteboard", href: "/whiteboard" },
-  { label: "Test Generator", href: "/test-generator" },
+const MOBILE_BOARDS = [
+  { slug: "fbise", label: "Federal Board" },
+  { slug: "punjab", label: "Punjab Board" },
+  { slug: "sindh", label: "Sindh Board" },
+  { slug: "balochistan", label: "Balochistan Board" },
+  { slug: "kpk", label: "KPK Board" },
+  { slug: "oxford", label: "Oxford Board" },
+  { slug: "cambridge", label: "Cambridge Board" },
 ];
 
 type DropdownProps = {
-  label: string;
-  groups: { heading?: string; items: { label: string; href: string }[] }[];
+  item: DropdownDef;
   activeSlug: string | null;
   onOpen: (slug: string) => void;
   onClose: () => void;
@@ -145,15 +152,27 @@ type DropdownProps = {
   setDropdownSlug: (slug: string | null) => void;
 };
 
-function HoverDropdown({ label, groups, activeSlug, onOpen, onClose, onFocused, setDropdownSlug }: DropdownProps) {
-  const slug = label.toLowerCase().replace(/[^a-z]/g, "-");
+function HoverDropdown({ item, activeSlug, onOpen, onClose, onFocused, setDropdownSlug }: DropdownProps) {
+  const slug = item.label.toLowerCase().replace(/[^a-z]/g, "-");
   const isOpen = activeSlug === slug;
+
+  if (item.soon) {
+    return (
+      <Link
+        href={`/${slug}`}
+        className="flex items-center gap-1 whitespace-nowrap rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent lg:px-2"
+      >
+        {item.label}
+        <span className="rounded bg-amber-100 px-1 py-0.5 text-[7px] font-bold uppercase leading-none text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+      </Link>
+    );
+  }
 
   return (
     <div className="relative" onMouseEnter={() => onOpen(slug)} onMouseLeave={onClose}>
-      <button type="button" className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
-        {label}
-        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+      <button type="button" className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
+        {item.label}
+        <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
         <div
@@ -161,22 +180,22 @@ function HoverDropdown({ label, groups, activeSlug, onOpen, onClose, onFocused, 
           onMouseEnter={onFocused}
           onMouseLeave={onClose}
         >
-          {groups.map((g, gi) => (
+          {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && (
                 <div className="mb-1 mt-1 px-2.5 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>
               )}
-              {g.items.map((item) => (
+              {g.items.map((itm) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
+                  key={itm.href}
+                  href={itm.href}
                   onClick={() => setDropdownSlug(null)}
-                  className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent"
+                  className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:translate-x-0.5"
                 >
-                  {item.label}
+                  {itm.label}
                 </Link>
               ))}
-              {gi < groups.length - 1 && <div className="my-1 border-t border-border" />}
+              {gi < item.groups.length - 1 && <div className="my-1 border-t border-border" />}
             </div>
           ))}
         </div>
@@ -187,12 +206,10 @@ function HoverDropdown({ label, groups, activeSlug, onOpen, onClose, onFocused, 
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
   const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
   const { user, loading, isStaff, signOut } = useAuth();
   const { tr, locale, toggleLocale } = useLocale();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const moreRef = useRef<HTMLDivElement>(null);
 
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
@@ -200,18 +217,10 @@ export function Header() {
 
   const scheduleClose = useCallback((ms = 150) => {
     clearClose();
-    closeTimer.current = setTimeout(() => { setDropdownSlug(null); setMoreOpen(false); }, ms);
+    closeTimer.current = setTimeout(() => { setDropdownSlug(null); }, ms);
   }, [clearClose]);
 
-  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); setMoreOpen(false); }, [clearClose]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (moreRef.current && !moreRef.current.contains(e.target as Node)) setMoreOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  const openDropdown = useCallback((slug: string) => { clearClose(); setDropdownSlug(slug); }, [clearClose]);
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur print:hidden">
@@ -222,14 +231,13 @@ export function Header() {
           <span className="hidden font-serif text-base font-bold text-foreground transition-colors duration-200 group-hover/logo:text-accent sm:block">BoardNotes</span>
         </Link>
 
-        {/* Desktop nav — core items */}
-        <div className="hidden min-w-0 items-center gap-0 xl:flex">
+        {/* Desktop nav — all items inline */}
+        <div className="hidden min-w-0 items-center gap-0 overflow-x-auto scrollbar-none xl:flex">
           <BoardsMenu />
-          {CORE_DROPDOWNS.map((dd) => (
+          {NAV_ITEMS.map((item) => (
             <HoverDropdown
-              key={dd.label}
-              label={dd.label}
-              groups={dd.groups}
+              key={item.label}
+              item={item}
               activeSlug={dropdownSlug}
               onOpen={openDropdown}
               onClose={() => scheduleClose()}
@@ -237,49 +245,6 @@ export function Header() {
               setDropdownSlug={setDropdownSlug}
             />
           ))}
-          {/* More dropdown */}
-          <div className="relative" ref={moreRef} onMouseEnter={() => { clearClose(); setMoreOpen(true); setDropdownSlug(null); }} onMouseLeave={() => scheduleClose()}>
-            <button type="button" onClick={() => { setMoreOpen((o) => !o); setDropdownSlug(null); }}
-              className="flex items-center gap-1 rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent whitespace-nowrap lg:px-2">
-              More
-              <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 transition-transform ${moreOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-            </button>
-            {moreOpen && (
-              <div className="absolute right-0 top-full z-30 mt-1 w-56 rounded-xl border border-border bg-card p-2 shadow-xl animate-scale-in"
-                onMouseEnter={clearClose} onMouseLeave={() => scheduleClose()}>
-                {MORE_DROPDOWNS.map((dd) => (
-                  <div key={dd.label} className="relative group/dropdown">
-                    <div className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent cursor-pointer">
-                      {dd.label}
-                      <svg viewBox="0 0 24 24" className="h-3 w-3 -rotate-90" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-                    </div>
-                    <div className="invisible absolute left-full top-0 ml-1 w-48 rounded-xl border border-border bg-card p-2 shadow-xl group-hover/dropdown:visible">
-                      {dd.groups.map((g, gi) => (
-                        <div key={gi}>
-                          {g.heading && <div className="mb-1 mt-1 px-2 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
-                          {g.items.map((item) => (
-                            <Link key={item.href} href={item.href} onClick={() => { setMoreOpen(false); setDropdownSlug(null); }}
-                              className="block rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-                              {item.label}
-                            </Link>
-                          ))}
-                          {gi < dd.groups.length - 1 && <div className="my-1 border-t border-border" />}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-                <div className="my-1 border-t border-border" />
-                {COMING_SOON.map((item) => (
-                  <Link key={item.href} href={item.href} onClick={() => { setMoreOpen(false); setDropdownSlug(null); }}
-                    className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-                    {item.label}
-                    <span className="rounded bg-amber-100 px-1 py-0.5 text-[8px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
 
         {/* Desktop right */}
@@ -299,26 +264,26 @@ export function Header() {
               autoComplete="off"
               placeholder={locale === "ur" ? "تلاش…" : "Search…"}
               aria-label={tr("search")}
-              className="w-14 bg-transparent text-[10px] font-medium text-foreground outline-none placeholder:text-muted focus:w-20 sm:w-20 sm:text-[11px] sm:focus:w-24 xl:w-24 xl:focus:w-32 transition-all"
+              className="w-14 bg-transparent text-[10px] font-medium text-foreground outline-none placeholder:text-muted focus:w-20 sm:w-20 sm:text-[11px] sm:focus:w-24 xl:w-24 xl:focus:w-32 transition-all duration-300"
             />
           </form>
           {/* Lang toggle */}
           <button type="button" onClick={toggleLocale}
-            className="rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-muted transition hover:text-foreground sm:px-2" title="Toggle language">
+            className="rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-muted transition-all duration-200 hover:text-foreground sm:px-2" title="Toggle language">
             {locale === "en" ? "اردو" : "EN"}
           </button>
           <ThemeToggle />
 
           {!loading && user ? (
             <>
-              {isStaff && <Link href="/admin" className="hidden rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-accent transition hover:bg-accent/10 lg:inline-block">Admin</Link>}
-              <Link href="/account" className="hidden rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-foreground transition hover:bg-card sm:inline-block">{user.name.split(" ")[0]}</Link>
+              {isStaff && <Link href="/admin" className="hidden rounded-lg px-1.5 py-1.5 text-[11px] font-semibold text-accent transition-all duration-200 hover:bg-accent/10 lg:inline-block">Admin</Link>}
+              <Link href="/account" className="hidden rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-foreground transition-all duration-200 hover:border-accent hover:bg-accent hover:text-white sm:inline-block">{user.name.split(" ")[0]}</Link>
             </>
           ) : (
             <Link href="/login" className="rounded-full bg-accent px-3 py-1 text-[11px] font-bold text-white shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 hover:scale-105 sm:px-4 sm:py-1.5 sm:text-[12px]">{tr("signUp")}</Link>
           )}
 
-          {/* WhatsApp CTA — hidden on small screens */}
+          {/* WhatsApp CTA */}
           <a
             href={WHATSAPP_CHANNEL_URL}
             target="_blank"
@@ -336,9 +301,9 @@ export function Header() {
           className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-foreground xl:hidden"
           aria-label={menuOpen ? tr("closeMenu") : tr("openMenu")}>
           <span className="flex flex-col gap-1" aria-hidden="true">
-            <span className={`h-0.5 w-3.5 bg-current transition-transform ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
-            <span className={`h-0.5 w-3.5 bg-current transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`h-0.5 w-3.5 bg-current transition-transform ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
+            <span className={`h-0.5 w-3.5 bg-current transition-all duration-300 ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
+            <span className={`h-0.5 w-3.5 bg-current transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`h-0.5 w-3.5 bg-current transition-all duration-300 ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
           </span>
         </button>
       </nav>
@@ -347,7 +312,7 @@ export function Header() {
       {menuOpen && (
         <div className="border-t border-border bg-card px-4 py-4 xl:hidden animate-fade-in">
           {/* Search */}
-          <form action="/search" role="search" className="mb-3 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
+          <form action="/search" role="search" className="mb-3 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 transition-all duration-300 focus-within:border-accent">
             <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
@@ -363,7 +328,7 @@ export function Header() {
 
           <div className="mb-1 mt-3 flex items-center gap-2">
             <button type="button" onClick={toggleLocale}
-              className="rounded-lg border border-border px-2.5 py-1.5 text-[12px] font-semibold text-muted transition hover:text-foreground">
+              className="rounded-lg border border-border px-2.5 py-1.5 text-[12px] font-semibold text-muted transition-all duration-200 hover:text-foreground">
               {locale === "en" ? "اردو" : "EN"}
             </button>
             <ThemeToggle />
@@ -372,55 +337,38 @@ export function Header() {
           {/* Boards quick links */}
           <div className="mb-1 mt-3 px-1 text-[10px] font-bold uppercase tracking-wider text-muted">{tr("boards")}</div>
           <div className="grid grid-cols-2 gap-1">
-            {[
-              { slug: "fbise", label: "Federal Board" },
-              { slug: "punjab", label: "Punjab Board" },
-              { slug: "sindh", label: "Sindh Board" },
-              { slug: "balochistan", label: "Balochistan Board" },
-              { slug: "kpk", label: "KPK Board" },
-              { slug: "oxford", label: "Oxford Board" },
-              { slug: "cambridge", label: "Cambridge Board" },
-            ].map((b) => (
+            {MOBILE_BOARDS.map((b) => (
               <Link key={b.slug} href={`/${b.slug}`} onClick={() => setMenuOpen(false)}
-                className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent">
+                className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition-all duration-200 hover:border-accent hover:bg-accent/10 hover:text-accent">
                 {b.label}
               </Link>
             ))}
           </div>
 
           {/* All sections */}
-          {[...CORE_DROPDOWNS, ...MORE_DROPDOWNS].map((dd) => (
-            <MobileSection key={dd.label} title={dd.label} groups={dd.groups} onLink={() => setMenuOpen(false)} />
-          ))}
-
-          <div className="mb-1 mt-3 px-1 text-[10px] font-bold uppercase tracking-wider text-muted">Coming Soon</div>
-          {COMING_SOON.map((item) => (
-            <Link key={item.href} href={item.href} onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-              {item.label}
-              <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
-            </Link>
+          {NAV_ITEMS.map((item) => (
+            <MobileSection key={item.label} item={item} onLink={() => setMenuOpen(false)} />
           ))}
 
           <div className="mt-3 border-t border-border pt-3">
             {!loading && user ? (
               <div className="flex flex-col gap-1.5">
-                <Link href="/account" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium">{user.name}</Link>
-                {isStaff && <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-accent">{tr("admin")}</Link>}
-                <button type="button" onClick={() => { signOut(); setMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted">{tr("signOut")}</button>
+                <Link href="/account" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-accent/10">{user.name}</Link>
+                {isStaff && <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-accent transition-all duration-200 hover:bg-accent/10">{tr("admin")}</Link>}
+                <button type="button" onClick={() => { signOut(); setMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted transition-all duration-200 hover:bg-red-50 hover:text-red-600">{tr("signOut")}</button>
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
-                <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full bg-accent px-5 py-2.5 text-center text-sm font-bold text-white">{tr("signUp")} / {tr("signIn")}</Link>
+                <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full bg-accent px-5 py-2.5 text-center text-sm font-bold text-white transition-all duration-300 hover:shadow-lg hover:shadow-accent/20">{tr("signUp")} / {tr("signIn")}</Link>
               </div>
             )}
-            <Link href="/upload" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-center text-sm font-bold text-accent">{tr("uploadTitle")}</Link>
+            <Link href="/upload" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-center text-sm font-bold text-accent transition-all duration-300 hover:bg-accent hover:text-white">{tr("uploadTitle")}</Link>
             <a
               href={WHATSAPP_CHANNEL_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMenuOpen(false)}
-              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-center text-sm font-bold text-white"
+              className="mt-2 flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 text-center text-sm font-bold text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#25D366]/20"
             >
               <WhatsAppIcon />
               {tr("joinWhatsApp")}
@@ -432,24 +380,35 @@ export function Header() {
   );
 }
 
-function MobileSection({ title, groups, onLink }: { title: string; groups: { heading?: string; items: { label: string; href: string }[] }[]; onLink: () => void }) {
+function MobileSection({ item, onLink }: { item: DropdownDef; onLink: () => void }) {
   const [open, setOpen] = useState(false);
+
+  if (item.soon) {
+    return (
+      <Link href={`/${item.label.toLowerCase().replace(/[^a-z]/g, "-")}`} onClick={onLink}
+        className="mb-0.5 flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-accent/10">
+        {item.label}
+        <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+      </Link>
+    );
+  }
+
   return (
     <div className="mb-0.5">
       <button type="button" onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-accent/10">
-        {title}
-        <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+        className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-accent/10">
+        {item.label}
+        <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 text-muted transition-transform duration-200 ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {open && (
-        <div className="ml-3 pb-1">
-          {groups.map((g, gi) => (
+        <div className="ml-3 pb-1 animate-fade-in">
+          {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && <div className="mb-1 mt-1 text-[9px] font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
-              {g.items.map((item) => (
-                <Link key={item.href} href={item.href} onClick={onLink}
-                  className="block rounded-lg px-3 py-1.5 text-[13px] font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-                  {item.label}
+              {g.items.map((itm) => (
+                <Link key={itm.href} href={itm.href} onClick={onLink}
+                  className="block rounded-lg px-3 py-1.5 text-[13px] font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:translate-x-0.5">
+                  {itm.label}
                 </Link>
               ))}
             </div>
