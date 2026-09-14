@@ -62,7 +62,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
   return (
     <div>
       {/* ─── Hero Banner ─── */}
-      <section className="relative overflow-hidden text-white" style={{ background: "linear-gradient(135deg, #0d6659 0%, #0D9488 40%, #059669 70%, #047857 100%)" }}>
+      <section className="hero-gradient relative overflow-hidden text-white">
         {/* Floating decorative shapes */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/10 blur-2xl animate-float" />
@@ -254,7 +254,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
 
       {/* ─── Upload CTA ─── */}
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl px-8 py-12 text-white transition-shadow duration-500 hover:shadow-2xl hover:shadow-accent/20 sm:px-12 sm:py-16" style={{ background: "linear-gradient(135deg, #0d6659 0%, #0D9488 40%, #059669 70%, #047857 100%)" }}>
+        <div className="cta-gradient relative overflow-hidden rounded-3xl px-8 py-12 text-white transition-shadow duration-500 hover:shadow-2xl hover:shadow-accent/20 sm:px-12 sm:py-16">
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
             <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10 blur-2xl animate-float" />
             <div className="absolute -bottom-20 -left-16 h-72 w-72 rounded-full bg-emerald-300/10 blur-3xl animate-float-slow" />

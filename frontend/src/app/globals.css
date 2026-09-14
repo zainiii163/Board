@@ -369,6 +369,14 @@ html.dark .glass {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.hero-gradient {
+  background: linear-gradient(135deg, #065f56 0%, #0D9488 35%, #059669 65%, #047857 100%);
+}
+
+.cta-gradient {
+  background: linear-gradient(135deg, #065f56 0%, #0D9488 35%, #059669 65%, #047857 100%);
+}
+
 /* Trust badge shine */
 @keyframes shine {
   0% { left: -100%; }
