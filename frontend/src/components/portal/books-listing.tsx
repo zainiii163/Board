@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { apiFetch } from "@/lib/api-client";
 import { useLocale } from "@/lib/locale-context";
@@ -8,13 +8,6 @@ import { ResourceCard } from "@/components/portal/resource-card";
 import { type PortalCategory, type PortalResource } from "@/components/portal/portal-types";
 
 const PAGE_SIZE = 24;
-
-type Filter = {
-  category: string;
-  subcategory: string;
-  sort: string;
-  page: number;
-};
 
 type Props = {
   initialResources: PortalResource[];
@@ -24,7 +17,8 @@ type Props = {
 
 export function BooksListing({ initialResources, initialTotal, categories }: Props) {
   const { tr } = useLocale();
-  const [filter, setFilter] = useState<Filter>({ category: "", subcategory: "", sort: "latest", page: 1 });
+  const [filter, setFilter] = useState({ category: "", subcategory: "", sort: "latest", page: 1 });
+  const [searchQuery, setSearchQuery] = useState("");
   const [resources, setResources] = useState(initialResources);
   const [total, setTotal] = useState(initialTotal);
   const [loading, setLoading] = useState(false);
@@ -36,9 +30,14 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
     (async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ limit: "120", sort: filter.sort });
+        const params = new URLSearchParams({
+          limit: String(PAGE_SIZE),
+          offset: String((filter.page - 1) * PAGE_SIZE),
+          sort: filter.sort,
+        });
         const useCat = filter.subcategory || filter.category;
         if (useCat) params.set("category", useCat);
+        if (searchQuery) params.set("q", searchQuery);
         const data = await apiFetch<{ resources: PortalResource[]; total: number }>(`/api/resources?${params}`);
         if (!cancelled) { setResources(data.resources); setTotal(data.total); }
       } catch {
@@ -48,22 +47,11 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
       }
     })();
     return () => { cancelled = true; };
-  }, [filter.category, filter.subcategory, filter.sort]);
+  }, [filter.category, filter.subcategory, filter.sort, filter.page, searchQuery]);
 
-  const categoryNameById = useMemo(
-    () => Object.fromEntries(categories.map((c) => [String(c.id), c.name])),
-    [categories],
-  );
+  const categoryNameById = Object.fromEntries(categories.map((c) => [String(c.id), c.name]));
 
-  const selectedTopCat = useMemo(
-    () => categories.find((c) => c.slug === filter.category),
-    [categories, filter.category],
-  );
-
-  const paginatedResources = useMemo(() => {
-    const start = (filter.page - 1) * PAGE_SIZE;
-    return resources.slice(start, start + PAGE_SIZE);
-  }, [resources, filter.page]);
+  const selectedTopCat = categories.find((c) => c.slug === filter.category);
 
   const selectClass =
     "rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold text-foreground outline-none transition focus:border-accent";
@@ -83,7 +71,7 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
           ))}
         </select>
 
-        {selectedTopCat && (selectedTopCat as unknown as { children?: PortalCategory[] }).children && (
+        {selectedTopCat?.children && (
           <select
             aria-label="Subcategory"
             className={selectClass}
@@ -91,7 +79,7 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
             onChange={(e) => setFilter((f) => ({ ...f, subcategory: e.target.value, page: 1 }))}
           >
             <option value="">All {selectedTopCat.name}</option>
-            {(selectedTopCat as unknown as { children?: PortalCategory[] }).children?.map((child: PortalCategory) => (
+            {selectedTopCat.children.map((child) => (
               <option key={child.slug} value={child.slug}>{child.icon} {child.name}</option>
             ))}
           </select>
@@ -108,6 +96,14 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
           <option value="a-z">{tr("sortAZ")}</option>
         </select>
 
+        <input
+          type="text"
+          placeholder={tr("searchPlaceholder") ?? "Search resources…"}
+          className={selectClass}
+          value={searchQuery}
+          onChange={(e) => { setSearchQuery(e.target.value); setFilter((f) => ({ ...f, page: 1 })); }}
+        />
+
         <p className="text-sm font-semibold text-muted">
           {total} {tr("resourcesCount")}
         </p>
@@ -119,10 +115,10 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
         </div>
       )}
 
-      {!loading && paginatedResources.length > 0 ? (
+      {!loading && resources.length > 0 ? (
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {paginatedResources.map((r) => (
+            {resources.map((r) => (
               <ResourceCard key={r.id} resource={r} categoryName={categoryNameById[String(r.categoryId)]} />
             ))}
           </div>
