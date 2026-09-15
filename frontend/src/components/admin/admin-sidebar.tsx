@@ -77,7 +77,7 @@ const sections: LinkSection[] = [
   },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ onLinkClick }: { onLinkClick?: () => void }) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
@@ -94,7 +94,7 @@ export function AdminSidebar() {
     .filter((section) => section.links.length > 0);
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-card">
+    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-border bg-card">
       <div className="border-b border-border p-5">
         <Link href="/" className="font-serif text-xl font-black text-foreground">
           BoardNotes
@@ -128,6 +128,7 @@ export function AdminSidebar() {
                       <Link
                         key={link.href}
                         href={link.href}
+                        onClick={onLinkClick}
                         className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition ${
                           active
                             ? "bg-gradient-to-r from-accent/15 to-accent/5 text-accent shadow-sm"
@@ -154,7 +155,7 @@ export function AdminSidebar() {
         <p className="text-xs text-muted">Signed in as</p>
         <p className="text-sm font-semibold text-foreground">{user?.name}</p>
         <div className="mt-3 flex gap-2">
-          <Link href="/" className="text-xs font-semibold text-accent hover:underline">
+          <Link href="/" onClick={onLinkClick} className="text-xs font-semibold text-accent hover:underline">
             View site
           </Link>
           <button type="button" onClick={signOut} className="text-xs font-semibold text-muted hover:underline">
