@@ -601,14 +601,14 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
         </div>
 
         {/* Prev / Next exercise navigation */}
-        <nav className="mt-6 flex items-center justify-between gap-3 border-t border-border pt-5">
+        <nav className="mt-6 grid gap-3 border-t border-border pt-5 sm:flex sm:items-center sm:justify-between">
           {prevExercise ? (
             <Link
               href={exercisePath(prevExercise.slug)}
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition hover:border-accent/40 hover:text-accent"
+              className="inline-flex items-center gap-2 overflow-hidden rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-semibold text-foreground transition hover:border-accent/40 hover:text-accent"
             >
-              <span aria-hidden="true">←</span>
-              {tr("previous")} · {prevExercise.title}
+              <span aria-hidden="true" className="shrink-0">←</span>
+              <span className="truncate">{tr("previous")} · {prevExercise.title}</span>
             </Link>
           ) : (
             <span className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-muted/50">{tr("previous")}</span>
@@ -616,10 +616,10 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
           {nextExercise ? (
             <Link
               href={exercisePath(nextExercise.slug)}
-              className="inline-flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-bold text-accent transition hover:bg-accent/20"
+              className="inline-flex items-center gap-2 overflow-hidden rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-bold text-accent transition hover:bg-accent/20"
             >
-              {tr("next")} · {nextExercise.title}
-              <span aria-hidden="true">→</span>
+              <span className="truncate">{tr("next")} · {nextExercise.title}</span>
+              <span aria-hidden="true" className="shrink-0">→</span>
             </Link>
           ) : (
             <span className="rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-muted/50">{tr("next")}</span>

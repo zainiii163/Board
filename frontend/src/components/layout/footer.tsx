@@ -48,7 +48,6 @@ export function Footer() {
     { href: "/terms", label: tr("terms") },
     { href: "/copyright", label: tr("copyright") },
     { href: WHATSAPP_CHAT_URL, label: tr("joinWhatsApp"), external: true },
-    { href: YOUTUBE_CHANNEL_URL, label: "YouTube", external: true },
   ];
 
   return (
@@ -156,9 +155,9 @@ export function Footer() {
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </a>
-              <span className="text-slate-500">Based on National Curriculum 2022–23</span>
+              <span className="text-slate-500">National Curriculum 2026–27</span>
               <span className="text-slate-500">•</span>
-              <span className="text-slate-500">Session: 2026–2027</span>
+              <span className="text-slate-500">Session: {new Date().getFullYear()}–{new Date().getFullYear() + 1}</span>
             </div>
           </div>
         </div>

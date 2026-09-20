@@ -34,28 +34,27 @@ const NAV_ITEMS: DropdownDef[] = [
     ]},
   ]},
   { label: "Past Papers", groups: [
-    { items: [
+    { heading: "Pakistani Boards", items: [
       { label: "9th", href: "/categories/9th-class-model-papers" },
       { label: "10th", href: "/categories/10th-class-model-papers" },
       { label: "1st Year", href: "/categories/1st-year-model-papers" },
       { label: "2nd Year", href: "/categories/2nd-year-model-papers" },
     ]},
-  ]},
-  { label: "Guess Papers", groups: [
-    { items: [
-      { label: "9th", href: "/categories/9th-class-guess-papers" },
-      { label: "10th", href: "/categories/10th-class-guess-papers" },
-      { label: "1st Year", href: "/categories/1st-year-guess-papers" },
-      { label: "2nd Year", href: "/categories/2nd-year-guess-papers" },
+    { heading: "International", items: [
+      { label: "Cambridge IGCSE", href: "/categories/cambridge-intl-notes" },
+      { label: "Pearson Edexcel", href: "/categories/pearson-edexcel-notes" },
+      { label: "OxfordAQA", href: "/categories/oxford-notes" },
+      { label: "City & Guilds", href: "/categories/city-guilds-notes" },
+      { label: "IB", href: "/categories/ib-notes" },
     ]},
   ]},
-  { label: "Tests & Generator", groups: [
+  { label: "Test Generator", groups: [
     { items: [
       { label: "9th Class Tests", href: "/categories/9th-class-tests" },
       { label: "10th Class Tests", href: "/categories/10th-class-tests" },
       { label: "1st Year Tests", href: "/categories/1st-year-tests" },
       { label: "2nd Year Tests", href: "/categories/2nd-year-tests" },
-      { label: "Test Generator", href: "/test-generator" },
+      { label: "Generate a Test", href: "/test-generator" },
     ]},
   ]},
   { label: "Tuition", groups: [
@@ -96,7 +95,7 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
         <svg viewBox="0 0 24 24" className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
-        <div className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-2xl animate-scale-in backdrop-blur-sm" onMouseEnter={onFocused} onMouseLeave={onClose}>
+        <div className={`absolute left-0 top-full z-50 mt-2 rounded-xl border border-border bg-card p-2 shadow-2xl animate-scale-in backdrop-blur-sm ${item.groups.length > 1 ? "w-80" : "w-64"}`} onMouseEnter={onFocused} onMouseLeave={onClose}>
           {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && <div className="mb-1 mt-2 px-3 text-xs font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
@@ -235,14 +234,6 @@ export function Header() {
             <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             <input name="q" autoComplete="off" placeholder={tr("portalSearchPlaceholder")} aria-label={tr("search")} className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
           </form>
-          <div className="mb-1 mt-3 px-1 text-[10px] font-bold uppercase tracking-wider text-muted">Boards</div>
-          <div className="grid grid-cols-2 gap-1 mb-3">
-            <Link href="/fbise" onClick={() => setMenuOpen(false)} className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition hover:border-accent hover:bg-accent/10 hover:text-accent">Federal Board</Link>
-            <Link href="/punjab" onClick={() => setMenuOpen(false)} className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition hover:border-accent hover:bg-accent/10 hover:text-accent">Punjab Board</Link>
-            <Link href="/oxford" onClick={() => setMenuOpen(false)} className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition hover:border-accent hover:bg-accent/10 hover:text-accent">Oxford</Link>
-            <Link href="/cambridge" onClick={() => setMenuOpen(false)} className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition hover:border-accent hover:bg-accent/10 hover:text-accent">Cambridge</Link>
-            <Link href="/apsacs" onClick={() => setMenuOpen(false)} className="rounded-lg border border-border px-3 py-2 text-[13px] font-semibold text-foreground transition hover:border-accent hover:bg-accent/10 hover:text-accent">APSACS</Link>
-          </div>
           {NAV_ITEMS.map((item) => (
             <MobileSection key={item.label} item={item} onLink={() => setMenuOpen(false)} />
           ))}

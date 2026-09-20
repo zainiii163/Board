@@ -1,100 +1,116 @@
-"use client";
+﻿"use client";
+
+import Link from "next/link";
+
+const FEATURES = [
+  {
+    icon: "\uD83D\uDCDA",
+    title: "Books & Notes",
+    desc: "Curated textbooks, notes, and solved exercises from Class 5 to 12 \u2014 organized by board, class, and subject.",
+    gradient: "from-teal-500 to-emerald-600",
+    href: "/books",
+  },
+  {
+    icon: "\uD83D\uDCCB",
+    title: "Past Papers & Pairing",
+    desc: "Past papers, pairing schemes, and model papers for all boards \u2014 know exactly what to expect.",
+    gradient: "from-sky-500 to-blue-600",
+    href: "/categories",
+  },
+  {
+    icon: "\uD83D\uDCDD",
+    title: "Test Generator",
+    desc: "Custom practice tests with MCQs and subjective questions. Instant grading and progress tracking.",
+    gradient: "from-violet-500 to-purple-600",
+    href: "/test-generator",
+  },
+  {
+    icon: "\uD83D\uDC69\u200D\uD83C\uDFEB",
+    title: "Tuition & Support",
+    desc: "Connect with experienced tutors for personalized learning support across all subjects.",
+    gradient: "from-amber-500 to-orange-600",
+    href: "/tuition",
+  },
+];
+
+const STATS = [
+  { value: "679+", label: "Resources" },
+  { value: "8", label: "Boards" },
+  { value: "5\u201312", label: "Classes" },
+  { value: "100%", label: "Free" },
+];
 
 export function PlatformIntro() {
   return (
-    <section className="border-t border-border bg-gradient-to-b from-background via-accent/[0.02] to-background">
-      <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          {/* Main Heading */}
-          <div className="mb-10 text-center">
-            <h2 className="font-serif text-2xl font-black text-foreground sm:text-3xl lg:text-4xl">
-              Your Complete Learning & Exam Preparation Platform
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-muted sm:text-lg">
-              Designed specifically for students from Class 5 to Class 12, BoardNotes provides comprehensive academic resources to help you excel in your studies and prepare confidently for your board examinations. Our platform brings together everything you need to succeed in one convenient location.
-            </p>
+    <section className="relative overflow-hidden border-t border-border bg-gradient-to-b from-background via-accent/[0.02] to-background">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -right-40 top-10 h-80 w-80 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute -left-40 bottom-10 h-80 w-80 rounded-full bg-emerald-500/5 blur-3xl" />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        {/* Stats row */}
+        <div className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {STATS.map((s) => (
+            <div key={s.label} className="rounded-xl border border-border bg-card/60 px-4 py-3 text-center backdrop-blur-sm transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
+              <p className="text-2xl font-black text-accent sm:text-3xl">{s.value}</p>
+              <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-muted">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Heading */}
+        <div className="mb-12 text-center">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-accent">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+            Why BoardNotes
           </div>
+          <h2 className="font-serif text-2xl font-black text-foreground sm:text-3xl lg:text-4xl">
+            Your Complete Learning Platform
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
+            Everything you need to ace your board exams \u2014 free study resources, practice tests, and expert support in one place.
+          </p>
+        </div>
 
-          {/* Feature Sections */}
-          <div className="space-y-10">
-            {/* Study Resources */}
-            <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                  </svg>
+        {/* Feature cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:gap-5">
+          {FEATURES.map((f) => (
+            <Link
+              key={f.title}
+              href={f.href}
+              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all duration-400 hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5 sm:p-7"
+            >
+              <div className={`absolute left-0 top-0 h-1 w-full bg-gradient-to-r ${f.gradient} transition-all duration-500 group-hover:h-1.5`} />
+              <div className="flex gap-4">
+                <span className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${f.gradient} text-2xl text-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                  {f.icon}
                 </span>
-                <h3 className="font-serif text-xl font-bold text-foreground sm:text-2xl">
-                  Study Resources for Every Class
-                </h3>
+                <div className="min-w-0">
+                  <h3 className="text-base font-bold text-foreground transition-colors duration-200 group-hover:text-accent sm:text-lg">
+                    {f.title}
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">
+                    {f.desc}
+                  </p>
+                </div>
               </div>
-              <p className="text-base leading-relaxed text-muted sm:text-lg">
-                Access high-quality Books & Notes tailored to your specific class and subject requirements. Whether you're in Class 5, Class 10, or preparing for your Class 12 board exams, our curated study materials are organized by grade level and subject to help you find exactly what you need for effective learning and revision.
-              </p>
-            </div>
+              <div className="absolute bottom-4 right-5 text-muted transition-all duration-300 group-hover:translate-x-1 group-hover:text-accent">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+              </div>
+            </Link>
+          ))}
+        </div>
 
-            {/* Exam Preparation */}
-            <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M9 12h6" />
-                    <path d="M12 9v6" />
-                    <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
-                  </svg>
-                </span>
-                <h3 className="font-serif text-xl font-bold text-foreground sm:text-2xl">
-                  Prepare Smarter for Board Exams
-                </h3>
-              </div>
-              <p className="text-base leading-relaxed text-muted sm:text-lg">
-                Understanding exam patterns is crucial for success. Our Pairing Schemes, Past Papers, and Guess Papers provide valuable insights into what to expect in your board examinations. These resources help you identify important topics, understand question formats, and practice with actual exam papers from previous years, giving you a significant advantage in your preparation.
-              </p>
-            </div>
-
-            {/* Practice & Testing */}
-            <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-                    <path d="M14 2v6h6" />
-                    <path d="M8 13h8" />
-                    <path d="M8 17h8" />
-                    <path d="M8 9h2" />
-                  </svg>
-                </span>
-                <h3 className="font-serif text-xl font-bold text-foreground sm:text-2xl">
-                  Practice & Test Yourself
-                </h3>
-              </div>
-              <p className="text-base leading-relaxed text-muted sm:text-lg">
-                Put your knowledge to the test with our innovative Test Generator feature. Create custom practice tests based on your specific subjects and chapters, allowing you to assess your understanding, identify areas that need improvement, and build confidence before your actual exams. Regular practice with our testing tools helps reinforce learning and improves retention.
-              </p>
-            </div>
-
-            {/* Expert Support */}
-            <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                </span>
-                <h3 className="font-serif text-xl font-bold text-foreground sm:text-2xl">
-                  Learn with Expert Support
-                </h3>
-              </div>
-              <p className="text-base leading-relaxed text-muted sm:text-lg">
-                Sometimes you need extra help to master difficult concepts. Our Tuitions section connects you with experienced tutors and additional learning resources when you need them most. Whether you're struggling with a specific topic or want to deepen your understanding, our tuition services provide the personalized support you need to overcome challenges and achieve your academic goals.
-              </p>
-            </div>
-          </div>
+        {/* Bottom CTA */}
+        <div className="mt-10 text-center">
+          <Link
+            href="/categories"
+            className="shine-on-hover inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-6 py-3 text-sm font-bold text-accent transition-all duration-300 hover:bg-accent hover:text-white hover:shadow-lg hover:shadow-accent/20"
+          >
+            Explore All Categories
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+          </Link>
         </div>
       </div>
     </section>
