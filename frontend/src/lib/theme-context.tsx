@@ -27,6 +27,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
     localStorage.setItem("boardnotes_theme", theme);
+    document.cookie = `boardnotes_theme=${theme}; path=/; max-age=31536000; SameSite=Lax`;
   }, [theme]);
 
   const value = useMemo(
