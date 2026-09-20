@@ -12,10 +12,12 @@ const readQueryNumber = (value: unknown) => {
   return Number.isFinite(num) ? num : undefined;
 };
 
-export const list = async (req: Request, res: Response) => {
-  const classId = readQueryNumber(req.query.classId);
-  res.json(await subjectsService.listSubjects(classId));
-};
+export const list = async (req: Request, res: Response) => {
+  const classId = readQueryNumber(req.query.classId);
+  const board = asString(req.query.board);
+  const classSlug = asString(req.query.class);
+  res.json(await subjectsService.listSubjects(classId, board || undefined, classSlug || undefined));
+};
 
 export const getBySlug = async (req: Request, res: Response, next: NextFunction) => {
   try {

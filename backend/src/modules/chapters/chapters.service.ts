@@ -1,6 +1,6 @@
 import type { ContentStatus } from "@boardnotes/shared";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 
 
@@ -80,6 +80,33 @@ export async function listChapters(status?: ContentStatus): Promise<CmsChapterRe
 
   return cmsStore.listChaptersAdmin(status);
 
+}
+
+export async function listChaptersByBoardClassSubject(
+  boardSlug: string,
+  classSlug: string,
+  subjectSlug: string,
+): Promise<{ slug: string; title: string }[]> {
+  if (!boardSlug || !classSlug || !subjectSlug) return [];
+
+  const board = await db.query.boards.findFirst({ where: eq(schema.boards.slug, boardSlug) });
+  if (!board) return [];
+
+  const klass = await db.query.classes.findFirst({
+    where: and(eq(schema.classes.boardId, board.id), eq(schema.classes.slug, classSlug)),
+  });
+  if (!klass) return [];
+
+  const subject = await db.query.subjects.findFirst({
+    where: and(eq(schema.subjects.classId, klass.id), eq(schema.subjects.slug, subjectSlug)),
+  });
+  if (!subject) return [];
+
+  const chapters = await db.query.chapters.findMany({
+    where: eq(schema.chapters.subjectId, subject.id),
+  });
+
+  return chapters.map((c) => ({ slug: c.slug, title: c.title }));
 }
 
 

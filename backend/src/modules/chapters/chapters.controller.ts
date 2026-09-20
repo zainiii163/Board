@@ -8,6 +8,18 @@ import { ApiError } from "../../utils/api-error.js";
 const asString = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] ?? "" : value ?? "";
 
+export const listPublic = async (req: any, res: Response, next: NextFunction) => {
+  try {
+    const board = asString(req.query.board);
+    const classSlug = asString(req.query.class);
+    const subject = asString(req.query.subject);
+    const chapters = await chaptersService.listChaptersByBoardClassSubject(board, classSlug, subject);
+    res.json(chapters);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const list = async (req: AuthedRequest, res: Response, next: NextFunction) => {
   try {
     const status = req.query.status as ContentStatus | undefined;

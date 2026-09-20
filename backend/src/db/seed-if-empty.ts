@@ -5,6 +5,7 @@ import { seedPlatformContent, seedDemoClassroom, seedDemoChapterVideo } from "./
 import { seedRegionalBoardContent } from "./seed-board-backfill.js";
 import { seedLogarithmsEnrichment } from "./seed-logarithms-enrichment.js";
 import { seedBookCovers } from "./seed-book-covers.js";
+import { seedSubjectsAndMCQs } from "./seed-subjects-mcqs.js";
 
 export async function seedIfEmpty() {
   const existing = await db.select({ id: schema.boards.id }).from(schema.boards).limit(1);
@@ -16,6 +17,7 @@ export async function seedIfEmpty() {
     await seedRegionalBoardContent();
     await seedLogarithmsEnrichment();
     await seedBookCovers();
+    await seedSubjectsAndMCQs();
     return;
   }
   console.log("[db] Empty database — seeding board content from demo catalog…");
@@ -24,5 +26,6 @@ export async function seedIfEmpty() {
   await seedDemoClassroom();
   await seedDemoChapterVideo();
   await seedBookCovers();
+  await seedSubjectsAndMCQs();
   console.log("[db] Seed complete. Admin CMS changes will persist to PostgreSQL.");
 }

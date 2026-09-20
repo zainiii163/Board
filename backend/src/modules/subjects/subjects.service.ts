@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { cmsStore, type CmsSubjectRecord } from "../../store/cms-store.js";
 import { db } from "../../db/index.js";
@@ -40,14 +40,28 @@ async function mapSubjectRow(row: {
   };
 }
 
-export async function listSubjects(classId?: number): Promise<CmsSubjectRecord[]> {
+export async function listSubjects(classId?: number, boardSlug?: string, classSlug?: string): Promise<CmsSubjectRecord[]> {
   if (useDb()) {
-    const rows = classId
-      ? await db.query.subjects.findMany({
-          where: eq(schema.subjects.classId, classId),
-          with: { class: { with: { board: true } } },
-        })
-      : await db.query.subjects.findMany({ with: { class: { with: { board: true } } } });
+    let rows;
+    if (boardSlug && classSlug) {
+      const boardRow = await db.query.boards.findFirst({ where: eq(schema.boards.slug, boardSlug) });
+      if (!boardRow) return [];
+      const classRow = await db.query.classes.findFirst({
+        where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, boardRow.id)),
+      });
+      if (!classRow) return [];
+      rows = await db.query.subjects.findMany({
+        where: eq(schema.subjects.classId, classRow.id),
+        with: { class: { with: { board: true } } },
+      });
+    } else if (classId) {
+      rows = await db.query.subjects.findMany({
+        where: eq(schema.subjects.classId, classId),
+        with: { class: { with: { board: true } } },
+      });
+    } else {
+      rows = await db.query.subjects.findMany({ with: { class: { with: { board: true } } } });
+    }
     return Promise.all(rows.map(mapSubjectRow));
   }
   return cmsStore.listSubjectsAdmin(classId);
