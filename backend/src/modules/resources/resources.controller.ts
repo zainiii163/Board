@@ -5,6 +5,13 @@ import { portalStore, type PortalResource } from "../../store/portal-store.js";
 import { savePdfUpload } from "../pdfs/pdfs.service.js";
 import type { AuthedRequest } from "../../middleware/auth.middleware.js";
 import { ApiError } from "../../utils/api-error.js";
+import { env } from "../../config/env.js";
+
+function resolveCoverUrl(coverUrl: string | null): string | null {
+  if (!coverUrl) return null;
+  if (coverUrl.startsWith("http")) return coverUrl;
+  return env.publicApiUrl ? `${env.publicApiUrl}${coverUrl}` : coverUrl;
+}
 
 export function toPublicResource(resource: PortalResource) {
   return {
@@ -18,7 +25,7 @@ export function toPublicResource(resource: PortalResource) {
     author: resource.author,
     description: resource.description,
     fileUrl: resource.fileUrl,
-    coverUrl: resource.coverUrl,
+    coverUrl: resolveCoverUrl(resource.coverUrl),
     sizeLabel: resource.sizeLabel,
     pages: resource.pages,
     downloads: resource.downloads,

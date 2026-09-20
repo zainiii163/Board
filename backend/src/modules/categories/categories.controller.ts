@@ -2,6 +2,13 @@ import type { Request, Response, NextFunction } from "express";
 
 import { portalStore, type PortalCategory, type PortalResource } from "../../store/portal-store.js";
 import { ApiError } from "../../utils/api-error.js";
+import { env } from "../../config/env.js";
+
+function resolveUrl(url: string | null): string | null {
+  if (!url) return null;
+  if (url.startsWith("http")) return url;
+  return env.publicApiUrl ? `${env.publicApiUrl}${url}` : url;
+}
 
 function toPublicCategory(category: PortalCategory) {
   return {
@@ -12,7 +19,7 @@ function toPublicCategory(category: PortalCategory) {
     parentId: category.parentId,
     icon: category.icon,
     gradient: category.gradient,
-    imageUrl: category.imageUrl,
+    imageUrl: resolveUrl(category.imageUrl),
   };
 }
 
@@ -28,7 +35,7 @@ function toPublicResource(resource: PortalResource) {
     author: resource.author,
     description: resource.description,
     fileUrl: resource.fileUrl,
-    coverUrl: resource.coverUrl,
+    coverUrl: resolveUrl(resource.coverUrl),
     sizeLabel: resource.sizeLabel,
     pages: resource.pages,
     downloads: resource.downloads,

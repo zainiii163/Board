@@ -177,6 +177,123 @@ const CATEGORY_COVERS: Record<string, string> = {
   tuition: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
 };
 
+// Real book cover mapping: board + class + subject → static cover file
+const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
+  FBISE: {
+    5: {
+      Mathematics: "/book-covers/fbise-5-5-mathematics.webp",
+      English: "/book-covers/fbise-5-5-english.jpg",
+      Urdu: "/book-covers/fbise-5-5-urdu.webp",
+      "General Science": "/book-covers/fbise-5-5-general-science.webp",
+      "Pakistan Studies": "/book-covers/fbise-5-5th-class-social-studies.jpg",
+      Islamiat: "/book-covers/fbise-5-class-5-islamiat-federal-board.webp",
+    },
+    6: {
+      Mathematics: "/book-covers/fbise-6-math-6-nbf.webp",
+      "Computer Science": "/book-covers/fbise-6-class-6-computer-science-book.webp",
+      Arabic: "/book-covers/fbise-6-arabic-book-6th-class.jpg",
+    },
+    7: {
+      Mathematics: "/book-covers/fbise-7-general-science-7-nbf.webp",
+      English: "/book-covers/fbise-7-english-7-nbf.webp",
+      "Computer Science": "/book-covers/fbise-7-computer-science-7.jpg",
+      Urdu: "/book-covers/fbise-7-urdu-7-nbf.webp",
+      Islamiat: "/book-covers/fbise-7-class-7-islamiat-federal-board.jpg",
+      "General Science": "/book-covers/fbise-7-general-science-7-nbf.webp",
+      Geography: "/book-covers/fbise-7-geography-7-nbf.webp",
+      History: "/book-covers/fbise-7-class-7-history-federal-board.jpg",
+    },
+    8: {
+      Mathematics: "/book-covers/fbise-8-math-8-nbf.webp",
+      English: "/book-covers/fbise-8-english-8-nbf-fg-saleemi-book-depot-in-39471868674351.webp",
+      "Computer Science": "/book-covers/fbise-8-computer-8-nbf.webp",
+      Urdu: "/book-covers/fbise-8-urdu-8-nbf.jpg",
+      Islamiat: "/book-covers/fbise-8-islamiyat-class-8.webp",
+      "General Science": "/book-covers/fbise-8-general-science-8.jpg",
+      Geography: "/book-covers/fbise-8-geography-8-nbf.webp",
+      History: "/book-covers/fbise-8-nbf-history-8.jpg",
+    },
+    9: {
+      Physics: "/book-covers/fbise-9-class-9-physics-nbf.jpg",
+      Chemistry: "/book-covers/fbise-9-chemistry-9-with-experimentation-skills-nbf.webp",
+      Mathematics: "/book-covers/fbise-9-9th-class-mathematics-nbf.jpg",
+      Biology: "/book-covers/fbise-9-9th-class-biology-nbf.jpg",
+      English: "/book-covers/fbise-9-english-9-nbf.webp",
+      "Computer Science": "/book-covers/fbise-9-hamdardchemistryguide9.webp",
+      Urdu: "/book-covers/fbise-9-nbf-urdu-9.webp",
+      "Pakistan Studies": "/book-covers/fbise-9-class-9-pakistan-studies-urdu-.jpg",
+      Islamiat: "/book-covers/fbise-9-islamiat-lazmi-class-9-nbf.webp",
+    },
+    10: {
+      Physics: "/book-covers/fbise-10-10th-class-physics-nbf.jpg",
+      Chemistry: "/book-covers/fbise-10-chemistry-10-nbf.webp",
+      Mathematics: "/book-covers/fbise-10---------------------.jpg",
+      Biology: "/book-covers/fbise-10-biology-10-nbf.webp",
+      English: "/book-covers/fbise-10-class-10-english-book-pdf-federal-board.webp",
+      "Computer Science": "/book-covers/fbise-10-nbf-computer-science-10.jpg",
+      Urdu: "/book-covers/fbise-10-nbf-urdu-10.webp",
+      "Pakistan Studies": "/book-covers/fbise-10-pakistan-studies-grade-10-nbf.webp",
+      Islamiat: "/book-covers/fbise-10-islamiat-10-nbf.webp",
+    },
+    11: {
+      Physics: "/book-covers/fbise-11-physics-class-11-nbf.webp",
+      Chemistry: "/book-covers/fbise-11-textbook-of-chemistry-grade-11-federal-board.webp",
+      Mathematics: "/book-covers/fbise-11-math-11-nbf.webp",
+      Biology: "/book-covers/fbise-11-biology-11-national-book-foundation--federal-board.webp",
+      English: "/book-covers/fbise-11-english-11-nbf-fg.webp",
+      "Computer Science": "/book-covers/fbise-11-computer-science-11-nbf.webp",
+      Urdu: "/book-covers/fbise-11-nbf-urdu-11.webp",
+      Islamiat: "/book-covers/fbise-11-islamiat-11-nbf.webp",
+    },
+    12: {
+      Physics: "/book-covers/fbise-12-physics-national-book-foundation-12--federal-board.webp",
+      Chemistry: "/book-covers/fbise-12-textbook-chemistry-grade-12th-federal-board.webp",
+      Mathematics: "/book-covers/fbise-12-mathematics-book-for-class-12.webp",
+      Biology: "/book-covers/fbise-12-biology-grade-12-edition-2025.webp",
+      English: "/book-covers/fbise-12-english-for-grade-12-nbf-fg-saleemi-book-depot-in-4235439.webp",
+      "Computer Science": "/book-covers/fbise-12-computer-science-for-grade-12-nbf-fg-saleemi-book-depot-i.webp",
+      Urdu: "/book-covers/fbise-12-nbf-urdu-12.webp",
+      "Pakistan Studies": "/book-covers/fbise-12-nbf-pak-studies-12.png",
+    },
+  },
+  "Punjab Board": {
+    9: {
+      Physics: "/book-covers/punjab-9-ptb-physics-class-9th-2025.webp",
+      Chemistry: "/book-covers/punjab-9-ptb-chemistry-class-9th-2025.webp",
+      Mathematics: "/book-covers/punjab-9-class-9-mathematics.webp",
+      Biology: "/book-covers/punjab-9-class-9-biology-pctb.webp",
+      English: "/book-covers/punjab-9-pctb-english-9th-class-2025_800x.webp",
+      "Computer Science": "/book-covers/punjab-9-ptb-computer-science-entrepreneurship-class-9th-2025.webp",
+      Urdu: "/book-covers/punjab-9-pctb-urdu-9th-class-2025.webp",
+      Islamiat: "/book-covers/punjab-9-class-9-islamiat.webp",
+      "General Science": "/book-covers/punjab-9-class-9-general-science.webp",
+    },
+    10: {
+      Biology: "/book-covers/punjab-10-10-biology.jpg",
+      Chemistry: "/book-covers/punjab-10-10th-class-chemistry.jpg",
+    },
+  },
+  Oxford: {
+    9: { Mathematics: "/book-covers/oxford-think!-new-syllabus-mathematics-1-8th-edition.webp" },
+    10: { Mathematics: "/book-covers/oxford-think!-new-syllabus-mathematics-2-8th-edition.webp" },
+    11: { Mathematics: "/book-covers/oxford-think!-new-syllabus-mathematics-3-8th-edition.webp" },
+    12: { Mathematics: "/book-covers/oxford-think!-new-syllabus-mathematics-4-8th-edition.webp" },
+  },
+  APSACS: {
+    8: { Islamiat: "/book-covers/apsacs-apsacs--islamiat-textbook-class-8.webp" },
+  },
+};
+
+function getBookCover(board: string | null, classNum: number | null, subject: string): string | null {
+  if (!board || !classNum) return null;
+  const boardKey = board === "Federal Board" ? "FBISE" : board;
+  const boardCovers = BOOK_COVERS[boardKey];
+  if (!boardCovers) return null;
+  const classCovers = boardCovers[classNum];
+  if (!classCovers) return null;
+  return classCovers[subject] ?? null;
+}
+
 const categories: PortalCategory[] = [];
 let categoryId = 1;
 
@@ -266,6 +383,7 @@ function pushResource(input: {
   categorySlug: string;
   subject: string;
   board?: string | null;
+  classLabel?: string | null;
   description: string;
   sizeLabel: string;
   pages: number;
@@ -275,19 +393,24 @@ function pushResource(input: {
   const dayOffset = intBetween(1, 75);
   const added = new Date(Date.now() - dayOffset * 86400000 - intBetween(0, 20) * 3600000).toISOString();
   const fileUrl = null;
+  const board = input.board ?? pick(BOARD_TAGS);
+  const classLabel = input.classLabel ?? (category.name.match(/\d+/) ? `Class ${category.name.match(/\d+/)![0]}` : null);
+  const classNum = classLabel ? parseInt(classLabel.replace(/\D/g, "")) : null;
+  // Try real book cover first, fall back to subject-based Unsplash
+  const realCover = getBookCover(board, classNum, input.subject);
   const baseSlug = slugify(`${input.subject} ${input.title}`);
   resources.push({
     id: resourceId++,
     slug: resources.some((r) => r.slug === baseSlug) ? `${baseSlug}-${intBetween(1, 99)}` : baseSlug,
     title: input.title,
     categoryId: category.id,
-    board: input.board ?? pick(BOARD_TAGS),
-    classLabel: category.name.match(/\d+/) ? `Class ${category.name.match(/\d+/)![0]}` : null,
+    board,
+    classLabel,
     subject: input.subject,
     author: pick(AUTHORS),
     description: input.description,
     fileUrl,
-    coverUrl: input.coverUrl ?? null,
+    coverUrl: input.coverUrl ?? realCover ?? SUBJECT_COVERS[input.subject] ?? SUBJECT_COVERS.General,
     sizeLabel: input.sizeLabel,
     pages: input.pages,
     downloads: intBetween(340, 9800),
@@ -317,10 +440,10 @@ for (const [leafSlug, board] of Object.entries(BOARD_TEXTBOOK)) {
         categorySlug: leafSlug,
         subject,
         board,
+        classLabel: `Class ${cls}`,
         description: `Official ${board} ${ORDINALS[cls]} ${subject} textbook in PDF format for reading online and download.`,
         sizeLabel: `${intBetween(8, 42)} MB`,
         pages: intBetween(180, 320),
-        coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
       });
     }
   }
@@ -362,10 +485,10 @@ for (const [leafSlug, board] of Object.entries(BOARD_NOTES)) {
         categorySlug: leafSlug,
         subject,
         board,
+        classLabel: `Class ${cls}`,
         description: NOTE_DESCRIPTIONS[subject] ?? NOTE_DESCRIPTIONS.Physics,
         sizeLabel: `${intBetween(1, 6)} MB`,
         pages: intBetween(6, 32),
-        coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
       });
     }
   }
@@ -386,10 +509,10 @@ for (const [slug, cls] of Object.entries(PAIRING_MAP)) {
       categorySlug: slug,
       subject,
       board: pick(BOARD_TAGS),
+      classLabel: `Class ${cls}`,
       description: `Official ${ORDINALS[cls]} ${subject} pairing scheme for the annual board exams 2026 with section-wise marks distribution.`,
       sizeLabel: `${intBetween(1, 4)} MB`,
       pages: intBetween(4, 14),
-      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -409,20 +532,20 @@ for (const [slug, cls] of Object.entries(MODEL_MAP)) {
       categorySlug: slug,
       subject,
       board: pick(BOARD_TAGS),
+      classLabel: `Class ${cls}`,
       description: `Official model paper for ${ORDINALS[cls]} ${subject} board exam 2026 with detailed solutions.`,
       sizeLabel: `${intBetween(2, 8)} MB`,
       pages: intBetween(12, 30),
-      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
     pushResource({
       title: `${ORDINALS[cls]} ${subject} Past Paper 2025 (Annual) PDF`,
       categorySlug: slug,
       subject,
       board: pick(BOARD_TAGS),
+      classLabel: `Class ${cls}`,
       description: `${ORDINALS[cls]} ${subject} past paper from the 2025 annual board examination with answer key.`,
       sizeLabel: `${intBetween(2, 8)} MB`,
       pages: intBetween(10, 28),
-      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -442,20 +565,20 @@ for (const [slug, cls] of Object.entries(GUESS_MAP)) {
       categorySlug: slug,
       subject,
       board: pick(BOARD_TAGS),
+      classLabel: `Class ${cls}`,
       description: `Most important ${subject} questions predicted for the ${ORDINALS[cls]} board exam 2026, with marking scheme.`,
       sizeLabel: `${intBetween(1, 6)} MB`,
       pages: intBetween(8, 24),
-      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
     pushResource({
       title: `${ORDINALS[cls]} ${subject} Important Topics 2026 PDF`,
       categorySlug: slug,
       subject,
       board: pick(BOARD_TAGS),
+      classLabel: `Class ${cls}`,
       description: `Key ${subject} topics and chapter summaries for ${ORDINALS[cls]} exam preparation 2026.`,
       sizeLabel: `${intBetween(1, 4)} MB`,
       pages: intBetween(6, 18),
-      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -475,20 +598,20 @@ for (const [slug, cls] of Object.entries(TEST_MAP)) {
       categorySlug: slug,
       subject,
       board: pick(BOARD_TAGS),
+      classLabel: `Class ${cls}`,
       description: `Chapterwise test papers for ${subject} — print-ready with mark allocation for ${ORDINALS[cls]} class.`,
       sizeLabel: `${intBetween(3, 12)} MB`,
       pages: intBetween(15, 45),
-      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
     pushResource({
       title: `${ORDINALS[cls]} ${subject} Full & Half Book Test PDF`,
       categorySlug: slug,
       subject,
       board: pick(BOARD_TAGS),
+      classLabel: `Class ${cls}`,
       description: `Full book and half book test papers for ${subject} ${ORDINALS[cls]} with objective and subjective sections.`,
       sizeLabel: `${intBetween(2, 9)} MB`,
       pages: intBetween(10, 38),
-      coverUrl: SUBJECT_COVERS[subject] ?? SUBJECT_COVERS.General,
     });
   }
 }
@@ -517,7 +640,6 @@ for (const entry of TUITION_RESOURCES) {
     description: entry.description,
     sizeLabel: `${intBetween(1, 4)} MB`,
     pages: intBetween(2, 10),
-    coverUrl: SUBJECT_COVERS[entry.subject] ?? CATEGORY_COVERS.tuition,
   });
 }
 

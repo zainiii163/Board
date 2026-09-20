@@ -22,6 +22,10 @@ export function createApp() {
     "/demo-pdfs",
     express.static(path.join(process.cwd(), "public", "demo-pdfs")),
   );
+  app.use(
+    "/book-covers",
+    express.static(path.join(process.cwd(), "public", "book-covers")),
+  );
 
   app.get("/uploads/:filename", async (req, res, next) => {
     const filename = String(req.params.filename);
