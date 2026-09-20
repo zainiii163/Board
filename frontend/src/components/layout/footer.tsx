@@ -28,7 +28,6 @@ export function Footer() {
     { href: "/categories", label: tr("browseCategories") },
     { href: "/books", label: tr("books") },
     { href: "/model-papers", label: "Model & Past Papers" },
-    { href: "/guess-papers", label: "Guess Papers" },
     { href: "/tuition", label: "Tuition" },
     { href: "/upload", label: tr("uploadTitle") },
   ];
@@ -143,9 +142,9 @@ export function Footer() {
               <Link href="/copyright" className="hover:text-white transition-colors">Copyright</Link>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-slate-500">Based on National Curriculum 2022–23</span>
+              <span className="text-slate-500">National Curriculum 2026–27</span>
               <span className="text-slate-500">•</span>
-              <span className="text-slate-500">Session: 2026–2027</span>
+              <span className="text-slate-500">Session: {new Date().getFullYear()}–{new Date().getFullYear() + 1}</span>
             </div>
           </div>
         </div>
