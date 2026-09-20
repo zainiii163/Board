@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
@@ -18,16 +19,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const theme = (await cookies()).get("boardnotes_theme")?.value;
+  const htmlClass = theme === "dark"
+    ? "h-full scroll-smooth antialiased dark"
+    : "h-full scroll-smooth antialiased";
+
   return (
-    <html lang="en" className="h-full scroll-smooth antialiased" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('boardnotes_theme');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})();`,
-          }}
-        />
-      </head>
+    <html lang="en" className={htmlClass} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>

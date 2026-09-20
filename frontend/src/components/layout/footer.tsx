@@ -33,6 +33,14 @@ export function Footer() {
     { href: "/upload", label: tr("uploadTitle") },
   ];
 
+  const boardLinks = [
+    { href: "/fbise", label: "Federal Board" },
+    { href: "/punjab", label: "Punjab Board" },
+    { href: "/oxford", label: "Oxford" },
+    { href: "/cambridge", label: "Cambridge" },
+    { href: "/apsacs", label: "APSACS" },
+  ];
+
   const companyLinks = [
     { href: "/about", label: tr("about") },
     { href: "/contact", label: tr("contact") },
@@ -44,7 +52,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-[#182333] bg-[#182333] text-slate-300 print:hidden">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-8">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:px-8">
         <div>
           <Link href="/" className="inline-block font-serif text-2xl font-black tracking-tight text-white transition-all duration-300 hover:text-accent hover:scale-105">
             BoardNotes
@@ -70,6 +78,19 @@ export function Footer() {
           <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-200">Study</h3>
           <ul className="space-y-2.5 text-sm">
             {studyLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="inline-block transition-all duration-300 hover:text-white hover:translate-x-1.5 text-slate-400">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-200">Boards</h3>
+          <ul className="space-y-2.5 text-sm">
+            {boardLinks.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="inline-block transition-all duration-300 hover:text-white hover:translate-x-1.5 text-slate-400">
                   {link.label}
@@ -110,6 +131,26 @@ export function Footer() {
         </div>
       </div>
 
+      {/* Essential Links Section */}
+      <div className="border-t border-white/10 bg-[#0f1729]">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
+            <div className="flex flex-wrap gap-4">
+              <Link href="/about" className="hover:text-white transition-colors">About Us</Link>
+              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+              <Link href="/copyright" className="hover:text-white transition-colors">Copyright</Link>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-slate-500">Based on National Curriculum 2022–23</span>
+              <span className="text-slate-500">•</span>
+              <span className="text-slate-500">Session: 2026–2027</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Join Our WhatsApp CTA */}
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:px-6 lg:flex-row lg:px-8">
@@ -133,7 +174,10 @@ export function Footer() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 py-5 text-center text-xs text-slate-500 sm:px-6 lg:px-8">
-          © {new Date().getFullYear()} BoardNotes · {tr("footerTagline")}
+          <div className="flex flex-col items-center gap-2">
+            <p>© {new Date().getFullYear()} BoardNotes · {tr("footerTagline")}</p>
+            <p className="text-slate-600">All educational materials are provided for educational purposes only. Please respect copyright laws.</p>
+          </div>
         </div>
       </div>
     </footer>

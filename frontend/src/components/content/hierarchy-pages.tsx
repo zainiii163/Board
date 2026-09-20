@@ -16,6 +16,7 @@ import { DownloadGate } from "@/components/content/download-gate";
 import { AdBanner } from "@/components/portal/ad-banner";
 import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedList } from "@/lib/i18n";
+import { ACADEMIC_YEAR } from "@/lib/constants";
 
 const SUBJECT_COLORS = [
   { bg: "bg-gradient-to-br from-sky-50 to-blue-50", dark: "dark:from-sky-950/30 dark:to-blue-950/30", border: "border-sky-200/60 dark:border-sky-800/30", icon: "bg-gradient-to-br from-sky-500 to-blue-500", hover: "hover:border-sky-400", tag: "text-sky-600 dark:text-sky-300" },
@@ -53,11 +54,18 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
           <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
         </div>
         <div className="relative">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
-            🏫 {tr("boardLabel")}
-          </span>
-          <h1 className="mt-4 text-3xl font-black sm:text-4xl" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.15)" }}>{title}</h1>
-          <p className="mt-2 max-w-lg text-sm text-white/85">{tr("chooseClassContinue")}</p>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
+                🏫 {tr("boardLabel")}
+              </span>
+              <h1 className="mt-4 text-3xl font-black sm:text-4xl" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.15)" }}>{title}</h1>
+              <p className="mt-2 max-w-lg text-sm text-white/85">{tr("chooseClassContinue")}</p>
+            </div>
+            <span className="rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-sm font-bold text-white backdrop-blur-sm">
+              {ACADEMIC_YEAR}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -82,6 +90,12 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
                 <p className={`text-xs font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("classLabel")}</p>
                 <h2 className="mt-1 text-xl font-black text-foreground transition-colors duration-200 group-hover:text-accent">{klass.title}</h2>
                 <p className="mt-2 text-sm text-muted">{tr("openSubjectsResources")}</p>
+                <div className="mt-4 flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full border ${color.border} ${color.bg} ${color.dark} px-3 py-1 text-[10px] font-bold ${color.tag}`}>
+                    {ACADEMIC_YEAR}
+                  </span>
+                  <span className="text-xs font-semibold text-accent">Click More →</span>
+                </div>
                 <span className="absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r opacity-60 transition-all duration-700 group-hover:w-full rounded-full" />
               </Link>
             );
@@ -142,8 +156,15 @@ export function ClassPageContent({
               🎓 {tr("classLabel")}
             </span>
           </div>
-          <h1 className="mt-4 text-3xl font-black sm:text-4xl" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.15)" }}>{classTitle}</h1>
-          <p className="mt-2 max-w-lg text-sm text-white/85">{tr("chooseSubjectContinue").replace("{board}", boardTitle)}</p>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="text-3xl font-black sm:text-4xl" style={{ textShadow: "0 2px 10px rgba(0,0,0,0.15)" }}>{classTitle}</h1>
+              <p className="mt-2 max-w-lg text-sm text-white/85">{tr("chooseSubjectContinue").replace("{board}", boardTitle)}</p>
+            </div>
+            <span className="rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-sm font-bold text-white backdrop-blur-sm">
+              {ACADEMIC_YEAR}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -167,6 +188,12 @@ export function ClassPageContent({
                 <p className={`text-xs font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("subjectLabel")}</p>
                 <h2 className="mt-1 text-xl font-black text-foreground transition-colors duration-200 group-hover:text-accent">{subject.title}</h2>
                 <p className="mt-2 text-sm text-muted">{tr("openChaptersNotes")}</p>
+                <div className="mt-4 flex items-center gap-2">
+                  <span className={`inline-flex items-center rounded-full border ${color.border} ${color.bg} ${color.dark} px-3 py-1 text-[10px] font-bold ${color.tag}`}>
+                    {ACADEMIC_YEAR}
+                  </span>
+                  <span className="text-xs font-semibold text-accent">Click More →</span>
+                </div>
                 <span className={`absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r ${color.icon} opacity-60 transition-all duration-700 group-hover:w-full rounded-full`} />
               </Link>
             );
@@ -189,6 +216,26 @@ export function ClassPageContent({
             <p className="mt-1 font-bold text-foreground transition-colors duration-200 group-hover:text-accent">{card.desc}</p>
           </Link>
         ))}
+      </div>
+
+      {/* SEO Content Block */}
+      <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
+        <h3 className="mb-3 text-lg font-bold text-foreground">{boardTitle} {classTitle} Study Resources</h3>
+        <p className="mb-3 text-sm leading-6 text-muted">
+          Access comprehensive study materials for {boardTitle} {classTitle}, including textbooks, notes, past papers, and solved exercises. 
+          Our resources are aligned with the latest curriculum standards, ensuring students have access to high-quality educational content 
+          that supports their learning journey.
+        </p>
+        <p className="mb-3 text-sm leading-6 text-muted">
+          Find subject-specific guides for Mathematics, Physics, Chemistry, Biology, English, Urdu, and Computer Science. 
+          Each subject includes detailed chapter notes, solved exercises, and additional practice materials to help students 
+          excel in their academic performance and board examinations.
+        </p>
+        <p className="text-sm leading-6 text-muted">
+          All study materials are designed to follow the {boardTitle} curriculum guidelines, making them perfect for classroom learning, 
+          homework assistance, and exam preparation. Teachers and students can rely on these resources for consistent and accurate 
+          educational content based on the National Curriculum 2022–23 standards.
+        </p>
       </div>
     </section>
   );
@@ -249,7 +296,7 @@ export function SubjectPageContent({
               <p className={`text-sm font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("subjectLabel")}</p>
               <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{subjectTitle}</h1>
             </div>
-            <span className="rounded-full border border-border bg-card/80 px-3 py-1 text-sm font-semibold text-muted backdrop-blur-sm">{tr("sessionYear")}</span>
+            <span className="rounded-full border border-border bg-card/80 px-3 py-1 text-sm font-semibold text-muted backdrop-blur-sm">{ACADEMIC_YEAR}</span>
           </div>
         </div>
       </div>

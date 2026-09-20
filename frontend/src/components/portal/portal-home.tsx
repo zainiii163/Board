@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 
 import { useLocale } from "@/lib/locale-context";
 import { CategoryCard } from "@/components/portal/category-card";
@@ -15,46 +14,6 @@ type Props = {
   trending: PortalResource[] | null;
   categoryNameById: Record<string, string>;
 };
-
-function TrustBar() {
-  const [visible, setVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true); }, { threshold: 0.3 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const items = [
-    { icon: "📚", label: "679+", desc: "Resources" },
-    { icon: "🏫", label: "11", desc: "Categories" },
-    { icon: "📥", label: "Free", desc: "Downloads" },
-    { icon: "🔒", label: "Safe", desc: "& Secure" },
-  ];
-
-  return (
-    <div ref={ref} className="border-b border-border bg-card/60 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-center gap-6 px-4 py-3 sm:gap-10 sm:px-6 sm:py-4 lg:px-8">
-        {items.map((item, i) => (
-          <div
-            key={item.label}
-            className={`flex items-center gap-2 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-            style={{ transitionDelay: `${i * 100}ms` }}
-          >
-            <span className="text-lg sm:text-xl">{item.icon}</span>
-            <div>
-              <p className="text-xs font-black text-foreground sm:text-sm">{item.label}</p>
-              <p className="text-[10px] font-semibold text-muted sm:text-xs">{item.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export function PortalHome({ categories, latest, trending, categoryNameById }: Props) {
   const { tr } = useLocale();
@@ -115,10 +74,6 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
         </div>
       </section>
 
-      {/* Trust bar */}
-      <TrustBar />
-
-      {/* Ad — below hero */}
       <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6 lg:px-8">
         <AdBanner size="leaderboard" className="mx-auto" />
       </div>
@@ -279,3 +234,5 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
     </div>
   );
 }
+
+export { PortalHome as HomeLanding };
