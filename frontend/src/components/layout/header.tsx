@@ -95,7 +95,7 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
         <svg viewBox="0 0 24 24" className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
-        <div className={`absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 rounded-xl border border-border bg-card p-2 shadow-2xl animate-scale-in backdrop-blur-sm ${item.groups.length > 1 ? "w-80" : "w-64"}`} onMouseEnter={onFocused} onMouseLeave={onClose}>
+        <div className={`absolute left-0 top-full z-50 mt-2 rounded-xl border border-border bg-card p-2 shadow-2xl animate-scale-in backdrop-blur-sm ${item.groups.length > 1 ? "w-80" : "w-64"}`} onMouseEnter={onFocused} onMouseLeave={onClose}>
           {item.groups.map((g, gi) => (
             <div key={gi}>
               {g.heading && <div className="mb-1 mt-2 px-3 text-xs font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
