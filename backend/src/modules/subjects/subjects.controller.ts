@@ -2,9 +2,10 @@ import type { Request, Response, NextFunction } from "express";
 
 import * as subjectsService from "./subjects.service.js";
 import type { AuthedRequest } from "../../middleware/auth.middleware.js";
-
-const asString = (value: string | string[] | undefined) =>
-  Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+const asString = (value: unknown) => {
+  const raw = Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+  return typeof raw === "string" ? raw : "";
+};
 
 const readQueryNumber = (value: unknown) => {
   const raw = Array.isArray(value) ? value[0] : value;
