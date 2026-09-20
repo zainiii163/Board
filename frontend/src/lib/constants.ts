@@ -2,8 +2,15 @@ export const SITE_NAME = "BoardNotes";
 export const DEFAULT_BOARD = "fbise";
 export const SUPPORTED_BOARDS = ["fbise", "punjab", "kpk", "sindh", "apsacs"] as const;
 
+// WhatsApp Contact/Chat - Direct chat with phone number
+export const WHATSAPP_CHAT_URL = "https://wa.me/923017521835";
+
+// WhatsApp Channel - Join channel link
 export const WHATSAPP_CHANNEL_URL =
-  process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL ?? "https://whatsapp.com/channel/join";
+  process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL ?? "https://whatsapp.com/channel/0029Vb5PkniD38CY2Nks972r";
+
+// YouTube Channel
+export const YOUTUBE_CHANNEL_URL = "https://youtube.com/@mathwithmalikshahid?si=dfkdLMiUZobg6I5p";
 
 export const NAV_BOARDS = [
   { slug: "fbise", label: "Federal Board" },

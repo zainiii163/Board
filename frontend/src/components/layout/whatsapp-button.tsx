@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 
-import { WHATSAPP_CHANNEL_URL } from "@/lib/constants";
+import { WHATSAPP_CHAT_URL } from "@/lib/constants";
 
 const emptySubscribe = () => () => {};
 
@@ -14,7 +14,7 @@ export function WhatsAppButton() {
 
   return createPortal(
     <a
-      href={WHATSAPP_CHANNEL_URL}
+      href={WHATSAPP_CHAT_URL}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-5 right-5 z-[9999] flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:bg-[#1ebe5d] hover:scale-110"
