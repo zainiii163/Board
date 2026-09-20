@@ -191,6 +191,7 @@ export const books = pgTable("books", {
   subjectTitle: text("subject_title"),
   title: text("title").notNull(),
   priceLabel: text("price_label").notNull().default("Free PDF"),
+  coverUrl: text("cover_url"),
   pdfUrl: text("pdf_url"),
   notesPath: text("notes_path"),
 });

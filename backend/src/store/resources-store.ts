@@ -10,6 +10,7 @@ export type BookRecord = {
   subjectTitle: string | null;
   title: string;
   priceLabel: string;
+  coverUrl: string | null;
   pdfUrl: string | null;
   notesPath: string | null;
 };
@@ -69,6 +70,7 @@ const books: BookRecord[] = BOOKS.map((book) => {
     subjectTitle: book.title.toLowerCase().includes("math") ? "Mathematics" : null,
     title: book.title,
     priceLabel: book.price,
+    coverUrl: null,
     pdfUrl: null,
     notesPath: book.title.toLowerCase().includes("math") ? `/${board.slug}/${classSlug}/mathematics` : null,
   };

@@ -17,6 +17,7 @@ function mapBookRow(row: typeof schema.books.$inferSelect): BookRecord {
     subjectTitle: row.subjectTitle,
     title: row.title,
     priceLabel: row.priceLabel,
+    coverUrl: row.coverUrl,
     pdfUrl: row.pdfUrl,
     notesPath: row.notesPath,
   };
@@ -60,6 +61,7 @@ export async function createBook(input: Omit<BookRecord, "id">): Promise<BookRec
         subjectTitle: input.subjectTitle,
         title: input.title,
         priceLabel: input.priceLabel,
+        coverUrl: input.coverUrl,
         pdfUrl: input.pdfUrl,
         notesPath: input.notesPath,
       })
