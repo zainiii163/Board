@@ -2,8 +2,9 @@ export const SITE_NAME = "BoardNotes";
 export const DEFAULT_BOARD = "fbise";
 export const SUPPORTED_BOARDS = ["fbise", "punjab", "kpk", "sindh", "apsacs"] as const;
 
-export const WHATSAPP_CHANNEL_URL =
-  process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL ?? "https://whatsapp.com/channel/join";
+const RAW_WA = process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL ?? "";
+const isAbsoluteUrl = (u: string) => /^https?:\/\//i.test(u);
+export const WHATSAPP_CHANNEL_URL = isAbsoluteUrl(RAW_WA) ? RAW_WA : "https://whatsapp.com/channel/join";
 
 export const NAV_BOARDS = [
   { slug: "fbise", label: "Federal Board" },
