@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { env } from "../config/env.js";
 import { isR2Enabled, r2DeletePdf, r2ListUploads, r2PublicUrl, r2PutPdf } from "../storage/r2-storage.js";
@@ -14,8 +15,10 @@ export type StoredPdf = {
   storage?: "local" | "r2";
 };
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const DEMO_DIR = path.join(process.cwd(), "public", "demo-pdfs");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
+const UPLOAD_DIR = path.join(PUBLIC_DIR, "uploads");
+const DEMO_DIR = path.join(PUBLIC_DIR, "demo-pdfs");
 
 const demoFiles = [
   "fbise-9-math-ch1-ex1-1.pdf",

@@ -1,12 +1,16 @@
 import cors from "cors";
 import express from "express";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { env } from "./config/env.js";
 import { apiRouter } from "./routes/index.js";
 import { errorHandler } from "./utils/error-handler.js";
 import { isR2Enabled } from "./storage/r2-storage.js";
 import { readUploadBuffer, uploadExistsLocally } from "./store/pdf-store.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
 
 export function createApp() {
   const app = express();
@@ -20,11 +24,11 @@ export function createApp() {
   app.use(express.json());
   app.use(
     "/demo-pdfs",
-    express.static(path.join(process.cwd(), "public", "demo-pdfs")),
+    express.static(path.join(PUBLIC_DIR, "demo-pdfs")),
   );
   app.use(
     "/book-covers",
-    express.static(path.join(process.cwd(), "public", "book-covers")),
+    express.static(path.join(PUBLIC_DIR, "book-covers")),
   );
 
   app.get("/uploads/:filename", async (req, res, next) => {
@@ -46,7 +50,7 @@ export function createApp() {
 
   app.use(
     "/uploads",
-    express.static(path.join(process.cwd(), "public", "uploads")),
+    express.static(path.join(PUBLIC_DIR, "uploads")),
   );
   app.get("/", (_req, res) => {
     res.json({
