@@ -7,7 +7,9 @@ export const env = {
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean),
-  publicApiUrl: (process.env.PUBLIC_API_URL ?? "").replace(/\/$/, ""),
+  publicApiUrl: (process.env.PUBLIC_API_URL
+    || (process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : "")
+    || "").replace(/\/$/, ""),
   publicSiteUrl: (process.env.PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, ""),
   autoMigrate: process.env.AUTO_MIGRATE !== "false",
   r2Bucket: process.env.R2_BUCKET ?? "",
