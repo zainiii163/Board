@@ -412,7 +412,10 @@ const BOARD_TEXTBOOK: Record<string, string> = {
 };
 
 function textbookTitle(board: string, cls: number, subject: string): string {
-  if (board === "Federal Board") return `Class ${cls} - ${subject} - National Book Foundation (NBF) - Federal Board`;
+  if (board === "Federal Board") {
+    if (cls >= 9) return `Class ${cls} - ${subject} - Federal Board (FBISE)`;
+    return `Class ${cls} - ${subject} - National Book Foundation (NBF)`;
+  }
   if (board === "Punjab Board") return `Class ${cls} - ${subject} - Punjab Board`;
   if (board === "Oxford") return `Class ${cls} - ${subject} - Oxford`;
   if (board === "Cambridge") return `Class ${cls} - ${subject} - Cambridge`;

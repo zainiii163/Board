@@ -58,11 +58,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       </section>
 
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-        {/* Ad */}
-        <div className="mb-8">
-          <AdBanner size="leaderboard" className="mx-auto" />
-        </div>
-
         {/* Child categories */}
         {children.length > 0 && (
           <div className="mb-10">
@@ -115,6 +110,11 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         ) : (
           <p className="text-sm text-muted">No resources here yet.</p>
         )}
+
+        {/* Ad — bottom only */}
+        <div className="mt-10">
+          <AdBanner size="leaderboard" className="mx-auto" />
+        </div>
       </div>
     </div>
   );

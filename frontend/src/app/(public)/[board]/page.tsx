@@ -6,10 +6,13 @@ import { apiFetchOrNull } from "@/lib/api-client";
 
 export const dynamic = "force-dynamic";
 
+type BoardSubject = { slug: string; title: string; chapters?: { slug: string }[] };
+type BoardClass = { slug: string; title: string; subjects?: BoardSubject[] };
+
 type BoardData = {
   slug: string;
   title: string;
-  classes: { slug: string; title: string }[];
+  classes: BoardClass[];
 };
 
 export async function generateMetadata({ params }: { params: Promise<{ board: string }> }): Promise<Metadata> {
@@ -28,5 +31,11 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
   const data = await apiFetchOrNull<BoardData>(`/api/boards/${board}`);
   if (!data) notFound();
 
-  return <BoardPageContent board={board} title={data.title} classes={data.classes} />;
+  const classes = data.classes.map((klass) => ({
+    slug: klass.slug,
+    title: klass.title,
+    subjects: (klass.subjects ?? []).map((s) => ({ slug: s.slug, title: s.title })),
+  }));
+
+  return <BoardPageContent board={board} title={data.title} classes={classes} />;
 }

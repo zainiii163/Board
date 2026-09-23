@@ -28,3 +28,28 @@ export const APSACS_CLASS_RANGE = { min: 1, max: 8 } as const;
 
 // Dynamic academic year - can be easily updated for future years
 export const ACADEMIC_YEAR = "2026–2027";
+
+// FBISE abbreviation applies only to matric/inter (classes 9-12).
+// Classes 5-8 are published by the National Book Foundation (NBF).
+export function boardShortName(boardSlug: string, classNum?: number): string {
+  if (boardSlug === "fbise") {
+    if (classNum === undefined) return "Federal Board";
+    return classNum >= 9 ? "FBISE" : "NBF";
+  }
+  return NAV_BOARDS.find((b) => b.slug === boardSlug)?.label ?? boardSlug;
+}
+
+// Portal textbook category slug for each board (used by Books links).
+export const BOARD_TEXTBOOK_CATEGORY: Record<string, string> = {
+  fbise: "federal-text-books",
+  punjab: "punjab-text-books",
+  kpk: "kpk-text-books",
+  sindh: "sindh-text-books",
+  oxford: "oxford-text-books",
+  cambridge: "cambridge-text-books",
+  apsacs: "federal-text-books",
+};
+
+export function boardTextbookCategory(boardSlug: string): string {
+  return BOARD_TEXTBOOK_CATEGORY[boardSlug] ?? "federal-text-books";
+}

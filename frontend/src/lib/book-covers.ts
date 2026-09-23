@@ -1,0 +1,116 @@
+import { getApiBaseUrl } from "@/lib/api-client";
+
+// Real book cover mapping: board slug + class + subject → static cover file.
+// Mirrors backend BOOK_COVERS (keyed by board slug to match frontend routes).
+const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
+  fbise: {
+    5: {
+      Mathematics: "/book-covers/fbise-5-5-mathematics.webp",
+      English: "/book-covers/fbise-5-5-english.jpg",
+      Urdu: "/book-covers/fbise-5-5-urdu.webp",
+      "General Science": "/book-covers/fbise-5-5-general-science.webp",
+      "Pakistan Studies": "/book-covers/fbise-5-5th-Class-Social-Studies.jpg",
+      Islamiat: "/book-covers/fbise-5-Class-5-Islamiat-Federal-Board.webp",
+    },
+    6: {
+      Mathematics: "/book-covers/fbise-6-MATH-6-NBF.webp",
+      "Computer Science": "/book-covers/fbise-6-Class-6-Computer-Science-Book.webp",
+      Arabic: "/book-covers/fbise-6-Arabic-Book--6th-class.jpg",
+    },
+    7: {
+      Mathematics: "/book-covers/fbise-7-GENERAL-SCIENCE-7-NBF.webp",
+      English: "/book-covers/fbise-7-ENGLISH-7-NBF.webp",
+      "Computer Science": "/book-covers/fbise-7-Computer-Science-7.jpg",
+      Urdu: "/book-covers/fbise-7-URDU-7-NBF.webp",
+      Islamiat: "/book-covers/fbise-7-Class-7-Islamiat-Federal-Board.jpg",
+      "General Science": "/book-covers/fbise-7-Class-7-General-Science-Federal-Board.jpg",
+      Geography: "/book-covers/fbise-7-GEOGRAPHY-7-NBF.webp",
+      History: "/book-covers/fbise-7-Class-7-History-Federal-Board.jpg",
+    },
+    8: {
+      Mathematics: "/book-covers/fbise-8-Math-8-NBF.webp",
+      English: "/book-covers/fbise-8-English-8-NBF-FG-Saleemi-Book-Depot-in-39471868674351.webp",
+      "Computer Science": "/book-covers/fbise-8-Computer-8-NBF.webp",
+      Urdu: "/book-covers/fbise-8-Urdu-8-NBF.jpg",
+      Islamiat: "/book-covers/fbise-8-ISLAMIYAT-Class-8.webp",
+      "General Science": "/book-covers/fbise-8-General-Science-8.jpg",
+      Geography: "/book-covers/fbise-8-Geography-8-NBF.webp",
+      History: "/book-covers/fbise-8-nbf-history-8.jpg",
+    },
+    9: {
+      Physics: "/book-covers/fbise-9-Class-9-Physics-NBF.jpg",
+      Chemistry: "/book-covers/fbise-9-Chemistry-9-With-Experimentation-Skills-NBF.webp",
+      Mathematics: "/book-covers/fbise-9-9th-Class-Mathematics-NBF.jpg",
+      Biology: "/book-covers/fbise-9-9th-Class-Biology-NBF.jpg",
+      English: "/book-covers/fbise-9-English-9-NBF.webp",
+      "Computer Science": "/book-covers/fbise-9-HamdardChemistryGuide9.webp",
+      Urdu: "/book-covers/fbise-9-NBF-URDU-9.webp",
+      "Pakistan Studies": "/book-covers/fbise-9-Class-9-Pakistan-Studies--Urdu-.jpg",
+      Islamiat: "/book-covers/fbise-9-Islamiat-Lazmi-Class-9-NBF.webp",
+    },
+    10: {
+      Physics: "/book-covers/fbise-10-10th-Class-Physics--NBF.jpg",
+      Chemistry: "/book-covers/fbise-10-Chemistry-10-NBF.webp",
+      Mathematics: "/book-covers/fbise-10---------------------.jpg",
+      Biology: "/book-covers/fbise-10-Biology-10-NBF.webp",
+      English: "/book-covers/fbise-10-class-10-english-book-pdf-federal-board.webp",
+      "Computer Science": "/book-covers/fbise-10-NBF-COMPUTER-SCIENCE-10.jpg",
+      Urdu: "/book-covers/fbise-10-NBF-URDU-10.webp",
+      "Pakistan Studies": "/book-covers/fbise-10-Pakistan-Studies-Grade-10-NBF.webp",
+      Islamiat: "/book-covers/fbise-10-Islamiat-10-NBF.webp",
+    },
+    11: {
+      Physics: "/book-covers/fbise-11-Physics-Class-11-NBF.webp",
+      Chemistry: "/book-covers/fbise-11-Textbook-of-Chemistry-Grade-11-Federal-board.webp",
+      Mathematics: "/book-covers/fbise-11-Math-11-NBF.webp",
+      Biology: "/book-covers/fbise-11-Biology-11-NATIONAL-BOOK-FOUNDATION--Federal-Board.webp",
+      English: "/book-covers/fbise-11-English-11-NBF-FG.webp",
+      "Computer Science": "/book-covers/fbise-11-Computer-Science-11-NBF.webp",
+      Urdu: "/book-covers/fbise-11-NBF-URDU-11.webp",
+      Islamiat: "/book-covers/fbise-11-Islamiat-11-NBF.webp",
+    },
+    12: {
+      Physics: "/book-covers/fbise-12-Physics-National-Book-Foundation-12--Federal-board.webp",
+      Chemistry: "/book-covers/fbise-12-TextBook-Chemistry-Grade-12th-Federal-board.webp",
+      Mathematics: "/book-covers/fbise-12-Mathematics-Book-For-Class-12.webp",
+      Biology: "/book-covers/fbise-12-Biology-Grade-12-Edition-2025.webp",
+      English: "/book-covers/fbise-12-English-For-Grade-12-NBF-FG-Saleemi-Book-Depot-in-42354394857775.webp",
+      "Computer Science": "/book-covers/fbise-12-Computer-Science-For-Grade-12-NBF-FG-Saleemi-Book-Depot-in-42627272999215.webp",
+      Urdu: "/book-covers/fbise-12-NBF-URDU-12.webp",
+      "Pakistan Studies": "/book-covers/fbise-12-NBF-Pak-Studies-12.png",
+    },
+  },
+  punjab: {
+    9: {
+      Physics: "/book-covers/punjab-9-PTB-Physics-Class-9th-2025.webp",
+      Chemistry: "/book-covers/punjab-9-PTB-Chemistry-Class-9th-2025.webp",
+      Mathematics: "/book-covers/punjab-9-Class-9-Mathematics.webp",
+      Biology: "/book-covers/punjab-9-Class-9-Biology-PCTB.webp",
+      English: "/book-covers/punjab-9-PCTB-English-9th-Class-2025-800x.webp",
+      "Computer Science": "/book-covers/punjab-9-PTB-Computer-Science-Entrepreneurship-Class-9th-2025.webp",
+      Urdu: "/book-covers/punjab-9-PCTB-Urdu-9th-Class-2025.webp",
+      Islamiat: "/book-covers/punjab-9-Class-9-Islamiat.webp",
+      "General Science": "/book-covers/punjab-9-Class-9-General-Science.webp",
+    },
+    10: {
+      Biology: "/book-covers/punjab-10-10-biology.jpg",
+      Chemistry: "/book-covers/punjab-10-10th-Class-Chemistry.jpg",
+    },
+  },
+  oxford: {
+    9: { Mathematics: "/book-covers/oxford-think--New-Syllabus-Mathematics-1-8th-edition.webp" },
+    10: { Mathematics: "/book-covers/oxford-think--New-Syllabus-Mathematics-2-8th-edition.webp" },
+    11: { Mathematics: "/book-covers/oxford-think--New-Syllabus-Mathematics-3-8th-edition.webp" },
+    12: { Mathematics: "/book-covers/oxford-think--New-Syllabus-Mathematics-4-8th-edition.webp" },
+  },
+  apsacs: {
+    8: { Islamiat: "/book-covers/apsacs-APSACS--Islamiat-Textbook-Class-8.webp" },
+  },
+};
+
+// Returns a full absolute URL to a real book cover, or null when no cover exists.
+export function getBookCover(boardSlug: string, classNum: number, subjectTitle: string): string | null {
+  const path = BOOK_COVERS[boardSlug]?.[classNum]?.[subjectTitle];
+  if (!path) return null;
+  return `${getApiBaseUrl()}${path}`;
+}

@@ -6,13 +6,16 @@ import { apiFetchOrNull } from "@/lib/api-client";
 
 export const dynamic = "force-dynamic";
 
+type ExerciseSummary = { slug: string; title: string };
+type ChapterSummary = { slug: string; title: string; summary: string; summaryUr?: string; exercises?: ExerciseSummary[] };
+
 type SubjectData = {
   board: { slug: string; title: string } | null;
   class: { slug: string; title: string } | null;
   subject: {
     slug: string;
     title: string;
-    chapters: { slug: string; title: string; summary: string; summaryUr?: string }[];
+    chapters: ChapterSummary[];
   };
 };
 

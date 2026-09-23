@@ -157,7 +157,7 @@ export const getBoardClassSubject = async (req: Request, res: Response) => {
                 where: and(eq(schema.subjects.slug, subjectSlug), eq(schema.subjects.classId, klass.id)),
                 with: {
                     class: { with: { board: true } },
-                    chapters: true,
+                    chapters: { with: { exercises: true } },
                 },
             });
             if (subject) {

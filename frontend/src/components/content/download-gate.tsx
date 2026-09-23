@@ -25,7 +25,7 @@ type Props = {
   onDownload?: () => void;
 };
 
-export function DownloadGate({ url, label, seconds = 25, onDownload }: Props) {
+export function DownloadGate({ url, label, seconds = 12, onDownload }: Props) {
   const { tr } = useLocale();
   const [state, setState] = useState<"idle" | "waiting" | "ready">("idle");
   const [left, setLeft] = useState(0);

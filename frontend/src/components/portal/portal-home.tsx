@@ -70,10 +70,6 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6 lg:px-8">
-        <AdBanner size="leaderboard" className="mx-auto" />
-      </div>
-
       {/* ─── Categories ─── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">

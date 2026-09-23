@@ -137,11 +137,6 @@ export default async function BookDetailPage({ params }: { params: Promise<{ slu
         </div>
       </section>
 
-      {/* Ad — above reader */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <AdBanner size="leaderboard" className="mx-auto" />
-      </div>
-
       {/* PDF reader */}
       {resource.fileUrl && (
         <section className="mx-auto max-w-6xl px-4 pb-4 sm:px-6 lg:px-8">
@@ -154,9 +149,9 @@ export default async function BookDetailPage({ params }: { params: Promise<{ slu
         </section>
       )}
 
-      {/* Ad — after reader */}
+      {/* Ad — bottom only */}
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
-        <AdBanner size="inline" className="mx-auto" />
+        <AdBanner size="leaderboard" className="mx-auto" />
       </div>
 
       {/* Related */}
