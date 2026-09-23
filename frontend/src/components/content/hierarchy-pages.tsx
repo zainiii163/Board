@@ -816,13 +816,15 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
           cards={props.definitions ?? []}
           chapterKey={`${props.board}/${props.classSlug}/${props.subject}/${props.chapter}`}
         />
-        <ChapterQuiz
-          board={props.board}
-          classSlug={props.classSlug}
-          subject={props.subject}
-          chapter={props.chapter}
-          chapterTitle={props.chapterTitle}
-        />
+        <div id="quiz" className="scroll-mt-24">
+          <ChapterQuiz
+            board={props.board}
+            classSlug={props.classSlug}
+            subject={props.subject}
+            chapter={props.chapter}
+            chapterTitle={props.chapterTitle}
+          />
+        </div>
         <ChapterZipDownload
           board={props.board}
           classSlug={props.classSlug}

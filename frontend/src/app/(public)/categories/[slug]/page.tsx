@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 
 import { apiFetchOrNull } from "@/lib/api-client";
 import { ResourceCard } from "@/components/portal/resource-card";
-import { CoverArt } from "@/components/portal/cover-art";
 import { AdBanner } from "@/components/portal/ad-banner";
 import {
   type PortalCategory,
   type PortalResource,
   type PortalTrailNode,
 } from "@/components/portal/portal-types";
+import { BOARD_TEXTBOOK_CATEGORY } from "@/lib/constants";
 
 type CategoryDetail = {
   category: PortalCategory;
@@ -20,6 +20,8 @@ type CategoryDetail = {
   total: number;
 };
 
+const BOARD_BOOK_SLUGS = new Set(Object.values(BOARD_TEXTBOOK_CATEGORY));
+
 export const dynamic = "force-dynamic";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -28,31 +30,42 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   if (!data) notFound();
 
   const { category, trail, children, siblings, resources } = data;
+  // On board textbook pages, don't cross-link to other boards.
+  const showSiblings = !BOARD_BOOK_SLUGS.has(category.slug);
 
   return (
     <div>
-      {/* Category header */}
-      <section className={`bg-gradient-to-br ${category.gradient} text-white`}>
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-6 px-4 py-12 sm:px-6 lg:px-8 lg:flex-row lg:items-center">
-          <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-5xl backdrop-blur">
-            {category.icon}
-          </div>
-          <div className="min-w-0">
-            <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-xs font-bold text-white/70" aria-label="Breadcrumb">
-              <Link href="/categories" className="transition hover:text-white">
-                Home
-              </Link>
-              {trail.map((node) => (
-                <span key={node.slug} className="inline-flex items-center gap-1.5">
-                  <span>/</span>
-                  <Link href={`/categories/${node.slug}`} className="transition hover:text-white">
-                    {node.name}
-                  </Link>
+      {/* Category header — simple */}
+      <section className="border-b border-border bg-background">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+          <nav className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-muted" aria-label="Breadcrumb">
+            <Link href="/categories" className="transition hover:text-accent">
+              Home
+            </Link>
+            {trail.map((node) => (
+              <span key={node.slug} className="inline-flex items-center gap-1.5">
+                <span>/</span>
+                <Link href={`/categories/${node.slug}`} className="transition hover:text-accent">
+                  {node.name}
+                </Link>
+              </span>
+            ))}
+            <span>/</span>
+            <span className="text-foreground">{category.name}</span>
+          </nav>
+          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-2xl">
+                  {category.icon}
                 </span>
-              ))}
-            </nav>
-            <h1 className="font-serif text-3xl font-bold sm:text-4xl">{category.name}</h1>
-            <p className="mt-2 text-sm font-semibold text-white/80">{data.total} PDFs to download</p>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Category</p>
+                  <h1 className="mt-0.5 font-serif text-3xl font-black text-foreground sm:text-4xl">{category.name}</h1>
+                </div>
+              </div>
+              <p className="mt-3 text-sm text-muted">{data.total} PDFs to download</p>
+            </div>
           </div>
         </div>
       </section>
@@ -76,8 +89,8 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           </div>
         )}
 
-        {/* Sibling quick nav */}
-        {siblings.length > 0 && (
+        {/* Sibling quick nav — hidden on board textbook pages */}
+        {showSiblings && siblings.length > 0 && (
           <div className="mb-10">
             <h2 className="mb-4 font-serif text-xl font-bold text-foreground">Also in this section</h2>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -87,7 +100,9 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                   href={`/categories/${s.slug}`}
                   className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 transition hover:border-accent"
                 >
-                  <CoverArt title={s.name} gradient={s.gradient} className="h-12 w-9 rounded-lg" />
+                  <span className="inline-flex h-10 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-background text-sm">
+                    {s.icon}
+                  </span>
                   <span className="min-w-0 text-sm font-semibold text-foreground">{s.name}</span>
                 </Link>
               ))}

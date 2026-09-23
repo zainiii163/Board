@@ -21,52 +21,36 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
 
   return (
     <div>
-      {/* ─── Hero Banner (Compact) ─── */}
-      <section className="hero-gradient relative overflow-hidden text-white">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/10 blur-2xl animate-float" />
-          <div className="absolute -bottom-28 -left-20 h-80 w-80 rounded-full bg-emerald-300/15 blur-3xl animate-float-slow" />
-          <div className="absolute inset-0 opacity-[0.06]" style={{
-            backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
-          }} />
-        </div>
-
-        <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+      {/* ─── Hero — simple ─── */}
+      <section className="border-b border-border bg-background">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
-            <div className="animate-fade-in-up mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[11px] font-bold backdrop-blur-sm">
-              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300" />
+            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-[11px] font-bold text-muted">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
               {ACADEMIC_YEAR} — Free study resources for all boards
             </div>
-            <h1 className="animate-fade-in-up stagger-1 font-serif text-xl font-black leading-tight text-white sm:text-2xl lg:text-3xl" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.15)" }}>
+            <h1 className="font-serif text-xl font-black leading-tight text-foreground sm:text-2xl lg:text-3xl">
               {tr("portalHeroTitle")}
             </h1>
-            <p className="animate-fade-in-up stagger-2 mt-2 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base">
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
               {tr("portalHeroDesc")}
             </p>
-            <div className="animate-fade-in-up stagger-3 mt-5 flex flex-wrap gap-3">
+            <div className="mt-5 flex flex-wrap gap-3">
               <Link
                 href="/categories"
-                className="shine-on-hover inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                style={{ color: "#0D9488" }}
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                 {tr("browseCategories")}
               </Link>
               <Link
                 href="/books"
-                className="shine-on-hover inline-flex items-center gap-2 rounded-full border-2 border-white/40 bg-white/10 px-5 py-2.5 text-sm font-bold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/70 hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-bold text-foreground transition hover:border-accent hover:text-accent"
               >
                 {tr("books")} →
               </Link>
             </div>
           </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
-            <path d="M0 40L48 34C96 28 192 16 288 12C384 8 480 12 576 18C672 24 768 32 864 34C960 36 1056 30 1152 24C1248 18 1344 12 1392 10L1440 8V40H0Z" className="fill-background" />
-          </svg>
         </div>
       </section>
 
