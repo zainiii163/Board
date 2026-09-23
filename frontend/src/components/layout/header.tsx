@@ -125,7 +125,8 @@ function buildBoardNav(boardSlug: string): DropdownDef {
   return {
     label,
     groups: [
-      { heading: "Notes & Books", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref(boardSlug, n) })) },
+      { heading: "Notes", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref(boardSlug, n) })) },
+      { heading: "Books", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: `${classHref(boardSlug, n)}?view=books` })) },
       { items: [
         { label: `All ${label}`, href: `/${boardSlug}` },
         { label: "MCQ Practice", href: "/online-quizzes" },

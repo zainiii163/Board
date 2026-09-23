@@ -61,7 +61,7 @@ export function ChapterQuiz({ board, classSlug, subject, chapter, chapterTitle }
   }
 
   return (
-    <div className="mt-8 rounded-2xl border border-border bg-background p-5">
+    <div id="quiz" className="mt-8 scroll-mt-24 rounded-2xl border border-border bg-background p-5">
       <h2 className="text-lg font-bold text-foreground">{tr("practiceQuiz")} — {chapterTitle}</h2>
       <p className="mt-1 text-sm text-muted">{questions.length} {tr("mcqsTimed")}</p>
 

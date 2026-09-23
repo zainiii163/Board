@@ -81,7 +81,7 @@ export function BoardsMenu() {
                       {NAV_CLASSES.map((num) => (
                         <Link
                           key={`books-${num}`}
-                          href={`/${active.slug}/${num}`}
+                          href={`/${active.slug}/${num}?view=books`}
                           className="rounded-lg px-2 py-1.5 text-[12px] font-semibold text-foreground transition hover:bg-accent/10 hover:text-accent"
                         >
                           {CLASS_LABEL(num)}

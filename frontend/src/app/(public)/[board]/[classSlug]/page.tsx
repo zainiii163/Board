@@ -25,10 +25,13 @@ export async function generateMetadata({ params }: { params: Promise<{ board: st
 
 export default async function ClassPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ board: string; classSlug: string }>;
+  searchParams: Promise<{ view?: string }>;
 }) {
   const { board, classSlug } = await params;
+  const { view } = await searchParams;
   const data = await apiFetchOrNull<ClassData>(`/api/boards/${board}/classes/${classSlug}`);
   const klass = data?.class;
   if (!data || !klass) notFound();
@@ -40,6 +43,7 @@ export default async function ClassPage({
       boardTitle={data.board?.title ?? "Board"}
       classTitle={klass.title}
       subjects={klass.subjects}
+      initialView={view === "books" ? "books" : "notes"}
     />
   );
 }

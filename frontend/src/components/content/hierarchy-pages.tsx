@@ -242,6 +242,7 @@ type ClassPageContentProps = {
   boardTitle: string;
   classTitle: string;
   subjects: { slug: string; title: string }[];
+  initialView?: "notes" | "books";
 };
 
 export function ClassPageContent({
@@ -250,9 +251,10 @@ export function ClassPageContent({
   boardTitle,
   classTitle,
   subjects,
+  initialView = "notes",
 }: ClassPageContentProps) {
   const { tr } = useLocale();
-  const [view, setView] = useState<"notes" | "books">("notes");
+  const [view, setView] = useState<"notes" | "books">(initialView);
   const classNum = classNumber(classSlug);
   const short = boardShortName(board, classNum);
   const booksCategory = boardTextbookCategory(board);
@@ -596,6 +598,42 @@ export function SubjectPageContent({
         </div>
       </div>
 
+      {/* Chapter-wise MCQs — 9/11/12 board pattern is ~50% MCQs */}
+      {isFbiseMcq && (
+        <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-black text-foreground sm:text-xl">
+                Chapter-Wise {subjectTitle} MCQs
+              </h2>
+              <p className="mt-1 text-sm text-muted">
+                {classTitle} {short} exams are ~50% MCQs — drill every chapter with instant feedback.
+              </p>
+            </div>
+            <Link
+              href={`/online-quizzes?board=${board}&class=${classSlug}&subject=${subject}`}
+              className="shrink-0 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-700"
+            >
+              All {subjectTitle} MCQs →
+            </Link>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+            {chapters.map((chapter) => (
+              <Link
+                key={`mcq-${chapter.slug}`}
+                href={`/${board}/${classSlug}/${subject}/${chapter.slug}#quiz`}
+                className="group rounded-xl border border-border bg-background px-3.5 py-3 transition hover:border-emerald-500/50 hover:shadow-sm"
+              >
+                <p className="truncate text-xs font-bold text-foreground group-hover:text-emerald-600">
+                  {chapter.title}
+                </p>
+                <p className="mt-0.5 text-[11px] font-semibold text-emerald-600/90">MCQ practice →</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* What's Included */}
       <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
         <h2 className="text-lg font-bold text-foreground">What Is Included in the Notes?</h2>
@@ -623,6 +661,30 @@ export function SubjectPageContent({
           All {subjectTitle} notes follow the Single National Curriculum (SNC) and are prepared from the official{" "}
           {short} textbook. Each chapter is broken into exercise-wise solutions so you can revise exactly the part you
           need before an exam.
+        </p>
+      </div>
+
+      {/* Course & book description */}
+      <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+        <h2 className="text-lg font-black text-foreground sm:text-xl">
+          About the {classTitle} {subjectTitle} Course &amp; Book ({short})
+        </h2>
+        <p className="mt-3 text-sm leading-6 text-muted">
+          {classTitle} {subjectTitle} under {boardTitle} follows the Single National Curriculum and is examined by{" "}
+          {short} in the {ACADEMIC_YEAR} session. The course spans {chapters.length} chapters, each combining theory,
+          worked examples, and board-style exercises. For matric and intermediate students ({short}), the written
+          paper pairs these long/short questions with a heavy MCQ component — which is why every chapter above ships
+          with both exercise solutions and a chapter quiz.
+        </p>
+        <p className="mt-3 text-sm leading-6 text-muted">
+          The core book for this course is the official {short} {subjectTitle} textbook; our notes are structured
+          chapter-by-chapter against it, so you can read the book, revise from the SLO Notes pill, then confirm
+          understanding with the Numericals and exercise sub-links. Pair the course with {subjectTitle} pairing
+          schemes and past papers from your board page to mirror the exact exam pattern before test day.
+        </p>
+        <p className="mt-3 text-sm leading-6 text-muted">
+          Everything here is free to read in the browser; PDFs of each exercise and the full chapter zip are one
+          gated download away. Bookmark this subject page (★) to resume revision from any device.
         </p>
       </div>
 

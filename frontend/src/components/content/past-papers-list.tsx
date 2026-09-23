@@ -3,6 +3,7 @@
 import { PageHeading } from "@/components/layout/page-heading";
 import { useLocale } from "@/lib/locale-context";
 import { pdfUrl } from "@/lib/api-client";
+import { DownloadGate } from "@/components/content/download-gate";
 
 export type PastPaperItem = {
   id: number;
@@ -38,11 +39,7 @@ export function PastPapersList({ papers }: { papers: PastPaperItem[] }) {
               <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-foreground/90">
                 {paper.sessionType === "annual" ? tr("annual") : tr("supply")}
               </span>
-              {paper.pdfUrl && (
-                <a href={pdfUrl(paper.pdfUrl)} className="text-sm font-semibold text-accent hover:underline" download>
-                  {tr("downloadPdf")}
-                </a>
-              )}
+              {paper.pdfUrl && <DownloadGate url={pdfUrl(paper.pdfUrl)} compact />}
             </div>
           </div>
         ))}

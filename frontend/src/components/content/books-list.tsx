@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PageHeading } from "@/components/layout/page-heading";
 import { useLocale } from "@/lib/locale-context";
 import { pdfUrl } from "@/lib/api-client";
+import { DownloadGate } from "@/components/content/download-gate";
 
 export type BookItem = {
   id: number;
@@ -34,15 +35,9 @@ export function BooksList({ books }: { books: BookItem[] }) {
               <span className="rounded-full bg-accent/15 px-2 py-1 text-xs font-semibold text-accent">
                 {book.priceLabel}
               </span>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {book.pdfUrl && (
-                  <a
-                    href={pdfUrl(book.pdfUrl)}
-                    className="text-sm font-semibold text-accent hover:underline"
-                    download
-                  >
-                    {tr("downloadPdf")}
-                  </a>
+                  <DownloadGate url={pdfUrl(book.pdfUrl)} label={tr("downloadPdf")} compact />
                 )}
                 {book.notesPath && (
                   <Link href={book.notesPath} className="text-sm font-semibold text-accent hover:underline">
