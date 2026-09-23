@@ -149,24 +149,24 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
 
   if (item.soon) {
     return (
-      <Link href={`/${slug}`} className="flex items-center gap-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold text-foreground/80 transition hover:bg-accent/10 hover:text-accent">
+      <Link href={`/${slug}`} className="flex items-center gap-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold text-white/90 transition hover:bg-white/15 hover:text-white">
         {item.label}
-        <span className="rounded bg-amber-100 px-1 py-px text-[7px] font-bold uppercase leading-none text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
+        <span className="rounded bg-amber-300/90 px-1 py-px text-[7px] font-bold uppercase leading-none text-amber-950">Soon</span>
       </Link>
     );
   }
 
   return (
     <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
-      <button type="button" className={`flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-semibold transition hover:bg-accent/10 hover:text-accent ${isOpen ? "text-accent bg-accent/10" : "text-foreground/80"}`}>
+      <button type="button" className={`flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold text-white/90 transition hover:bg-white/15 hover:text-white ${isOpen ? "bg-white/20 text-white" : ""}`}>
         {item.label}
         <svg viewBox="0 0 24 24" className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
       </button>
       {isOpen && (
-        <div className={`absolute left-0 top-full z-50 mt-2 rounded-xl border border-border bg-card p-2 shadow-2xl animate-scale-in backdrop-blur-sm ${item.groups.length > 1 ? "w-80" : "w-64"}`} onMouseEnter={onFocused} onMouseLeave={onClose}>
+        <div className={`absolute left-0 top-full z-50 mt-2 rounded-2xl border border-border bg-card p-2 shadow-2xl animate-scale-in backdrop-blur-sm ring-1 ring-accent/20 ${item.groups.length > 1 ? "w-80" : "w-64"}`} onMouseEnter={onFocused} onMouseLeave={onClose}>
           {item.groups.map((g, gi) => (
             <div key={gi}>
-              {g.heading && <div className="mb-1 mt-2 px-3 text-xs font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
+              {g.heading && <div className="mb-1 mt-2 px-3 text-xs font-bold uppercase tracking-wider text-accent">{g.heading}</div>}
               {g.items.map((itm) => (
                 <Link key={itm.href} href={itm.href} onClick={onClose} className="block rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:pl-4">
                   {itm.label}
@@ -243,44 +243,44 @@ export function Header() {
   }, [clearClose]);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur-md print:hidden">
-      {/* Top Utility Bar */}
-      <div className="border-b border-border/50 bg-background/95">
-        <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6 lg:px-8" aria-label="Utility">
+    <header className="sticky top-0 z-20 print:hidden shadow-lg shadow-teal-950/15">
+      {/* Top Utility Bar — stylish gradient */}
+      <div className="bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-700 dark:from-teal-800 dark:via-emerald-800 dark:to-slate-900">
+        <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8" aria-label="Utility">
           {/* Logo */}
-          <Link href="/" className="flex shrink-0 items-center gap-2 transition-transform duration-300 hover:scale-105">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-white shadow-sm shadow-accent/20">B</span>
-            <span className="hidden font-serif text-lg font-bold text-foreground sm:block">BoardNotes</span>
+          <Link href="/" className="group flex shrink-0 items-center gap-2.5 transition-transform duration-300 hover:scale-105">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-sm font-black text-white ring-1 ring-white/30 backdrop-blur-sm transition group-hover:bg-white/25 group-hover:ring-white/50">B</span>
+            <span className="hidden bg-gradient-to-r from-white via-teal-50 to-emerald-100 bg-clip-text font-serif text-lg font-black text-transparent drop-shadow-sm sm:block">BoardNotes</span>
           </Link>
 
           {/* Search Bar */}
-          <form action="/search" role="search" className="hidden items-center gap-2 rounded-full border border-border bg-card px-4 py-2 sm:flex focus-within:border-accent transition-colors">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-            <input name="q" autoComplete="off" placeholder={locale === "ur" ? "تلاش…" : "Search…"} aria-label={tr("search")} className="w-28 bg-transparent text-sm font-medium text-foreground outline-none placeholder:text-muted focus:w-40 transition-all" />
+          <form action="/search" role="search" className="hidden items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 backdrop-blur-md transition focus-within:border-white/50 focus-within:bg-white/25 sm:flex">
+            <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-white/80" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+            <input name="q" autoComplete="off" placeholder={locale === "ur" ? "تلاش…" : "Search…"} aria-label={tr("search")} className="w-28 bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/70 focus:w-40 transition-all" />
           </form>
 
           {/* Auth Buttons + Upload CTA */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0 sm:gap-3">
             {!loading && user ? (
               <>
-                {isStaff && <Link href="/admin" className="hidden rounded-md px-3 py-1.5 text-sm font-semibold text-accent transition hover:bg-accent/10 lg:inline-block">Admin</Link>}
-                <Link href="/account" className="hidden rounded-full border border-border px-3 py-1.5 text-sm font-semibold text-foreground transition hover:bg-card sm:inline-block">{user.name.split(" ")[0]}</Link>
+                {isStaff && <Link href="/admin" className="hidden rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 lg:inline-block">Admin</Link>}
+                <Link href="/account" className="hidden rounded-full border border-white/30 bg-white/10 px-3.5 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 sm:inline-block">{user.name.split(" ")[0]}</Link>
               </>
             ) : (
               <>
-                <Link href="/login" className="shine-on-hover rounded-full bg-accent px-4 py-1.5 text-sm font-bold text-white shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-accent/25 hover:scale-105">{tr("signUp")}</Link>
+                <Link href="/login" className="shine-on-hover rounded-full bg-white px-4 py-1.5 text-sm font-black text-teal-700 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-black/20">{tr("signUp")}</Link>
               </>
             )}
-            <Link href="/upload" className="shine-on-hover rounded-full bg-gradient-to-r from-accent to-accent/80 px-4 py-1.5 text-sm font-bold text-white shadow-sm transition-all duration-300 hover:shadow-md hover:shadow-accent/25 hover:scale-105">
+            <Link href="/upload" className="shine-on-hover rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-1.5 text-sm font-black text-white shadow-md shadow-orange-900/25 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-900/30">
               {tr("uploadTitle")}
             </Link>
           </div>
         </nav>
       </div>
 
-      {/* Secondary Main Navbar */}
-      <div className="bg-background/95">
-        <nav className="mx-auto flex w-full max-w-[1400px] items-center px-4 py-3 sm:px-6 lg:px-8" aria-label="Main navigation">
+      {/* Secondary Main Navbar — deeper gradient */}
+      <div className="border-t border-white/10 bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 dark:from-emerald-900/95 dark:via-teal-950 dark:to-slate-900/95">
+        <nav className="mx-auto flex w-full max-w-[1400px] items-center px-4 py-2.5 sm:px-6 lg:px-8" aria-label="Main navigation">
           {/* Nav items */}
           <div className="hidden items-center gap-1 overflow-visible xl:flex">
             {navItems.map((item) => (
@@ -296,7 +296,7 @@ export function Header() {
           </div>
 
           {/* Mobile hamburger */}
-          <button type="button" onClick={() => setMenuOpen((o) => !o)} className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-foreground xl:hidden" aria-label={menuOpen ? tr("closeMenu") : tr("openMenu")}>
+          <button type="button" onClick={() => setMenuOpen((o) => !o)} className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/30 bg-white/10 text-white transition hover:bg-white/20 xl:hidden" aria-label={menuOpen ? tr("closeMenu") : tr("openMenu")}>
             <span className="flex flex-col gap-1.5" aria-hidden="true">
               <span className={`h-0.5 w-5 bg-current transition-all ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
               <span className={`h-0.5 w-5 bg-current transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
@@ -308,9 +308,9 @@ export function Header() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-border bg-card px-4 py-4 xl:hidden">
+        <div className="border-t border-border bg-card px-4 py-4 shadow-xl xl:hidden">
           <form action="/search" role="search" className="mb-3 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+            <svg viewBox="0 0 24 24" className="h-4 w-4 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             <input name="q" autoComplete="off" placeholder={tr("portalSearchPlaceholder")} aria-label={tr("search")} className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
           </form>
           {navItems.map((item) => (

@@ -21,36 +21,52 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
 
   return (
     <div>
-      {/* ─── Hero — simple ─── */}
-      <section className="border-b border-border bg-background">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      {/* ─── Hero — stylish gradient banner ─── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-700 dark:from-teal-900 dark:via-emerald-900 dark:to-slate-900 text-white">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/15 blur-3xl animate-float" />
+          <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-emerald-300/25 blur-3xl animate-float-slow" />
+          <div className="absolute left-1/3 top-1/2 h-40 w-40 rounded-full bg-cyan-300/20 blur-2xl animate-float" />
+          <div className="absolute inset-0 opacity-[0.07]" style={{
+            backgroundImage: "radial-gradient(circle, white 1.2px, transparent 1.2px)",
+            backgroundSize: "22px 22px",
+          }} />
+        </div>
+
+        <div className="relative mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8 lg:py-16">
           <div className="max-w-2xl">
-            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-[11px] font-bold text-muted">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
-              {ACADEMIC_YEAR} — Free study resources for all boards
+            <div className="animate-fade-in-up mb-4 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/15 px-4 py-1.5 text-[11px] font-bold backdrop-blur-md shadow-sm">
+              <span className="inline-block h-2 w-2 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.9)]" />
+              <span className="text-white">{ACADEMIC_YEAR} — Free study resources for all boards</span>
             </div>
-            <h1 className="font-serif text-xl font-black leading-tight text-foreground sm:text-2xl lg:text-3xl">
+            <h1 className="animate-fade-in-up stagger-1 font-serif text-xl font-black leading-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.2)] sm:text-2xl lg:text-3xl" style={{ textShadow: "0 2px 16px rgba(0,0,0,0.18)" }}>
               {tr("portalHeroTitle")}
             </h1>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted sm:text-base">
+            <p className="animate-fade-in-up stagger-2 mt-3 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base">
               {tr("portalHeroDesc")}
             </p>
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="animate-fade-in-up stagger-3 mt-6 flex flex-wrap gap-3">
               <Link
                 href="/categories"
-                className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+                className="shine-on-hover inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-teal-700 shadow-xl shadow-teal-950/25 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-teal-950/30"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                 {tr("browseCategories")}
               </Link>
               <Link
                 href="/books"
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-bold text-foreground transition hover:border-accent hover:text-accent"
+                className="shine-on-hover inline-flex items-center gap-2 rounded-full border-2 border-white/50 bg-white/10 px-6 py-3 text-sm font-black text-white backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white hover:bg-white/25"
               >
                 {tr("books")} →
               </Link>
             </div>
           </div>
+        </div>
+
+        <div className="absolute bottom-0 left-0 right-0" aria-hidden="true">
+          <svg viewBox="0 0 1440 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
+            <path d="M0 40L48 34C96 28 192 16 288 12C384 8 480 12 576 18C672 24 768 32 864 34C960 36 1056 30 1152 24C1248 18 1344 12 1392 10L1440 8V40H0Z" className="fill-background" />
+          </svg>
         </div>
       </section>
 

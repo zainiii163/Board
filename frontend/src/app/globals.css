@@ -372,6 +372,9 @@ html.dark .glass {
 .hero-gradient {
   background: linear-gradient(135deg, #065f56 0%, #0D9488 35%, #059669 65%, #047857 100%);
 }
+html.dark .hero-gradient {
+  background: linear-gradient(135deg, #042f2e 0%, #0f766e 40%, #065f46 70%, #0f172a 100%);
+}
 
 .cta-gradient {
   background: linear-gradient(135deg, #065f56 0%, #0D9488 35%, #059669 65%, #047857 100%);
