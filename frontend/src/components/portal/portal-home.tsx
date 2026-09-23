@@ -48,7 +48,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
             <div className="animate-fade-in-up stagger-3 mt-6 flex flex-wrap gap-3">
               <Link
                 href="/categories"
-                className="shine-on-hover inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-teal-700 shadow-xl shadow-teal-950/25 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-teal-950/30"
+                className="shine-on-hover relative z-10 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#0f766e] shadow-xl shadow-teal-950/25 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-teal-950/30"
               >
                 <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                 {tr("browseCategories")}

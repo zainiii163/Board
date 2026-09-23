@@ -264,11 +264,13 @@ export function Header() {
             {!loading && user ? (
               <>
                 {isStaff && <Link href="/admin" className="hidden rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 lg:inline-block">Admin</Link>}
-                <Link href="/account" className="hidden rounded-full border border-white/30 bg-white/10 px-3.5 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 sm:inline-block">{user.name.split(" ")[0]}</Link>
+                {user.name.split(" ")[0].toLowerCase() !== "admin" && (
+                  <Link href="/account" className="hidden rounded-full border border-white/30 bg-white/10 px-3.5 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 sm:inline-block">{user.name.split(" ")[0]}</Link>
+                )}
               </>
             ) : (
               <>
-                <Link href="/login" className="shine-on-hover rounded-full bg-white px-4 py-1.5 text-sm font-black text-teal-700 shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-black/20">{tr("signUp")}</Link>
+                <Link href="/login" className="shine-on-hover rounded-full bg-white px-4 py-1.5 text-sm font-black text-[#0f766e] shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-black/20">{tr("signUp")}</Link>
               </>
             )}
             <Link href="/upload" className="shine-on-hover rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-1.5 text-sm font-black text-white shadow-md shadow-orange-900/25 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-900/30">
