@@ -19,6 +19,8 @@ export const NAV_BOARDS = [
   { slug: "oxford", label: "Oxford Board" },
   { slug: "cambridge", label: "Cambridge Board" },
   { slug: "apsacs", label: "APSACS" },
+  { slug: "o-level", label: "O Level" },
+  { slug: "a-level", label: "A Level" },
 ] as const;
 
 export const NAV_CLASSES = [5, 6, 7, 8, 9, 10, 11, 12] as const;
@@ -47,6 +49,8 @@ export const BOARD_TEXTBOOK_CATEGORY: Record<string, string> = {
   sindh: "sindh-text-books",
   oxford: "oxford-text-books",
   cambridge: "cambridge-text-books",
+  "o-level": "cambridge-intl-notes",
+  "a-level": "cambridge-intl-notes",
   apsacs: "federal-text-books",
 };
 

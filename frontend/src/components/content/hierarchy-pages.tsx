@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import { LocalizedBreadcrumbs } from "@/components/layout/localized-breadcrumbs";
 import { ChapterQuiz } from "@/components/content/chapter-quiz";
+import { BookmarkButton } from "@/components/content/bookmark-button";
 import { SaveOfflineButton } from "@/components/content/save-offline-button";
 import { ChapterFlashcards, type Flashcard } from "@/components/content/chapter-flashcards";
 import { ChapterVideo } from "@/components/content/chapter-video";
@@ -21,19 +22,6 @@ import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedList } from "@/lib/i18n";
 import { ACADEMIC_YEAR, boardShortName, boardTextbookCategory } from "@/lib/constants";
 import { getBookCover } from "@/lib/book-covers";
-
-const SUBJECT_COLORS = [
-  { bg: "bg-gradient-to-br from-sky-50 to-blue-50", dark: "dark:from-sky-950/30 dark:to-blue-950/30", border: "border-sky-200/60 dark:border-sky-800/30", icon: "bg-gradient-to-br from-sky-500 to-blue-500", hover: "hover:border-sky-400", tag: "text-sky-600 dark:text-sky-300" },
-  { bg: "bg-gradient-to-br from-emerald-50 to-teal-50", dark: "dark:from-emerald-950/30 dark:to-teal-950/30", border: "border-emerald-200/60 dark:border-emerald-800/30", icon: "bg-gradient-to-br from-emerald-500 to-teal-500", hover: "hover:border-emerald-400", tag: "text-emerald-600 dark:text-emerald-300" },
-  { bg: "bg-gradient-to-br from-amber-50 to-orange-50", dark: "dark:from-amber-950/30 dark:to-orange-950/30", border: "border-amber-200/60 dark:border-amber-800/30", icon: "bg-gradient-to-br from-amber-500 to-orange-500", hover: "hover:border-amber-400", tag: "text-amber-600 dark:text-amber-300" },
-  { bg: "bg-gradient-to-br from-purple-50 to-fuchsia-50", dark: "dark:from-purple-950/30 dark:to-fuchsia-950/30", border: "border-purple-200/60 dark:border-purple-800/30", icon: "bg-gradient-to-br from-purple-500 to-fuchsia-500", hover: "hover:border-purple-400", tag: "text-purple-600 dark:text-purple-300" },
-  { bg: "bg-gradient-to-br from-rose-50 to-pink-50", dark: "dark:from-rose-950/30 dark:to-pink-950/30", border: "border-rose-200/60 dark:border-rose-800/30", icon: "bg-gradient-to-br from-rose-500 to-pink-500", hover: "hover:border-rose-400", tag: "text-rose-600 dark:text-rose-300" },
-  { bg: "bg-gradient-to-br from-cyan-50 to-sky-50", dark: "dark:from-cyan-950/30 dark:to-sky-950/30", border: "border-cyan-200/60 dark:border-cyan-800/30", icon: "bg-gradient-to-br from-cyan-500 to-sky-500", hover: "hover:border-cyan-400", tag: "text-cyan-600 dark:text-cyan-300" },
-  { bg: "bg-gradient-to-br from-indigo-50 to-violet-50", dark: "dark:from-indigo-950/30 dark:to-violet-950/30", border: "border-indigo-200/60 dark:border-indigo-800/30", icon: "bg-gradient-to-br from-indigo-500 to-violet-500", hover: "hover:border-indigo-400", tag: "text-indigo-600 dark:text-indigo-300" },
-  { bg: "bg-gradient-to-br from-red-50 to-rose-50", dark: "dark:from-red-950/30 dark:to-rose-950/30", border: "border-red-200/60 dark:border-red-800/30", icon: "bg-gradient-to-br from-red-500 to-rose-500", hover: "hover:border-red-400", tag: "text-red-600 dark:text-red-300" },
-  { bg: "bg-gradient-to-br from-teal-50 to-emerald-50", dark: "dark:from-teal-950/30 dark:to-emerald-950/30", border: "border-teal-200/60 dark:border-teal-800/30", icon: "bg-gradient-to-br from-teal-500 to-emerald-500", hover: "hover:border-teal-400", tag: "text-teal-600 dark:text-teal-300" },
-  { bg: "bg-gradient-to-br from-yellow-50 to-amber-50", dark: "dark:from-yellow-950/30 dark:to-amber-950/30", border: "border-yellow-200/60 dark:border-yellow-800/30", icon: "bg-gradient-to-br from-yellow-500 to-amber-500", hover: "hover:border-yellow-400", tag: "text-yellow-600 dark:text-yellow-300" },
-];
 
 type BoardSubject = { slug: string; title: string };
 type BoardClass = { slug: string; title: string; subjects?: BoardSubject[] };
@@ -289,8 +277,13 @@ export function ClassPageContent({
           <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{short}</span>
           <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">{ACADEMIC_YEAR}</span>
         </div>
-        <h1 className="mt-3 text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
-        <p className="mt-2 max-w-lg text-sm text-muted">{tr("chooseSubjectContinue").replace("{board}", boardTitle)}</p>
+        <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
+            <p className="mt-2 max-w-lg text-sm text-muted">{tr("chooseSubjectContinue").replace("{board}", boardTitle)}</p>
+          </div>
+          <BookmarkButton title={`${classTitle} · ${boardTitle}`} path={`/${board}/${classSlug}`} />
+        </div>
       </div>
 
       {/* Notes / Books toggle */}
@@ -322,28 +315,25 @@ export function ClassPageContent({
             {subjects.length === 0 ? (
               <p className="text-sm text-muted md:col-span-2 xl:col-span-3">{tr("noSubjectsYet")}</p>
             ) : (
-              subjects.map((subject, i) => {
-                const color = SUBJECT_COLORS[i % SUBJECT_COLORS.length];
+              subjects.map((subject) => {
                 return (
                   <Link
                     key={subject.slug}
                     href={`/${board}/${classSlug}/${subject.slug}`}
-                    className={`group relative overflow-hidden rounded-2xl border ${color.border} ${color.bg} ${color.dark} p-6 transition-all duration-400 hover:-translate-y-1 hover:shadow-xl ${color.hover} animate-fade-in-up stagger-${Math.min((i % 6) + 1, 6)}`}
+                    className="group rounded-2xl border border-border bg-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md animate-fade-in-up"
                   >
-                    <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-xl transition-all duration-700 group-hover:scale-150 group-hover:opacity-[0.15]`} />
-                    <span className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${color.icon} text-2xl text-white shadow-md transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                    <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-lg text-accent transition group-hover:bg-accent group-hover:text-white">
                       📖
                     </span>
-                    <p className={`text-xs font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("subjectLabel")}</p>
-                    <h2 className="mt-1 text-xl font-black text-foreground transition-colors duration-200 group-hover:text-accent">{subject.title}</h2>
-                    <p className="mt-2 text-sm text-muted">{tr("openChaptersNotes")}</p>
-                    <div className="mt-4 flex items-center gap-2">
-                      <span className={`inline-flex items-center rounded-full border ${color.border} ${color.bg} ${color.dark} px-3 py-1 text-[10px] font-bold ${color.tag}`}>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{tr("subjectLabel")}</p>
+                    <h2 className="mt-1 text-lg font-black text-foreground transition-colors group-hover:text-accent">{subject.title}</h2>
+                    <p className="mt-1 text-sm text-muted">{tr("openChaptersNotes")}</p>
+                    <div className="mt-3 flex items-center justify-between">
+                      <span className="rounded-full border border-border bg-background px-2.5 py-0.5 text-[10px] font-bold text-muted">
                         {ACADEMIC_YEAR}
                       </span>
                       <span className="text-xs font-semibold text-accent">Click More →</span>
                     </div>
-                    <span className={`absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r ${color.icon} opacity-60 transition-all duration-700 group-hover:w-full rounded-full`} />
                   </Link>
                 );
               })
@@ -458,7 +448,7 @@ export function SubjectPageContent({
   const { tr, locale } = useLocale();
   const classNum = classNumber(classSlug);
   const short = boardShortName(board, classNum);
-  const isFbiseMcq = board === "fbise" && MCQ_ELIGIBLE_CLASSES.has(classNum);
+  const isFbiseMcq = MCQ_ELIGIBLE_CLASSES.has(classNum);
   const tags = [
     boardShortName(board, classNum),
     classTitle,
@@ -469,7 +459,6 @@ export function SubjectPageContent({
     tr("pdfNotes"),
     "Chapter-Wise Notes",
   ] as const;
-  const color = SUBJECT_COLORS[chapters.length % SUBJECT_COLORS.length];
 
   const sscLabel = classNum === 9 || classNum === 10 ? "SSC" : classNum === 11 || classNum === 12 ? "HSSC" : null;
 
@@ -484,32 +473,25 @@ export function SubjectPageContent({
         ]}
       />
 
-      {/* Hero */}
-      <div className={`${color.bg} ${color.dark} relative mt-6 overflow-hidden rounded-3xl border ${color.border} px-8 py-10 shadow-xl sm:px-10`}>
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className={`absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-2xl animate-float`} />
-          <div className={`absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.05] blur-3xl animate-float-slow`} />
+      {/* Header — simple, studyplusplus-style */}
+      <div className="mt-6">
+        <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {boardTitle}</span>
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🎓 {classTitle}</span>
+          <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-accent">{short}</span>
+          {sscLabel && (
+            <span className="rounded-full border border-border bg-card px-2.5 py-0.5">{sscLabel}-{classNum === 9 || classNum === 11 ? "I" : "II"}</span>
+          )}
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">{ACADEMIC_YEAR}</span>
         </div>
-        <div className="relative">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5 text-[10px] font-bold text-muted">🏫 {boardTitle}</span>
-            <span className="text-muted/40">/</span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5 text-[10px] font-bold text-muted">🎓 {classTitle}</span>
-            <span className="text-muted/40">/</span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-[10px] font-bold text-accent">{short}</span>
-            {sscLabel && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5 text-[10px] font-bold text-muted">{sscLabel}-{classNum === 9 || classNum === 11 ? "I" : "II"}</span>
-            )}
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">{tr("subjectLabel")}</p>
+            <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">
+              {classTitle} {subjectTitle} Notes {short}
+            </h1>
           </div>
-          <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className={`text-sm font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("subjectLabel")}</p>
-              <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">
-                {classTitle} {subjectTitle} Notes {short}
-              </h1>
-            </div>
-            <span className="rounded-full border border-border bg-card/80 px-3 py-1 text-sm font-semibold text-muted backdrop-blur-sm">{ACADEMIC_YEAR}</span>
-          </div>
+          <BookmarkButton title={`${classTitle} ${subjectTitle} · ${boardTitle}`} path={`/${board}/${classSlug}/${subject}`} />
         </div>
       </div>
 
@@ -525,70 +507,89 @@ export function SubjectPageContent({
 
       {/* Tags */}
       <div className="mt-6 flex flex-wrap gap-2">
-        {tags.map((tag, i) => (
+        {tags.map((tag) => (
           <span
             key={tag}
-            className={`rounded-full border ${color.border} ${color.bg} ${color.dark} px-3 py-1 text-xs font-bold ${color.tag} animate-fade-in-up stagger-${i + 1}`}
+            className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted animate-fade-in-up"
           >
             {tag}
           </span>
         ))}
       </div>
 
-      {/* MCQ practice CTA — FBISE 9/11/12 now has 50% MCQs */}
+      {/* MCQ practice CTA — board exams 9/11/12 now heavy on MCQs */}
       {isFbiseMcq && (
         <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-300/50 bg-emerald-50/60 p-4 dark:border-emerald-800/40 dark:bg-emerald-950/30">
           <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
-            FBISE now has 50% MCQs in {classTitle} {subjectTitle}
+            {short} exams now feature ~50% MCQs in {classTitle} {subjectTitle}
           </span>
-          <Link
-            href="/test-generator"
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-700"
-          >
-            Practice MCQs →
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/online-quizzes?board=${board}&class=${classSlug}&subject=${subject}`}
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-emerald-700"
+            >
+              Practice MCQs →
+            </Link>
+            <Link
+              href="/test-generator"
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-600/40 bg-white/60 px-4 py-2 text-xs font-bold text-emerald-700 transition hover:bg-white dark:bg-transparent dark:text-emerald-300"
+            >
+              Full Test →
+            </Link>
+          </div>
         </div>
       )}
 
-      {/* Chapter cards with inline exercise links */}
+      {/* Chapter cards with SLO / exercises / numericals sub-links */}
       <div className="mt-8">
         <h2 className="text-xl font-black text-foreground sm:text-2xl">
           Chapter-Wise {subjectTitle} Notes
         </h2>
         <p className="mt-1 text-sm text-muted">SLO-based, exercise-wise, and numerical solutions for every chapter.</p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          {chapters.map((chapter, i) => {
-            const cc = SUBJECT_COLORS[i % SUBJECT_COLORS.length];
+          {chapters.map((chapter) => {
             const exercises = chapter.exercises ?? [];
+            const chapterHref = `/${board}/${classSlug}/${subject}/${chapter.slug}`;
+            const numericalHref = exercises.length > 0
+              ? `${chapterHref}/${exercises[exercises.length - 1].slug}`
+              : chapterHref;
             return (
               <div
                 key={chapter.slug}
-                className={`relative overflow-hidden rounded-2xl border ${cc.border} ${cc.bg} ${cc.dark} p-5 transition-all duration-400 hover:-translate-y-1 hover:shadow-xl ${cc.hover} animate-fade-in-up stagger-${Math.min((i % 6) + 1, 6)}`}
+                className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md animate-fade-in-up"
               >
-                <div className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${cc.icon} opacity-[0.08] blur-xl transition-all duration-700 group-hover:scale-150`} />
-                <p className={`text-xs font-bold uppercase tracking-[0.18em] ${cc.tag}`}>{tr("chapterLabel")} {i + 1}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{tr("chapterLabel")}</p>
                 <h3 className="mt-1 text-lg font-black text-foreground">
-                  <Link href={`/${board}/${classSlug}/${subject}/${chapter.slug}`} className="transition hover:text-accent">
+                  <Link href={chapterHref} className="transition hover:text-accent">
                     {chapter.title}
                   </Link>
                 </h3>
                 <p className="mt-2 text-xs leading-5 text-muted line-clamp-2">
                   {pickLocalized(locale, chapter.summary, chapter.summaryUr)}
                 </p>
-                {exercises.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {exercises.map((exercise) => (
-                      <Link
-                        key={exercise.slug}
-                        href={`/${board}/${classSlug}/${subject}/${chapter.slug}/${exercise.slug}`}
-                        className="rounded-full border border-border bg-card px-3 py-1 text-[11px] font-bold text-foreground/80 transition hover:border-accent hover:text-accent"
-                      >
-                        {exercise.title}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-                <span className={`absolute bottom-0 left-0 h-[3px] w-0 bg-gradient-to-r ${cc.icon} opacity-60 transition-all duration-700 group-hover:w-full rounded-full`} />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Link
+                    href={chapterHref}
+                    className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[11px] font-bold text-accent transition hover:bg-accent hover:text-white"
+                  >
+                    SLO Notes
+                  </Link>
+                  <Link
+                    href={numericalHref}
+                    className="rounded-full border border-border bg-background px-3 py-1 text-[11px] font-bold text-foreground/80 transition hover:border-accent hover:text-accent"
+                  >
+                    Numericals
+                  </Link>
+                  {exercises.map((exercise) => (
+                    <Link
+                      key={exercise.slug}
+                      href={`${chapterHref}/${exercise.slug}`}
+                      className="rounded-full border border-border bg-background px-3 py-1 text-[11px] font-bold text-foreground/80 transition hover:border-accent hover:text-accent"
+                    >
+                      {exercise.title}
+                    </Link>
+                  ))}
+                </div>
               </div>
             );
           })}
@@ -625,7 +626,7 @@ export function SubjectPageContent({
         </p>
       </div>
 
-      <SubjectFaq />
+      <SubjectFaq board={board} classNum={classNum} />
 
       {/* Authors */}
       <div className="mt-8 rounded-2xl border border-border bg-card/50 p-5">
@@ -680,7 +681,6 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
   const subjectKey = `${props.board}/${props.classSlug}/${props.subject}`;
   const summary = pickLocalized(locale, props.summary, props.summaryUr);
   const formulas = pickLocalizedList(locale, props.formulas, props.formulasUr);
-  const color = SUBJECT_COLORS[0];
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -700,19 +700,19 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
         ]}
       />
 
-      {/* Header banner */}
-      <div className={`${color.bg} ${color.dark} relative mt-6 overflow-hidden rounded-3xl border ${color.border} px-8 py-10 shadow-xl sm:px-10`}>
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className={`absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-2xl animate-float`} />
+      {/* Header — simple */}
+      <div className="mt-6">
+        <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {props.boardTitle}</span>
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🎓 {props.classTitle}</span>
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">📖 {props.subjectTitle}</span>
         </div>
-        <div className="relative">
-          <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
-            <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">🏫 {props.boardTitle}</span>
-            <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">🎓 {props.classTitle}</span>
-            <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">📖 {props.subjectTitle}</span>
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">{tr("chapterLabel")}</p>
+            <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{props.chapterTitle}</h1>
           </div>
-          <p className={`mt-3 text-sm font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("chapterLabel")}</p>
-          <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{props.chapterTitle}</h1>
+          <BookmarkButton title={props.chapterTitle} path={`/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}`} />
         </div>
       </div>
 
@@ -826,8 +826,6 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
   const exercisePath = (slug: string) =>
     `/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}/${slug}`;
 
-  const color = SUBJECT_COLORS[3];
-
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <LocalizedBreadcrumbs
@@ -841,28 +839,23 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
         ]}
       />
 
-      {/* Header banner */}
-      <div className={`${color.bg} ${color.dark} relative mt-6 overflow-hidden rounded-3xl border ${color.border} px-8 py-10 shadow-xl sm:px-10`}>
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className={`absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gradient-to-br ${color.icon} opacity-[0.08] blur-2xl animate-float`} />
-        </div>
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
-              <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">📖 {props.subjectTitle}</span>
-              <span className="rounded-full border border-border/50 bg-card/80 px-2.5 py-0.5">📑 {props.chapterTitle}</span>
-            </div>
-            <p className={`mt-3 text-sm font-bold uppercase tracking-[0.18em] ${color.tag}`}>{tr("exerciseLabel")}</p>
-            <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{props.exerciseTitle}</h1>
+      {/* Header — simple */}
+      <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
+            <span className="rounded-full border border-border bg-card px-2.5 py-0.5">📖 {props.subjectTitle}</span>
+            <span className="rounded-full border border-border bg-card px-2.5 py-0.5">📑 {props.chapterTitle}</span>
           </div>
-          {props.pdfDownloadUrl ? (
-            <DownloadGate url={props.pdfDownloadUrl} />
-          ) : (
-            <span className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border bg-card/80 px-4 py-3 text-sm font-semibold text-muted backdrop-blur-sm">
-              {tr("downloadPdf")}
-            </span>
-          )}
+          <p className="mt-3 text-sm font-bold uppercase tracking-[0.18em] text-accent">{tr("exerciseLabel")}</p>
+          <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{props.exerciseTitle}</h1>
         </div>
+        {props.pdfDownloadUrl ? (
+          <DownloadGate url={props.pdfDownloadUrl} />
+        ) : (
+          <span className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-muted">
+            {tr("downloadPdf")}
+          </span>
+        )}
       </div>
 
       <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">

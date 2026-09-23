@@ -36,9 +36,11 @@ export function Footer() {
   const boardLinks = [
     { href: "/fbise", label: "Federal Board" },
     { href: "/punjab", label: "Punjab Board" },
+    { href: "/apsacs", label: "APSACS" },
+    { href: "/o-level", label: "O Level" },
+    { href: "/a-level", label: "A Level" },
     { href: "/oxford", label: "Oxford" },
     { href: "/cambridge", label: "Cambridge" },
-    { href: "/apsacs", label: "APSACS" },
   ];
 
   const companyLinks = [

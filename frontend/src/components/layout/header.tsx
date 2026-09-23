@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
+import { usePathname } from "next/navigation";
 
 import { useLocale } from "@/lib/locale-context";
 import { useAuth } from "@/lib/auth-context";
+import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardShortName } from "@/lib/constants";
 
 type DropdownItem = { label: string; href: string };
 type DropdownGroup = { heading?: string; items: DropdownItem[] };
 type DropdownDef = { label: string; groups: DropdownGroup[]; soon?: boolean };
 
-const NAV_ITEMS: DropdownDef[] = [
-  { label: "Books & Notes", groups: [
+const BOOKS_NOTES_ITEM: DropdownDef = { label: "Books & Notes", groups: [
     { heading: "Pakistani Boards", items: [
       { label: "Federal Board", href: "/categories/federal-text-books" },
       { label: "Punjab Board", href: "/categories/punjab-text-books" },
@@ -23,8 +24,12 @@ const NAV_ITEMS: DropdownDef[] = [
     { heading: "International", items: [
       { label: "Oxford", href: "/categories/oxford-text-books" },
       { label: "Cambridge", href: "/categories/cambridge-text-books" },
+      { label: "O Level", href: "/o-level" },
+      { label: "A Level", href: "/a-level" },
     ]},
-  ]},
+  ]};
+
+const OTHER_NAV_ITEMS: DropdownDef[] = [
   { label: "Pairing Schemes", groups: [
     { items: [
       { label: "9th", href: "/categories/9th-class-pairing-schemes" },
@@ -42,6 +47,8 @@ const NAV_ITEMS: DropdownDef[] = [
     ]},
     { heading: "International", items: [
       { label: "Cambridge IGCSE", href: "/categories/cambridge-intl-notes" },
+      { label: "O Level", href: "/o-level" },
+      { label: "A Level", href: "/a-level" },
       { label: "Pearson Edexcel", href: "/categories/pearson-edexcel-notes" },
       { label: "OxfordAQA", href: "/categories/oxford-notes" },
       { label: "City & Guilds", href: "/categories/city-guilds-notes" },
@@ -55,6 +62,7 @@ const NAV_ITEMS: DropdownDef[] = [
       { label: "1st Year Tests", href: "/categories/1st-year-tests" },
       { label: "2nd Year Tests", href: "/categories/2nd-year-tests" },
       { label: "Generate a Test", href: "/test-generator" },
+      { label: "MCQ Practice", href: "/online-quizzes" },
     ]},
   ]},
   { label: "Tuition", groups: [
@@ -67,6 +75,65 @@ const NAV_ITEMS: DropdownDef[] = [
     ]},
   ]},
 ];
+
+const KNOWN_BOARD_SLUGS = new Set<string>([
+  ...NAV_BOARDS.map((b) => b.slug),
+  "apsacs",
+  "kpk",
+  "sindh",
+  "o-level",
+  "a-level",
+]);
+
+function classHref(boardSlug: string, num: number): string {
+  if (boardSlug === "apsacs") return `/apsacs/class-${num}`;
+  return `/${boardSlug}/${num}`;
+}
+
+function buildBoardNav(boardSlug: string): DropdownDef {
+  if (boardSlug === "apsacs") {
+    return {
+      label: boardShortName("apsacs"),
+      groups: [
+        { heading: "Classes", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref("apsacs", n) })) },
+        { items: [
+          { label: "All APSACS", href: "/apsacs" },
+          { label: "MCQ Practice", href: "/online-quizzes" },
+          { label: "Test Generator", href: "/test-generator" },
+        ]},
+      ],
+    };
+  }
+  if (boardSlug === "o-level" || boardSlug === "a-level") {
+    const label = boardShortName(boardSlug);
+    const years = boardSlug === "o-level"
+      ? [{ label: "Year 10", href: "/o-level#year-10" }, { label: "Year 11", href: "/o-level#year-11" }]
+      : [{ label: "Year 12 · AS", href: "/a-level#year-12" }, { label: "Year 13 · A Level", href: "/a-level#year-13" }];
+    return {
+      label,
+      groups: [
+        { heading: "Years", items: years },
+        { items: [
+          { label: `All ${label}`, href: `/${boardSlug}` },
+          { label: "MCQ Practice", href: "/online-quizzes" },
+          { label: "Test Generator", href: "/test-generator" },
+        ]},
+      ],
+    };
+  }
+  const label = boardShortName(boardSlug);
+  return {
+    label,
+    groups: [
+      { heading: "Notes & Books", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref(boardSlug, n) })) },
+      { items: [
+        { label: `All ${label}`, href: `/${boardSlug}` },
+        { label: "MCQ Practice", href: "/online-quizzes" },
+        { label: "Test Generator", href: "/test-generator" },
+      ]},
+    ],
+  };
+}
 
 
 
@@ -152,7 +219,18 @@ export function Header() {
   const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
   const { user, loading, isStaff, signOut } = useAuth();
   const { tr, locale } = useLocale();
+  const pathname = usePathname();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const activeBoard = useMemo(() => {
+    const first = (pathname ?? "/").split("/").filter(Boolean)[0];
+    return first && KNOWN_BOARD_SLUGS.has(first) ? first : null;
+  }, [pathname]);
+
+  const navItems = useMemo<DropdownDef[]>(() => {
+    if (!activeBoard) return [BOOKS_NOTES_ITEM, ...OTHER_NAV_ITEMS];
+    return [buildBoardNav(activeBoard), ...OTHER_NAV_ITEMS];
+  }, [activeBoard]);
 
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
@@ -204,7 +282,7 @@ export function Header() {
         <nav className="mx-auto flex w-full max-w-[1400px] items-center px-4 py-3 sm:px-6 lg:px-8" aria-label="Main navigation">
           {/* Nav items */}
           <div className="hidden items-center gap-1 overflow-visible xl:flex">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <Dropdown
                 key={item.label}
                 item={item}
@@ -234,7 +312,7 @@ export function Header() {
             <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
             <input name="q" autoComplete="off" placeholder={tr("portalSearchPlaceholder")} aria-label={tr("search")} className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
           </form>
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <MobileSection key={item.label} item={item} onLink={() => setMenuOpen(false)} />
           ))}
           <div className="mt-3 border-t border-border pt-3">

@@ -62,6 +62,8 @@ const demoPaths = [
   "/guess-papers",
   "/test",
   "/online-quizzes",
+  "/o-level",
+  "/a-level",
   "/whiteboard",
   "/test-generator",
   "/about",
