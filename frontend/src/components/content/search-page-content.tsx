@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import type { SearchResult } from "@/lib/shared-types";
 
@@ -51,7 +51,6 @@ export function SearchPageContent({
   portalCategoryNames = {},
 }: Props) {
   const { tr } = useLocale();
-  const [dismissedFilters, setDismissedFilters] = useState<Set<string>>(new Set());
 
   const filteredResults = results.filter((result) => {
     const matchesBoard =
@@ -74,12 +73,8 @@ export function SearchPageContent({
     if (subjectFilter !== "all") {
       chips.push({ key: "subject", label: `Subject: ${subjectFilter}`, param: "subject", value: subjectFilter });
     }
-    return chips.filter((c) => !dismissedFilters.has(c.key));
-  }, [boardFilter, classFilter, subjectFilter, dismissedFilters]);
-
-  function dismissFilter(key: string) {
-    setDismissedFilters((prev) => new Set(prev).add(key));
-  }
+    return chips;
+  }, [boardFilter, classFilter, subjectFilter]);
 
   function buildRemoveFilterUrl(param: string) {
     const params = new URLSearchParams();

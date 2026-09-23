@@ -18,17 +18,6 @@ type ChapterSummary = {
 
 type PortalStats = { books: number; categories: number; users: number };
 
-const statCardStyles = [
-  "from-blue-500 to-blue-600",
-  "from-violet-500 to-purple-600",
-  "from-emerald-500 to-teal-600",
-  "from-amber-500 to-orange-600",
-  "from-rose-500 to-pink-600",
-  "from-cyan-500 to-sky-600",
-];
-
-const statIcons = ["📚", "👥", "📦", "🏷️", "🚩", "✉️"];
-
 export default function AdminDashboard() {
   const { isEditor, isTeacher } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -142,7 +131,7 @@ export default function AdminDashboard() {
       <p className="mt-2 text-muted">Manage content, users, and student feedback.</p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {cards.map((card, i) => (
+        {cards.map((card) => (
           <Link
             key={card.label}
             href={card.href}

@@ -14,8 +14,6 @@ const SUBJECT_COLORS = [
   { bg: "bg-gradient-to-br from-cyan-50 to-sky-50", dark: "dark:from-cyan-950/30 dark:to-sky-950/30", border: "border-cyan-200/60 dark:border-cyan-800/30", icon: "bg-gradient-to-br from-cyan-500 to-sky-500", hover: "hover:border-cyan-400", tag: "text-cyan-600 dark:text-cyan-300" },
 ];
 
-const CLASS_ICONS = ["📚", "📖", "🎓", "✏️", "📝", "🧮", "🔬", "📐"];
-
 type APSACSClassPageContentProps = {
   board: string;
   classSlug: string;

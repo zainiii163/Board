@@ -2,23 +2,16 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { APSACSClassPageContent } from "@/components/content/apsacs-pages";
-import { apiFetchOrNull } from "@/lib/api-client";
 import { APSACS_CLASSES } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
-
-type ClassData = {
-  slug: string;
-  title: string;
-  subjects: { slug: string; title: string }[];
-};
 
 export async function generateMetadata({ params }: { params: Promise<{ classSlug: string }> }): Promise<Metadata> {
   const { classSlug } = await params;
   const classNum = classSlug.replace("class-", "");
   const classNumInt = parseInt(classNum, 10);
   
-  if (!APSACS_CLASSES.includes(classNumInt as any)) {
+  if (!(APSACS_CLASSES as readonly number[]).includes(classNumInt)) {
     return { title: "Class Not Found" };
   }
 
@@ -37,7 +30,7 @@ export default async function APSACSClassPage({ params }: { params: Promise<{ cl
   const classNum = classSlug.replace("class-", "");
   const classNumInt = parseInt(classNum, 10);
   
-  if (!APSACS_CLASSES.includes(classNumInt as any)) {
+  if (!(APSACS_CLASSES as readonly number[]).includes(classNumInt)) {
     notFound();
   }
 

@@ -1,17 +1,9 @@
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { BoardPageContent } from "@/components/content/hierarchy-pages";
-import { apiFetchOrNull } from "@/lib/api-client";
 import { APSACS_CLASSES } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
-
-type BoardData = {
-  slug: string;
-  title: string;
-  classes: { slug: string; title: string }[];
-};
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

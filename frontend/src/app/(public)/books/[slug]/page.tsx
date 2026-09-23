@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const data = await apiFetchOrNull<ResourceDetail>(`/api/resources/${slug}`);
   if (!data) return { title: "Resource Not Found" };
-  const { resource, category } = data;
+  const { resource } = data;
   return {
     title: `${resource.title} | BoardNotes`,
     description: resource.description || `Download ${resource.title} - free PDF resource for students.`,

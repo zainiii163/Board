@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef, useCallback, type FormEvent, type DragEvent } from "react";
+import { useEffect, useState, useRef, useCallback, type FormEvent, type DragEvent } from "react";
 
 import { getApiBaseUrl, getAuthToken } from "@/lib/api-client";
 import { useLocale } from "@/lib/locale-context";

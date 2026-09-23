@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { apiPost, apiFetch } from "@/lib/api-client";
 import { NAV_BOARDS, NAV_CLASSES } from "@/lib/constants";
-import { useLocale } from "@/lib/locale-context";
 
 type MCQ = {
   id: number;
@@ -43,8 +42,6 @@ const selectClass =
 const labelClass = "mb-2 block text-sm font-medium text-foreground";
 
 export default function TestGeneratorPage() {
-  const { tr } = useLocale();
-
   const [phase, setPhase] = useState<Phase>("config");
 
   const [board, setBoard] = useState<string>(NAV_BOARDS[0].slug);
@@ -55,13 +52,12 @@ export default function TestGeneratorPage() {
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [mcqCount, setMcqCount] = useState<number>(10);
 
-  const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [loadingChapters, setLoadingChapters] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
 
   const [mcqs, setMcqs] = useState<MCQ[]>([]);
-  const [timeMinutes, setTimeMinutes] = useState(15);
   const [timeLeft, setTimeLeft] = useState(0);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -71,17 +67,11 @@ export default function TestGeneratorPage() {
   const [submitting, setSubmitting] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const submitRef = useRef<() => Promise<void>>(async () => {});
 
   useEffect(() => {
-    if (!board || !classSlug) {
-      setSubjects([]);
-      setSubject("");
-      setChapters([]);
-      setSelectedChapters([]);
-      return;
-    }
+    if (!board || !classSlug) return;
     let cancelled = false;
-    setLoadingSubjects(true);
     apiFetch<Subject[]>(`/api/subjects?board=${board}&class=${classSlug}`)
       .then((data) => {
         if (cancelled) return;
@@ -89,6 +79,7 @@ export default function TestGeneratorPage() {
         setSubject("");
         setChapters([]);
         setSelectedChapters([]);
+        setLoadingChapters(false);
       })
       .catch(() => {
         if (cancelled) return;
@@ -101,13 +92,8 @@ export default function TestGeneratorPage() {
   }, [board, classSlug]);
 
   useEffect(() => {
-    if (!board || !classSlug || !subject) {
-      setChapters([]);
-      setSelectedChapters([]);
-      return;
-    }
+    if (!board || !classSlug || !subject) return;
     let cancelled = false;
-    setLoadingChapters(true);
     apiFetch<Chapter[]>(`/api/chapters?board=${board}&class=${classSlug}&subject=${subject}`)
       .then((data) => {
         if (cancelled) return;
@@ -141,7 +127,7 @@ export default function TestGeneratorPage() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearTimer();
-          handleSubmitTest();
+          submitRef.current();
           return 0;
         }
         return prev - 1;
@@ -172,7 +158,6 @@ export default function TestGeneratorPage() {
         mcqCount,
       });
       setMcqs(res.test.mcqs);
-      setTimeMinutes(res.test.timeMinutes);
       setTimeLeft(res.test.timeMinutes * 60);
       setCurrentQ(0);
       setAnswers({});
@@ -217,6 +202,10 @@ export default function TestGeneratorPage() {
     }
   }
 
+  useEffect(() => {
+    submitRef.current = handleSubmitTest;
+  });
+
   function formatTime(secs: number) {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
@@ -241,7 +230,14 @@ export default function TestGeneratorPage() {
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             <div>
               <label className={labelClass}>Board</label>
-              <select value={board} onChange={(e) => setBoard(e.target.value)} className={selectClass}>
+              <select
+                value={board}
+                onChange={(e) => {
+                  setLoadingSubjects(true);
+                  setBoard(e.target.value);
+                }}
+                className={selectClass}
+              >
                 {NAV_BOARDS.map((b) => (
                   <option key={b.slug} value={b.slug}>{b.label}</option>
                 ))}
@@ -249,7 +245,14 @@ export default function TestGeneratorPage() {
             </div>
             <div>
               <label className={labelClass}>Class</label>
-              <select value={classSlug} onChange={(e) => setClassSlug(e.target.value)} className={selectClass}>
+              <select
+                value={classSlug}
+                onChange={(e) => {
+                  setLoadingSubjects(true);
+                  setClassSlug(e.target.value);
+                }}
+                className={selectClass}
+              >
                 {NAV_CLASSES.map((c) => (
                   <option key={c} value={String(c)}>Class {c}</option>
                 ))}
@@ -259,7 +262,10 @@ export default function TestGeneratorPage() {
               <label className={labelClass}>Subject</label>
               <select
                 value={subject}
-                onChange={(e) => setSubject(e.target.value)}
+                onChange={(e) => {
+                  setLoadingChapters(true);
+                  setSubject(e.target.value);
+                }}
                 className={selectClass}
                 disabled={loadingSubjects}
               >
@@ -331,7 +337,6 @@ export default function TestGeneratorPage() {
 
   if (phase === "test") {
     const mcq = mcqs[currentQ];
-    const timePercent = timeMinutes > 0 ? (timeLeft / (timeMinutes * 60)) * 100 : 0;
     const timerColor = timeLeft <= 60 ? "text-red-600" : timeLeft <= 300 ? "text-amber-500" : "text-foreground";
 
     return (

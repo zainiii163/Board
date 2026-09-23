@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 
 import { apiAuthFetch, apiPatch, apiDelete, apiFetch } from "@/lib/api-client";
-import { useLocale } from "@/lib/locale-context";
 import { type PortalResource } from "@/components/portal/portal-types";
 
 type ResourcesPage = { resources: PortalResource[]; total: number };
@@ -13,7 +12,6 @@ type CatInfo = { id: number; slug: string; name: string; nameUr: string; icon: s
 const PAGE_SIZE = 50;
 
 export default function ManageResourcesPage() {
-  const { tr } = useLocale();
   const [resources, setResources] = useState<PortalResource[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -28,7 +26,10 @@ export default function ManageResourcesPage() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 300);
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -46,13 +47,17 @@ export default function ManageResourcesPage() {
   }, []);
 
   useEffect(() => {
-    setPage(1);
-    load(filterCat || undefined, debouncedSearch || undefined, 1);
-  }, [filterCat, debouncedSearch, load]);
-
-  useEffect(() => {
-    load(filterCat || undefined, debouncedSearch || undefined, page);
-  }, [page, load, filterCat, debouncedSearch]);
+    const url = `/api/resources?limit=${PAGE_SIZE}&sort=latest&offset=${(page - 1) * PAGE_SIZE}${filterCat ? `&category=${filterCat}` : ""}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ""}`;
+    let cancelled = false;
+    apiAuthFetch<ResourcesPage>(url)
+      .then((data) => {
+        if (cancelled) return;
+        setResources(data.resources);
+        setTotal(data.total);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [page, filterCat, debouncedSearch]);
 
   async function toggleStatus(resource: PortalResource) {
     setBusyId(resource.id);
@@ -157,7 +162,10 @@ export default function ManageResourcesPage() {
         </div>
         <select
           value={filterCat}
-          onChange={(e) => setFilterCat(e.target.value)}
+          onChange={(e) => {
+            setFilterCat(e.target.value);
+            setPage(1);
+          }}
           className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm font-medium text-foreground transition focus:border-accent focus:outline-none"
         >
           <option value="">All Categories</option>
