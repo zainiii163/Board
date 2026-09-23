@@ -125,12 +125,13 @@ export default async function BookDetailPage({ params }: { params: Promise<{ slu
             )}
 
             <ResourceActions slug={resource.slug} fileUrl={resource.fileUrl} downloads={resource.downloads} />
-            
-            {resource.fileUrl && (
-              <div className="mt-3">
-                <DriveLinkButton href={resource.fileUrl} label="Open in Google Drive" />
-              </div>
-            )}
+
+            {resource.fileUrl &&
+              (resource.fileUrl.includes("drive.google.com") || resource.fileUrl.includes("docs.google.com")) && (
+                <div className="mt-3">
+                  <DriveLinkButton href={resource.fileUrl} label="Open in Google Drive" />
+                </div>
+              )}
 
             <p className="mt-6 text-sm leading-relaxed text-muted">{resource.description}</p>
           </div>
