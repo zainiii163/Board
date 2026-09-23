@@ -41,6 +41,20 @@ export function boardShortName(boardSlug: string, classNum?: number): string {
   return NAV_BOARDS.find((b) => b.slug === boardSlug)?.label ?? boardSlug;
 }
 
+// Display title shown in breadcrumbs/chips/SEO: FBISE branding only for classes 9–12.
+// Classes 5–8 show NBF; board-level pages drop the "(FBISE)" suffix.
+export function boardDisplayTitle(boardTitle: string, boardSlug: string, classNum?: number): string {
+  if (boardSlug !== "fbise") return boardTitle;
+  if (!classNum || classNum < 5) {
+    return boardTitle.replace(/\s*\(FBISE\)/i, "").trim() || "Federal Board";
+  }
+  return classNum >= 9
+    ? boardTitle.includes("FBISE")
+      ? boardTitle
+      : "Federal Board (FBISE)"
+    : "National Book Foundation (NBF)";
+}
+
 // Portal textbook category slug for each board (used by Books links).
 export const BOARD_TEXTBOOK_CATEGORY: Record<string, string> = {
   fbise: "federal-text-books",

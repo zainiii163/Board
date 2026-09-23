@@ -14,6 +14,7 @@ import { ProgressTracker } from "@/components/content/progress-tracker";
 import { TextSizeControl } from "@/components/content/text-size-control";
 import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedSteps } from "@/lib/i18n";
+import { boardDisplayTitle } from "@/lib/constants";
 
 type QuestionPageViewProps = {
   board: string;
@@ -54,6 +55,8 @@ export function QuestionPageView(props: QuestionPageViewProps) {
       : null;
   const subjectKey = `${props.board}/${props.classSlug}/${props.subject}`;
   const progressLabel = `${props.subjectTitle} → ${props.chapterTitle}`;
+  const classNum = parseInt(props.classSlug, 10) || 0;
+  const displayTitle = boardDisplayTitle(props.boardTitle, props.board, classNum);
 
   return (
     <section className="question-page mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -67,7 +70,7 @@ export function QuestionPageView(props: QuestionPageViewProps) {
         <LocalizedBreadcrumbs
           items={[
             { label: "Home", href: "/" },
-            { label: props.boardTitle, href: `/${props.board}` },
+            { label: displayTitle, href: `/${props.board}` },
             { label: props.classTitle, href: `/${props.board}/${props.classSlug}` },
             { label: props.subjectTitle, href: `/${props.board}/${props.classSlug}/${props.subject}` },
             { label: props.chapterTitle, href: `/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}` },

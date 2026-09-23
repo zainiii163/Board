@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { SubjectPageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull } from "@/lib/api-client";
+import { boardDisplayTitle } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -47,12 +48,14 @@ export default async function SubjectPage({
 
   if (!data) notFound();
 
+  const classNum = parseInt(classSlug, 10) || 0;
+
   return (
     <SubjectPageContent
       board={board}
       classSlug={classSlug}
       subject={subject}
-      boardTitle={data.board?.title ?? "Board"}
+      boardTitle={boardDisplayTitle(data.board?.title ?? "Board", board, classNum)}
       classTitle={data.class?.title ?? "Class"}
       subjectTitle={data.subject.title}
       chapters={data.subject.chapters}

@@ -23,10 +23,12 @@ type Props = {
   label?: string;
   seconds?: number;
   compact?: boolean;
+  /** Set false when the gate sits in a page header — ads must never render at the top. */
+  showAd?: boolean;
   onDownload?: () => void;
 };
 
-export function DownloadGate({ url, label, seconds = 12, compact = false, onDownload }: Props) {
+export function DownloadGate({ url, label, seconds = 12, compact = false, showAd = true, onDownload }: Props) {
   const { tr } = useLocale();
   const text = label ?? tr("downloadPdf");
   const btnClass = compact
@@ -81,7 +83,7 @@ export function DownloadGate({ url, label, seconds = 12, compact = false, onDown
   if (state === "waiting") {
     return (
       <div className={compact ? "w-full max-w-[320px]" : "w-full max-w-xl"}>
-        <AdBanner size="inline" />
+        {showAd && <AdBanner size="inline" />}
         <button
           type="button"
           disabled

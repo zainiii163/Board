@@ -15,6 +15,15 @@ export type PastPaperItem = {
   pdfUrl: string | null;
 };
 
+function normalizeBoardLabel(boardTitle: string, classTitle: string): string {
+  if (!/federal|fbise/i.test(boardTitle)) return boardTitle;
+  const match = classTitle.match(/\d+/);
+  const classNum = match ? parseInt(match[0], 10) : 0;
+  if (classNum >= 9) return "Federal Board (FBISE)";
+  if (classNum > 0) return "National Book Foundation (NBF)";
+  return boardTitle.replace(/\s*\(FBISE\)/i, "").trim() || "Federal Board";
+}
+
 export function PastPapersList({ papers }: { papers: PastPaperItem[] }) {
   const { tr } = useLocale();
 
@@ -28,7 +37,9 @@ export function PastPapersList({ papers }: { papers: PastPaperItem[] }) {
             className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
           >
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{paper.boardTitle}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                {normalizeBoardLabel(paper.boardTitle, paper.classTitle)}
+              </p>
               <h2 className="mt-1 text-lg font-bold text-foreground">{paper.subjectTitle}</h2>
               <p className="text-sm text-muted">{paper.classTitle}</p>
             </div>

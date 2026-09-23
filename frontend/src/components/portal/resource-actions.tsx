@@ -52,6 +52,7 @@ export function ResourceActions({ slug, fileUrl, downloads }: Props) {
             <DownloadGate
               url={pdfUrl(fileUrl)}
               label={tr("downloadPdf")}
+              showAd={false}
               onDownload={trackDownload}
             />
             <a

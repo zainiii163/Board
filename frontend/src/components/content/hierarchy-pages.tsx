@@ -20,7 +20,7 @@ import { AdBanner } from "@/components/portal/ad-banner";
 import { CoverArt } from "@/components/portal/cover-art";
 import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedList } from "@/lib/i18n";
-import { ACADEMIC_YEAR, boardShortName, boardTextbookCategory } from "@/lib/constants";
+import { ACADEMIC_YEAR, boardDisplayTitle, boardShortName, boardTextbookCategory } from "@/lib/constants";
 import { getBookCover } from "@/lib/book-covers";
 
 type BoardSubject = { slug: string; title: string };
@@ -39,6 +39,7 @@ function classNumber(slug: string): number {
 
 export function BoardPageContent({ board, title, classes }: BoardPageContentProps) {
   const { tr } = useLocale();
+  const displayTitle = boardDisplayTitle(title, board);
 
   const seen = new Set<string>();
   const uniqueClasses = classes.filter((c) => {
@@ -52,11 +53,11 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <LocalizedBreadcrumbs items={[{ label: "Home", href: "/" }, { label: title }]} />
+      <LocalizedBreadcrumbs items={[{ label: "Home", href: "/" }, { label: displayTitle }]} />
 
       <div className="mt-6">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">{tr("boardLabel")}</p>
-        <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{title} Notes &amp; Books</h1>
+        <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{displayTitle} Notes &amp; Books</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">{tr("chooseClassContinue")}</p>
       </div>
 
@@ -210,10 +211,10 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
       {/* SEO Content Block */}
       <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">
-          {title} Books and Notes — Complete Study Material
+          {displayTitle} Books and Notes — Complete Study Material
         </h3>
         <p className="mb-3 text-sm leading-6 text-muted">
-          Access comprehensive study materials for {title}, including textbooks, chapter-wise notes, past papers,
+          Access comprehensive study materials for {displayTitle}, including textbooks, chapter-wise notes, past papers,
           and solved exercises. Choose a class above to jump straight to its Notes or Books section — every class
           page is bookmarkable for quick access during study sessions.
         </p>
@@ -223,7 +224,7 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
           aligned with the latest curriculum standards.
         </p>
         <p className="text-sm leading-6 text-muted">
-          All study materials follow the {title} curriculum guidelines for the {ACADEMIC_YEAR} session, making them
+          All study materials follow the {displayTitle} curriculum guidelines for the {ACADEMIC_YEAR} session, making them
           ideal for classroom learning, homework assistance, and exam preparation.
         </p>
       </div>
@@ -257,17 +258,26 @@ export function ClassPageContent({
   const [view, setView] = useState<"notes" | "books">(initialView);
   const classNum = classNumber(classSlug);
   const short = boardShortName(board, classNum);
+  const displayTitle = boardDisplayTitle(boardTitle, board, classNum);
   const booksCategory = boardTextbookCategory(board);
 
   const tabClass = (active: boolean) =>
     `rounded-full px-5 py-2 text-sm font-bold transition ${active ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`;
+
+  function selectView(next: "notes" | "books") {
+    setView(next);
+    const url = new URL(window.location.href);
+    if (next === "books") url.searchParams.set("view", "books");
+    else url.searchParams.delete("view");
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <LocalizedBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: boardTitle, href: `/${board}` },
+          { label: displayTitle, href: `/${board}` },
           { label: classTitle },
         ]}
       />
@@ -275,16 +285,16 @@ export function ClassPageContent({
       {/* Header */}
       <div className="mt-6">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">🏫 {boardTitle}</span>
+          <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">🏫 {displayTitle}</span>
           <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{short}</span>
           <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">{ACADEMIC_YEAR}</span>
         </div>
         <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
-            <p className="mt-2 max-w-lg text-sm text-muted">{tr("chooseSubjectContinue").replace("{board}", boardTitle)}</p>
+            <p className="mt-2 max-w-lg text-sm text-muted">{tr("chooseSubjectContinue").replace("{board}", displayTitle)}</p>
           </div>
-          <BookmarkButton title={`${classTitle} · ${boardTitle}`} path={`/${board}/${classSlug}`} />
+          <BookmarkButton title={`${classTitle} · ${displayTitle}`} path={`/${board}/${classSlug}`} />
         </div>
       </div>
 
@@ -294,7 +304,7 @@ export function ClassPageContent({
           type="button"
           role="tab"
           aria-selected={view === "notes"}
-          onClick={() => setView("notes")}
+          onClick={() => selectView("notes")}
           className={tabClass(view === "notes")}
         >
           📝 {tr("notes")}
@@ -303,7 +313,7 @@ export function ClassPageContent({
           type="button"
           role="tab"
           aria-selected={view === "books"}
-          onClick={() => setView("books")}
+          onClick={() => selectView("books")}
           className={tabClass(view === "books")}
         >
           📚 {tr("books")}
@@ -387,9 +397,9 @@ export function ClassPageContent({
 
       {/* SEO Content Block */}
       <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
-        <h3 className="mb-3 text-lg font-bold text-foreground">{boardTitle} {classTitle} Study Resources</h3>
+        <h3 className="mb-3 text-lg font-bold text-foreground">{displayTitle} {classTitle} Study Resources</h3>
         <p className="mb-3 text-sm leading-6 text-muted">
-          Access comprehensive study materials for {boardTitle} {classTitle}, including textbooks, notes, past papers, and solved exercises.
+          Access comprehensive study materials for {displayTitle} {classTitle}, including textbooks, notes, past papers, and solved exercises.
           Our resources are aligned with the latest curriculum standards, ensuring students have access to high-quality educational content
           that supports their learning journey.
         </p>
@@ -399,7 +409,7 @@ export function ClassPageContent({
           excel in their academic performance and board examinations.
         </p>
         <p className="text-sm leading-6 text-muted">
-          All study materials are designed to follow the {boardTitle} curriculum guidelines, making them perfect for classroom learning,
+          All study materials are designed to follow the {displayTitle} curriculum guidelines, making them perfect for classroom learning,
           homework assistance, and exam preparation. Teachers and students can rely on these resources for consistent and accurate
           educational content based on the National Curriculum 2022–23 standards.
         </p>
@@ -450,6 +460,7 @@ export function SubjectPageContent({
   const { tr, locale } = useLocale();
   const classNum = classNumber(classSlug);
   const short = boardShortName(board, classNum);
+  const displayTitle = boardDisplayTitle(boardTitle, board, classNum);
   const isFbiseMcq = MCQ_ELIGIBLE_CLASSES.has(classNum);
   const tags = [
     boardShortName(board, classNum),
@@ -469,7 +480,7 @@ export function SubjectPageContent({
       <LocalizedBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: boardTitle, href: `/${board}` },
+          { label: displayTitle, href: `/${board}` },
           { label: classTitle, href: `/${board}/${classSlug}` },
           { label: subjectTitle },
         ]}
@@ -478,7 +489,7 @@ export function SubjectPageContent({
       {/* Header — simple, studyplusplus-style */}
       <div className="mt-6">
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
-          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {boardTitle}</span>
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {displayTitle}</span>
           <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🎓 {classTitle}</span>
           <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-accent">{short}</span>
           {sscLabel && (
@@ -493,7 +504,7 @@ export function SubjectPageContent({
               {classTitle} {subjectTitle} Notes {short}
             </h1>
           </div>
-          <BookmarkButton title={`${classTitle} ${subjectTitle} · ${boardTitle}`} path={`/${board}/${classSlug}/${subject}`} />
+          <BookmarkButton title={`${classTitle} ${subjectTitle} · ${displayTitle}`} path={`/${board}/${classSlug}/${subject}`} />
         </div>
       </div>
 
@@ -501,7 +512,7 @@ export function SubjectPageContent({
       <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/5 p-5">
         <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-accent">Quick Answer</h2>
         <p className="mt-2 text-sm leading-6 text-foreground/90">
-          These free {classTitle} {subjectTitle} notes for {boardTitle} cover all {chapters.length} chapters with
+          These free {classTitle} {subjectTitle} notes for {displayTitle} cover all {chapters.length} chapters with
           SLO-based explanations, solved exercises, key formulas, and downloadable PDFs — aligned with the{" "}
           {ACADEMIC_YEAR} syllabus. Use the chapter cards below to jump straight into any exercise.
         </p>
@@ -670,11 +681,12 @@ export function SubjectPageContent({
           About the {classTitle} {subjectTitle} Course &amp; Book ({short})
         </h2>
         <p className="mt-3 text-sm leading-6 text-muted">
-          {classTitle} {subjectTitle} under {boardTitle} follows the Single National Curriculum and is examined by{" "}
+          {classTitle} {subjectTitle} under {displayTitle} follows the Single National Curriculum and is examined by{" "}
           {short} in the {ACADEMIC_YEAR} session. The course spans {chapters.length} chapters, each combining theory,
-          worked examples, and board-style exercises. For matric and intermediate students ({short}), the written
-          paper pairs these long/short questions with a heavy MCQ component — which is why every chapter above ships
-          with both exercise solutions and a chapter quiz.
+          worked examples, and board-style exercises.{" "}
+          {classNum >= 9
+            ? `For matric and intermediate students (${short}), the written paper pairs these long/short questions with a heavy MCQ component — which is why every chapter above ships with both exercise solutions and a chapter quiz.`
+            : `At this stage students build strong fundamentals through exercise-wise solutions and regular practice checks before assessment.`}
         </p>
         <p className="mt-3 text-sm leading-6 text-muted">
           The core book for this course is the official {short} {subjectTitle} textbook; our notes are structured
@@ -687,8 +699,6 @@ export function SubjectPageContent({
           gated download away. Bookmark this subject page (★) to resume revision from any device.
         </p>
       </div>
-
-      <SubjectFaq board={board} classNum={classNum} />
 
       {/* Authors */}
       <div className="mt-8 rounded-2xl border border-border bg-card/50 p-5">
@@ -711,6 +721,9 @@ export function SubjectPageContent({
           )}
         </p>
       </div>
+
+      {/* FAQ — true bottom, above only the ad */}
+      <SubjectFaq board={board} classNum={classNum} />
 
       {/* Ad — bottom only */}
       <div className="mt-8">
@@ -743,6 +756,8 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
   const subjectKey = `${props.board}/${props.classSlug}/${props.subject}`;
   const summary = pickLocalized(locale, props.summary, props.summaryUr);
   const formulas = pickLocalizedList(locale, props.formulas, props.formulasUr);
+  const classNum = classNumber(props.classSlug);
+  const displayTitle = boardDisplayTitle(props.boardTitle, props.board, classNum);
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
@@ -755,7 +770,7 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
       <LocalizedBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: props.boardTitle, href: `/${props.board}` },
+          { label: displayTitle, href: `/${props.board}` },
           { label: props.classTitle, href: `/${props.board}/${props.classSlug}` },
           { label: props.subjectTitle, href: `/${props.board}/${props.classSlug}/${props.subject}` },
           { label: props.chapterTitle },
@@ -765,7 +780,7 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
       {/* Header — simple */}
       <div className="mt-6">
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
-          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {props.boardTitle}</span>
+          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {displayTitle}</span>
           <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🎓 {props.classTitle}</span>
           <span className="rounded-full border border-border bg-card px-2.5 py-0.5">📖 {props.subjectTitle}</span>
         </div>
@@ -834,10 +849,10 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
         <SaveOfflineButton
           path={`/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}`}
           title={props.chapterTitle}
-          subjectLabel={`${props.boardTitle} · ${props.subjectTitle}`}
+          subjectLabel={`${displayTitle} · ${props.subjectTitle}`}
           apiPath={`/api/boards/${props.board}/classes/${props.classSlug}/subjects/${props.subject}/chapters/${props.chapter}`}
           payload={{
-            board: { slug: props.board, title: props.boardTitle },
+            board: { slug: props.board, title: displayTitle },
             class: { slug: props.classSlug, title: props.classTitle },
             subject: { slug: props.subject, title: props.subjectTitle },
             chapter: {
@@ -880,6 +895,8 @@ type ExercisePageContentProps = {
 
 export function ExercisePageContent(props: ExercisePageContentProps) {
   const { tr } = useLocale();
+  const classNum = classNumber(props.classSlug);
+  const displayTitle = boardDisplayTitle(props.boardTitle, props.board, classNum);
 
   const exerciseList = props.exercises ?? [];
   const currentIndex = exerciseList.findIndex((e) => e.slug === props.exercise);
@@ -895,7 +912,7 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
       <LocalizedBreadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: props.boardTitle, href: `/${props.board}` },
+          { label: displayTitle, href: `/${props.board}` },
           { label: props.classTitle, href: `/${props.board}/${props.classSlug}` },
           { label: props.subjectTitle, href: `/${props.board}/${props.classSlug}/${props.subject}` },
           { label: props.chapterTitle, href: `/${props.board}/${props.classSlug}/${props.subject}/${props.chapter}` },
@@ -914,7 +931,7 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
           <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{props.exerciseTitle}</h1>
         </div>
         {props.pdfDownloadUrl ? (
-          <DownloadGate url={props.pdfDownloadUrl} />
+          <DownloadGate url={props.pdfDownloadUrl} showAd={false} />
         ) : (
           <span className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-muted">
             {tr("downloadPdf")}

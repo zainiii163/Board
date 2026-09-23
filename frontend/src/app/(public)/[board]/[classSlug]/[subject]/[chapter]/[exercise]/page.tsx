@@ -4,6 +4,7 @@ import type { PdfSummary } from "@/lib/shared-types";
 
 import { ExercisePageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull, pdfUrl } from "@/lib/api-client";
+import { boardDisplayTitle } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -104,6 +105,8 @@ export default async function ExercisePage({
     board, classSlug, subject, chapter, exercise, questions,
   );
 
+  const classNum = parseInt(classSlug, 10) || 0;
+
   return (
     <ExercisePageContent
       board={board}
@@ -111,7 +114,7 @@ export default async function ExercisePage({
       subject={subject}
       chapter={chapter}
       exercise={exercise}
-      boardTitle={data.board?.title ?? "Board"}
+      boardTitle={boardDisplayTitle(data.board?.title ?? "Board", board, classNum)}
       classTitle={data.class?.title ?? "Class"}
       subjectTitle={data.subject?.title ?? "Subject"}
       chapterTitle={data.chapter?.title ?? "Chapter"}

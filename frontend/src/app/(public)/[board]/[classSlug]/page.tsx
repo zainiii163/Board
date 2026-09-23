@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { ClassPageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull } from "@/lib/api-client";
+import { boardDisplayTitle } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ board: st
   const { board, classSlug } = await params;
   const data = await apiFetchOrNull<ClassData>(`/api/boards/${board}/classes/${classSlug}`);
   if (!data?.class) return { title: "Class Not Found" };
-  const boardTitle = data.board?.title ?? "Board";
+  const classNum = parseInt(classSlug, 10) || 0;
+  const boardTitle = boardDisplayTitle(data.board?.title ?? "Board", board, classNum);
   return {
     title: `${data.class.title} - ${boardTitle} | BoardNotes`,
     description: `Browse all subjects for ${data.class.title} under ${boardTitle}. Notes, textbooks, past papers, and solved exercises.`,
@@ -36,11 +38,13 @@ export default async function ClassPage({
   const klass = data?.class;
   if (!data || !klass) notFound();
 
+  const classNum = parseInt(classSlug, 10) || 0;
+
   return (
     <ClassPageContent
       board={board}
       classSlug={classSlug}
-      boardTitle={data.board?.title ?? "Board"}
+      boardTitle={boardDisplayTitle(data.board?.title ?? "Board", board, classNum)}
       classTitle={klass.title}
       subjects={klass.subjects}
       initialView={view === "books" ? "books" : "notes"}

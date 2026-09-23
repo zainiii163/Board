@@ -3,6 +3,7 @@ import type { PdfSummary } from "@/lib/shared-types";
 
 import { QuestionPageView } from "@/components/content/question-page-view";
 import { apiFetchOrNull } from "@/lib/api-client";
+import { boardDisplayTitle } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,7 @@ export default async function QuestionPage({
   const pagePath = `/${board}/${classSlug}/${subject}/${chapter}/${exercise}/q/${questionNum}`;
   const pageTitle = `${data.exercise?.title ?? "Exercise"} — Question ${data.question.num}`;
   const questionRef = `${data.chapter?.title ?? chapter} / ${data.exercise?.title ?? exercise} / Q${data.question.num}`;
+  const classNum = parseInt(classSlug, 10) || 0;
 
   return (
     <QuestionPageView
@@ -56,7 +58,7 @@ export default async function QuestionPage({
       subject={subject}
       chapter={chapter}
       exercise={exercise}
-      boardTitle={data.board?.title ?? "Board"}
+      boardTitle={boardDisplayTitle(data.board?.title ?? "Board", board, classNum)}
       classTitle={data.class?.title ?? "Class"}
       subjectTitle={data.subject?.title ?? "Subject"}
       chapterTitle={data.chapter?.title ?? "Chapter"}

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { ChapterPageContent } from "@/components/content/hierarchy-pages";
 import { apiFetchOrNull } from "@/lib/api-client";
+import { boardDisplayTitle } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -48,13 +49,15 @@ export default async function ChapterPage({
   );
   if (!data) notFound();
 
+  const classNum = parseInt(classSlug, 10) || 0;
+
   return (
     <ChapterPageContent
       board={board}
       classSlug={classSlug}
       subject={subject}
       chapter={chapter}
-      boardTitle={data.board?.title ?? "Board"}
+      boardTitle={boardDisplayTitle(data.board?.title ?? "Board", board, classNum)}
       classTitle={data.class?.title ?? "Class"}
       subjectTitle={data.subject?.title ?? "Subject"}
       chapterTitle={data.chapter.title}

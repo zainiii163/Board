@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { LocalizedBreadcrumbs } from "@/components/layout/localized-breadcrumbs";
 import { AdBanner } from "@/components/portal/ad-banner";
+import { BookmarkButton } from "@/components/content/bookmark-button";
 
 export const dynamic = "force-dynamic";
 
@@ -67,25 +68,41 @@ export default function ALevelPage() {
           exam-style MCQ practice for every major syllabus. This section is being expanded with higher-quality
           covers, PDFs and generated notes as they arrive.
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Link
-            href="/online-quizzes"
-            className="rounded-full bg-accent px-4 py-2 text-xs font-bold text-white transition hover:opacity-90"
-          >
-            MCQ Practice →
-          </Link>
-          <Link
-            href="/categories/cambridge-intl-notes"
-            className="rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
-          >
-            Cambridge International library →
-          </Link>
-          <Link
-            href="/test-generator"
-            className="rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
-          >
-            Test Generator →
-          </Link>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/online-quizzes"
+              className="rounded-full bg-accent px-4 py-2 text-xs font-bold text-white transition hover:opacity-90"
+            >
+              MCQ Practice →
+            </Link>
+            <Link
+              href="/categories/cambridge-intl-notes"
+              className="rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
+            >
+              Cambridge International library →
+            </Link>
+            <Link
+              href="/past-papers"
+              className="rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
+            >
+              Past Papers →
+            </Link>
+            <Link
+              href="/test-generator"
+              className="rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
+            >
+              Test Generator →
+            </Link>
+          </div>
+          <BookmarkButton title="A Level Notes & Books" path="/a-level" />
+        </div>
+        <div className="mt-4 rounded-2xl border border-accent/30 bg-accent/5 p-4">
+          <h2 className="text-xs font-bold uppercase tracking-[0.16em] text-accent">Quick Answer</h2>
+          <p className="mt-1.5 text-sm leading-6 text-foreground/90">
+            Free Cambridge AS / A Level notes and book PDFs for Year 12–13, organised by syllabus code, with topical
+            past papers and exam-style MCQ practice — bookmark this page for direct access during revision.
+          </p>
         </div>
       </div>
 
@@ -161,21 +178,52 @@ export default function ALevelPage() {
 
       {/* Subjects */}
       <div className="mt-10">
-        <h2 className="text-lg font-black text-foreground">A Level subjects</h2>
+        <h2 className="text-lg font-black text-foreground" id="subjects">A Level subjects</h2>
         <p className="mt-1 text-sm text-muted">
           Cambridge syllabus codes shown. Each subject links to the Cambridge library — notes, books and papers for
-          that course.
+          that course. Anchor any subject with #subject-slug (e.g. #physics) to share a direct jump link.
         </p>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {A_LEVEL_SUBJECTS.map((s) => (
             <Link
               key={s.slug}
+              id={s.slug}
               href="/categories/cambridge-intl-notes"
-              className="group rounded-xl border border-border bg-card p-4 transition hover:border-accent/40 hover:shadow-sm"
+              className="group scroll-mt-24 rounded-xl border border-border bg-card p-4 transition hover:border-accent/40 hover:shadow-sm"
             >
               <span className="text-lg">{s.icon}</span>
               <p className="mt-1.5 text-sm font-bold text-foreground group-hover:text-accent">{s.title}</p>
               <p className="text-[11px] font-semibold text-accent">Notes &amp; books →</p>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Topical past papers */}
+      <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-black text-foreground">A Level topical past papers</h2>
+            <p className="mt-1 text-sm text-muted">
+              Drill by syllabus topic — newest papers first, mark schemes included as packs are uploaded.
+            </p>
+          </div>
+          <Link
+            href="/past-papers"
+            className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
+          >
+            All past papers →
+          </Link>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+          {A_LEVEL_SUBJECTS.slice(0, 8).map((s) => (
+            <Link
+              key={`pp-${s.slug}`}
+              href="/past-papers"
+              className="group rounded-xl border border-border bg-background px-3.5 py-3 transition hover:border-accent/50 hover:shadow-sm"
+            >
+              <p className="truncate text-xs font-bold text-foreground group-hover:text-accent">{s.title}</p>
+              <p className="mt-0.5 text-[11px] font-semibold text-accent">Topical papers →</p>
             </Link>
           ))}
         </div>
@@ -238,6 +286,11 @@ export default function ALevelPage() {
           Combine our topical papers with the test generator to simulate real exam conditions — timed, scored, and
           reviewed instantly after each attempt.
         </p>
+      </div>
+
+      <div className="mt-8 rounded-xl border border-border bg-background px-4 py-3 text-xs leading-5 text-muted">
+        BoardNotes is an independent study resource and is not affiliated with, endorsed by, or connected to
+        Cambridge Assessment International Education.
       </div>
 
       <div className="mt-8">
