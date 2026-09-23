@@ -371,7 +371,8 @@ function pushResource(input: {
   const category = categories.find((c) => c.slug === input.categorySlug) ?? categories[0];
   const dayOffset = intBetween(1, 75);
   const added = new Date(Date.now() - dayOffset * 86400000 - intBetween(0, 20) * 3600000).toISOString();
-  const fileUrl = null;
+  const fileUrl = SAMPLE_PDFS[fileIndex % SAMPLE_PDFS.length];
+  fileIndex += 1;
   const board = input.board ?? pick(BOARD_TAGS);
   const classLabel = input.classLabel ?? (category.name.match(/\d+/) ? `Class ${category.name.match(/\d+/)![0]}` : null);
   const classNum = classLabel ? parseInt(classLabel.replace(/\D/g, "")) : null;
