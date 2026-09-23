@@ -22,6 +22,10 @@ type CategoryDetail = {
 
 const BOARD_BOOK_SLUGS = new Set(Object.values(BOARD_TEXTBOOK_CATEGORY));
 
+function isBoardBookCategory(slug: string): boolean {
+  return BOARD_BOOK_SLUGS.has(slug) || slug.endsWith("-text-books");
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -31,7 +35,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   const { category, trail, children, siblings, resources } = data;
   // On board textbook pages, don't cross-link to other boards.
-  const showSiblings = !BOARD_BOOK_SLUGS.has(category.slug);
+  const showSiblings = !isBoardBookCategory(category.slug);
 
   return (
     <div>
