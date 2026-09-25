@@ -57,22 +57,29 @@ function parseClassName(className: string) {
 let bookIdCounter = 1;
 let pastPaperIdCounter = 1;
 
-const books: BookRecord[] = BOOKS.map((book) => {
+const MEMORY_BOOK_PDFS = [
+  "/demo-pdfs/textbook-math-9.pdf",
+  "/demo-pdfs/textbook-physics-9.pdf",
+  "/demo-pdfs/textbook-chemistry-9.pdf",
+];
+
+const books: BookRecord[] = BOOKS.map((book, index) => {
   const board = boardMeta[book.board] ?? { slug: slugify(book.board), title: book.board };
   const classSlug = parseClassName(book.className);
+  const isMath = book.title.toLowerCase().includes("math");
   return {
     id: bookIdCounter++,
     boardSlug: board.slug,
     boardTitle: board.title,
     classSlug,
     classTitle: book.className,
-    subjectSlug: book.title.toLowerCase().includes("math") ? "mathematics" : null,
-    subjectTitle: book.title.toLowerCase().includes("math") ? "Mathematics" : null,
+    subjectSlug: isMath ? "mathematics" : null,
+    subjectTitle: isMath ? "Mathematics" : null,
     title: book.title,
     priceLabel: book.price,
     coverUrl: null,
-    pdfUrl: null,
-    notesPath: book.title.toLowerCase().includes("math") ? `/${board.slug}/${classSlug}/mathematics` : null,
+    pdfUrl: MEMORY_BOOK_PDFS[index % MEMORY_BOOK_PDFS.length],
+    notesPath: isMath ? `/${board.slug}/${classSlug}/mathematics` : null,
   };
 });
 
@@ -94,8 +101,13 @@ const pastPapers: PastPaperRecord[] = PAST_PAPERS.map((paper) => {
 });
 
 export const resourcesStore = {
-  listBooks: (boardSlug?: string) =>
-    boardSlug ? books.filter((b) => b.boardSlug === boardSlug) : [...books],
+  listBooks: (filters: { boardSlug?: string; classSlug?: string; subjectSlug?: string } = {}) =>
+    books.filter((b) => {
+      if (filters.boardSlug && b.boardSlug !== filters.boardSlug) return false;
+      if (filters.classSlug && b.classSlug !== filters.classSlug) return false;
+      if (filters.subjectSlug && (b.subjectSlug ?? "") !== filters.subjectSlug) return false;
+      return true;
+    }),
 
   getBook: (id: number) => books.find((b) => b.id === id) ?? null,
 

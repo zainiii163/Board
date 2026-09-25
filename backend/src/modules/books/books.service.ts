@@ -5,6 +5,7 @@ import * as schema from "../../db/schema.js";
 import { useDb } from "../../db/mode.js";
 import { resourcesStore, type BookRecord } from "../../store/resources-store.js";
 import { ApiError } from "../../utils/api-error.js";
+import { savePdfUpload } from "../pdfs/pdfs.service.js";
 
 function mapBookRow(row: typeof schema.books.$inferSelect): BookRecord {
   return {
@@ -23,13 +24,23 @@ function mapBookRow(row: typeof schema.books.$inferSelect): BookRecord {
   };
 }
 
-export async function listBooks(boardSlug?: string): Promise<BookRecord[]> {
+export type BookFilters = {
+  boardSlug?: string;
+  classSlug?: string;
+  subjectSlug?: string;
+};
+
+export async function listBooks(filters: BookFilters = {}): Promise<BookRecord[]> {
   if (useDb()) {
     const rows = await db.select().from(schema.books);
-    const mapped = rows.map(mapBookRow);
-    return boardSlug ? mapped.filter((b) => b.boardSlug === boardSlug) : mapped;
+    return rows.map(mapBookRow).filter((b) => {
+      if (filters.boardSlug && b.boardSlug !== filters.boardSlug) return false;
+      if (filters.classSlug && b.classSlug !== filters.classSlug) return false;
+      if (filters.subjectSlug && (b.subjectSlug ?? "") !== filters.subjectSlug) return false;
+      return true;
+    });
   }
-  return resourcesStore.listBooks(boardSlug);
+  return resourcesStore.listBooks(filters);
 }
 
 export async function getBook(id: number): Promise<BookRecord> {
@@ -97,4 +108,11 @@ export async function deleteBook(id: number) {
   }
   if (!resourcesStore.deleteBook(id)) throw ApiError.notFound("Book not found.");
   return { deleted: true };
+}
+
+/** Store an uploaded PDF and link it to the book (easy per-class book attach). */
+export async function attachBookPdf(id: number, filename: string, buffer: Buffer): Promise<BookRecord> {
+  await getBook(id);
+  const saved = await savePdfUpload(filename, buffer);
+  return updateBook(id, { pdfUrl: saved.url });
 }

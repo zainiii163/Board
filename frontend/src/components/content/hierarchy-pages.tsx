@@ -49,7 +49,6 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
   });
 
   const notesClasses = uniqueClasses;
-  const booksCategory = boardTextbookCategory(board);
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -163,7 +162,7 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
                     <p className="mt-1 text-sm text-muted">Official textbooks in PDF — read online or download.</p>
                   </div>
                   <Link
-                    href={`/categories/${booksCategory}`}
+                    href={`/${board}/${klass.slug}?view=books`}
                     className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
                   >
                     Click More →
@@ -178,7 +177,7 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
                       return (
                         <Link
                           key={`book-${klass.slug}-${subject.slug}`}
-                          href={`/categories/${booksCategory}`}
+                          href={`/${board}/books/${klass.slug}/${subject.slug}`}
                           className="group"
                         >
                           <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
@@ -362,7 +361,7 @@ export function ClassPageContent({
               subjects.map((subject) => {
                 const cover = getBookCover(board, classNum, subject.title);
                 return (
-                  <Link key={`bk-${subject.slug}`} href={`/categories/${booksCategory}`} className="group">
+                  <Link key={`bk-${subject.slug}`} href={`/${board}/books/${classSlug}/${subject.slug}`} className="group">
                     <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
                       {cover ? (
                         <Image

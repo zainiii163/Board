@@ -11,5 +11,6 @@ const staff = [requireAuth, requireRole("admin", "editor", "teacher")] as const;
 booksRouter.get("/", controller.list);
 booksRouter.get("/:id", controller.getById);
 booksRouter.post("/", ...staff, controller.create);
+booksRouter.post("/:id/pdf", ...staff, controller.uploadMiddleware, controller.attachPdf);
 booksRouter.put("/:id", ...staff, controller.update);
 booksRouter.delete("/:id", requireAuth, requireRole("admin", "editor"), controller.remove);

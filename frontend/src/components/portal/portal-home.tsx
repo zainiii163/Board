@@ -7,6 +7,7 @@ import { ACADEMIC_YEAR } from "@/lib/constants";
 import { CategoryCard } from "@/components/portal/category-card";
 import { ResourceCard } from "@/components/portal/resource-card";
 import { AdBanner } from "@/components/portal/ad-banner";
+import { BoardCoverSections, type HomeBoardSection } from "@/components/portal/board-cover-sections";
 import { type PortalCategory, type PortalResource } from "@/components/portal/portal-types";
 
 type Props = {
@@ -14,9 +15,10 @@ type Props = {
   latest: PortalResource[] | null;
   trending: PortalResource[] | null;
   categoryNameById: Record<string, string>;
+  boardSections: HomeBoardSection[];
 };
 
-export function PortalHome({ categories, latest, trending, categoryNameById }: Props) {
+export function PortalHome({ categories, latest, trending, categoryNameById, boardSections }: Props) {
   const { tr } = useLocale();
 
   return (
@@ -69,6 +71,9 @@ export function PortalHome({ categories, latest, trending, categoryNameById }: P
           </svg>
         </div>
       </section>
+
+      {/* ─── Board cover sections (Study++ style) ─── */}
+      <BoardCoverSections sections={boardSections} />
 
       {/* ─── Categories ─── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">

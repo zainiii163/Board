@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { apiAuthFetch, apiDelete, apiPost, apiPut } from "@/lib/api-client";
+import { apiAuthFetch, apiDelete, apiPost, apiPut, apiUploadFile } from "@/lib/api-client";
 
 type Book = {
   id: number;
@@ -90,6 +90,11 @@ export default function ManageBooksPage() {
     await load();
   }
 
+  async function attachPdf(id: number, file: File) {
+    await apiUploadFile<Book>(`/api/books/${id}/pdf`, file);
+    await load();
+  }
+
   return (
     <div>
       <h1 className="font-serif text-3xl font-black text-foreground">Manage Books</h1>
@@ -131,7 +136,25 @@ export default function ManageBooksPage() {
                   {book.boardTitle} • {book.classTitle} • {book.priceLabel}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`text-[10px] font-bold uppercase tracking-wider ${book.pdfUrl ? "text-emerald-600" : "text-amber-600"}`}
+                >
+                  {book.pdfUrl ? "PDF attached" : "No PDF"}
+                </span>
+                <label className="cursor-pointer text-xs font-semibold text-accent hover:underline">
+                  {book.pdfUrl ? "Replace PDF" : "Attach PDF"}
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void attachPdf(book.id, file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
                 <button type="button" onClick={() => startEdit(book)} className="text-xs font-semibold text-accent">Edit</button>
                 <button type="button" onClick={() => remove(book.id)} className="text-xs font-semibold text-red-600">Delete</button>
               </div>

@@ -120,6 +120,40 @@ const CLASS_TITLES: Record<number, string> = {
   9: "Class 9", 10: "Class 10", 11: "Class 11", 12: "Class 12",
 };
 
+// Demo PDFs so every seeded book has a working Download/Read button.
+// Replace with real textbook PDFs via POST /api/books/:id/pdf.
+const SAMPLE_BOOK_PDFS = [
+  "/demo-pdfs/textbook-math-9.pdf",
+  "/demo-pdfs/textbook-physics-9.pdf",
+  "/demo-pdfs/textbook-chemistry-9.pdf",
+  "/demo-pdfs/9th-biology-notes.pdf",
+  "/demo-pdfs/9th-english-notes.pdf",
+  "/demo-pdfs/9th-urdu-notes.pdf",
+  "/demo-pdfs/10th-biology-notes.pdf",
+  "/demo-pdfs/10th-chemistry-notes.pdf",
+  "/demo-pdfs/10th-english-notes.pdf",
+  "/demo-pdfs/10th-maths-notes.pdf",
+  "/demo-pdfs/10th-physics-notes.pdf",
+  "/demo-pdfs/11th-chemistry-notes.pdf",
+  "/demo-pdfs/11th-maths-notes.pdf",
+  "/demo-pdfs/11th-physics-notes.pdf",
+  "/demo-pdfs/12th-physics-notes.pdf",
+];
+
+const SUBJECT_PDF_HINTS: { match: RegExp; file: string }[] = [
+  { match: /math/i, file: "/demo-pdfs/textbook-math-9.pdf" },
+  { match: /physics/i, file: "/demo-pdfs/textbook-physics-9.pdf" },
+  { match: /chemistry/i, file: "/demo-pdfs/textbook-chemistry-9.pdf" },
+  { match: /biolog/i, file: "/demo-pdfs/9th-biology-notes.pdf" },
+  { match: /english/i, file: "/demo-pdfs/9th-english-notes.pdf" },
+  { match: /urdu/i, file: "/demo-pdfs/9th-urdu-notes.pdf" },
+];
+
+function samplePdfFor(subject: string, index: number): string {
+  const hint = SUBJECT_PDF_HINTS.find((h) => h.match.test(subject));
+  return hint?.file ?? SAMPLE_BOOK_PDFS[index % SAMPLE_BOOK_PDFS.length];
+}
+
 export async function seedBookCovers() {
   // Ensure cover_url column exists on books table
   try {
@@ -131,6 +165,7 @@ export async function seedBookCovers() {
   const existing = await db.select({ id: schema.books.id }).from(schema.books).limit(1);
   if (existing.length > 0) {
     console.log("[db] Books already seeded — skipping cover seed.");
+    await backfillBookPdfs();
     return;
   }
 
@@ -159,6 +194,8 @@ export async function seedBookCovers() {
           subjectTitle: subject,
           title,
           coverUrl: coverPath,
+          pdfUrl: samplePdfFor(subject, count),
+          notesPath: `/${board.slug}/${classSlug}/${subjectSlug}`,
         });
         count++;
       }
@@ -166,4 +203,23 @@ export async function seedBookCovers() {
   }
 
   console.log(`[db] Seeded ${count} books with real covers.`);
+}
+
+/** Books without a PDF get a demo PDF so Download/Read buttons always work. */
+async function backfillBookPdfs() {
+  const rows = await db
+    .select({ id: schema.books.id, subjectTitle: schema.books.subjectTitle })
+    .from(schema.books)
+    .where(sql`pdf_url IS NULL`);
+  if (rows.length === 0) return;
+
+  let index = 0;
+  for (const row of rows) {
+    await db
+      .update(schema.books)
+      .set({ pdfUrl: samplePdfFor(row.subjectTitle ?? "", index) })
+      .where(sql`id = ${row.id}`);
+    index++;
+  }
+  console.log(`[db] Backfilled demo PDFs on ${rows.length} books.`);
 }
