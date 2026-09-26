@@ -360,23 +360,26 @@ export function ClassPageContent({
             ) : (
               subjects.map((subject) => {
                 const cover = getBookCover(board, classNum, subject.title);
+                const label = `${classSlug} ${subject.title}`;
                 return (
-                  <Link key={`bk-${subject.slug}`} href={`/${board}/books/${classSlug}/${subject.slug}`} className="group">
-                    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
-                      {cover ? (
-                        <Image
-                          src={cover}
-                          alt={`${classTitle} ${subject.title}`}
-                          width={200}
-                          height={260}
-                          className="aspect-[3/4] w-full object-cover"
-                        />
-                      ) : (
-                        <CoverArt title={`${classTitle} ${subject.title}`} className="aspect-[3/4] w-full" />
-                      )}
-                    </div>
-                    <p className="mt-2 text-center text-xs font-semibold text-foreground group-hover:text-accent">
-                      {subject.title}
+                  <Link
+                    key={`bk-${subject.slug}`}
+                    href={`/${board}/books/${classSlug}/${subject.slug}`}
+                    className="group relative block overflow-hidden rounded-md border border-border shadow-sm transition hover:grayscale-[60%]"
+                  >
+                    {cover ? (
+                      <Image
+                        src={cover}
+                        alt={`${classTitle} ${subject.title}`}
+                        width={200}
+                        height={300}
+                        className="aspect-[2/3] w-full object-cover"
+                      />
+                    ) : (
+                      <CoverArt title={`${classTitle} ${subject.title}`} className="aspect-[2/3] w-full" />
+                    )}
+                    <p className="absolute inset-x-0 bottom-0 bg-accent p-1 text-center text-xs font-bold text-white underline">
+                      {label}
                     </p>
                   </Link>
                 );
@@ -386,7 +389,7 @@ export function ClassPageContent({
           <div className="mt-6">
             <Link
               href={`/categories/${booksCategory}`}
-              className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm font-bold text-accent transition hover:bg-accent hover:text-white"
+              className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-3 py-1.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
             >
               Browse all {classTitle} books →
             </Link>
@@ -476,17 +479,31 @@ export function SubjectPageContent({
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-      <LocalizedBreadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: displayTitle, href: `/${board}` },
-          { label: classTitle, href: `/${board}/${classSlug}` },
-          { label: subjectTitle },
-        ]}
-      />
+      {/* Detail hero — Study++ style */}
+      <div className="hero-band -mx-4 -mt-10 sm:-mx-6 lg:-mx-8">
+        <div className="px-4 py-8 sm:px-6 lg:px-8">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-white/70 md:text-left">
+            {displayTitle} · {classTitle}
+          </p>
+          <h1 className="mt-1 text-center text-3xl font-black text-white sm:text-4xl md:text-left">
+            {classTitle} {subjectTitle} Notes {short}
+          </h1>
+        </div>
+      </div>
 
-      {/* Header — simple, studyplusplus-style */}
-      <div className="mt-6">
+      <div className="mt-5">
+        <LocalizedBreadcrumbs
+          items={[
+            { label: "Home", href: "/" },
+            { label: displayTitle, href: `/${board}` },
+            { label: classTitle, href: `/${board}/${classSlug}` },
+            { label: subjectTitle },
+          ]}
+        />
+      </div>
+
+      {/* Header chips + bookmark */}
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
           <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {displayTitle}</span>
           <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🎓 {classTitle}</span>
@@ -496,15 +513,7 @@ export function SubjectPageContent({
           )}
           <span className="rounded-full border border-border bg-card px-2.5 py-0.5">{ACADEMIC_YEAR}</span>
         </div>
-        <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">{tr("subjectLabel")}</p>
-            <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">
-              {classTitle} {subjectTitle} Notes {short}
-            </h1>
-          </div>
-          <BookmarkButton title={`${classTitle} ${subjectTitle} · ${displayTitle}`} path={`/${board}/${classSlug}/${subject}`} />
-        </div>
+        <BookmarkButton title={`${classTitle} ${subjectTitle} · ${displayTitle}`} path={`/${board}/${classSlug}/${subject}`} />
       </div>
 
       {/* Quick Answer */}

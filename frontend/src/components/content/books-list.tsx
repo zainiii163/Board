@@ -36,7 +36,7 @@ export function BooksList({ books }: { books: BookItem[] }) {
               <h2 className="mt-2 text-xl font-bold text-foreground">{book.title}</h2>
               <p className="mt-2 text-sm text-muted">{book.classTitle}</p>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <span className="rounded-full bg-accent/15 px-2 py-1 text-xs font-semibold text-accent">
+                <span className="rounded-md bg-accent px-2 py-1 text-xs font-bold text-white underline">
                   {book.priceLabel}
                 </span>
                 <div className="flex flex-wrap items-center gap-3">
@@ -44,7 +44,10 @@ export function BooksList({ books }: { books: BookItem[] }) {
                     <DownloadGate url={pdfUrl(book.pdfUrl)} label={tr("downloadPdf")} compact />
                   )}
                   {book.notesPath && (
-                    <Link href={book.notesPath} className="text-sm font-semibold text-accent hover:underline">
+                    <Link
+                      href={book.notesPath}
+                      className="rounded-md border-2 border-accent/40 px-2 py-1 text-sm font-semibold text-accent underline transition hover:bg-accent hover:text-white"
+                    >
                       {tr("viewNotes")}
                     </Link>
                   )}

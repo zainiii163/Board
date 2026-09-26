@@ -294,6 +294,20 @@ a {
     radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 70%);
 }
 
+/* Study++-style detail page hero band: gradient + light pattern */
+.hero-band {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.10) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+    linear-gradient(135deg, #065f56 0%, #0D9488 35%, #059669 65%, #047857 100%);
+}
+html.dark .hero-band {
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.06) 0%, transparent 50%),
+    linear-gradient(135deg, #042f2e 0%, #0f766e 40%, #065f46 70%, #0f172a 100%);
+}
+
 /* Animated gradient border */
 .gradient-border {
   position: relative;

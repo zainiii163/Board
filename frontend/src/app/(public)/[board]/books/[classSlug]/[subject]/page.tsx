@@ -76,7 +76,6 @@ export default async function BookDetailPage({ params }: PageProps) {
   const classNum = parseInt(classSlug, 10) || 0;
   const subjectTitle = book?.subjectTitle ?? prettifySubject(subject);
   const boardTitle = boardDisplayTitle(book?.boardTitle ?? "Board", board, classNum);
-  const short = boardShortName(board, classNum);
   const classTitle = book?.classTitle ?? `Class ${classSlug}`;
   const cover = resolveCover(book, board, classNum, subjectTitle);
   const fileUrl = book?.pdfUrl ?? null;
@@ -87,7 +86,19 @@ export default async function BookDetailPage({ params }: PageProps) {
 
   return (
     <div>
-      <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
+      {/* Detail hero — Study++ style */}
+      <section className="hero-band">
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.16em] text-white/70 md:text-left">
+            {boardTitle}
+          </p>
+          <h1 className="mt-2 text-center font-serif text-2xl font-bold text-white sm:text-3xl md:text-left">
+            {subjectTitle} Book — {classTitle}
+          </h1>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-6xl px-4 pt-5 sm:px-6 lg:px-8">
         <LocalizedBreadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -117,22 +128,14 @@ export default async function BookDetailPage({ params }: PageProps) {
           </div>
 
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">{boardTitle}</p>
-            <h1 className="mt-2 font-serif text-2xl font-bold leading-tight text-foreground sm:text-3xl">
-              {subjectTitle} Book — {classTitle}
-            </h1>
-            <p className="mt-2 text-sm text-muted">
-              {book?.boardTitle ?? boardTitle} • {short} • {ACADEMIC_YEAR}
-            </p>
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-card px-3 py-1 text-xs font-bold text-foreground ring-1 ring-border">
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-md bg-accent px-2.5 py-1 text-xs font-bold text-white underline">
                 {book?.priceLabel ?? "Free PDF"}
               </span>
-              <span className="rounded-full bg-card px-3 py-1 text-xs font-bold text-foreground ring-1 ring-border">
+              <span className="rounded-md border-2 border-accent/40 px-2.5 py-1 text-xs font-bold text-accent underline">
                 Textbook
               </span>
-              <span className="rounded-full bg-card px-3 py-1 text-xs font-bold text-foreground ring-1 ring-border">
+              <span className="rounded-md border-2 border-accent/40 px-2.5 py-1 text-xs font-bold text-accent underline">
                 {boardShortName(board, classNum)}
               </span>
             </div>
@@ -142,7 +145,7 @@ export default async function BookDetailPage({ params }: PageProps) {
                 <DownloadGate url={pdfUrl(fileUrl)} showAd={false} />
                 <a
                   href="#pdf-reader"
-                  className="inline-flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-5 py-3 text-sm font-bold text-accent transition hover:bg-accent/20"
+                  className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-4 py-2.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
                 >
                   Read Online
                 </a>
@@ -157,7 +160,7 @@ export default async function BookDetailPage({ params }: PageProps) {
             <div className="mt-4">
               <Link
                 href={notesHref}
-                className="text-sm font-bold text-accent transition hover:underline"
+                className="inline-flex items-center gap-2 rounded-md border-2 border-accent/40 px-3 py-1.5 text-sm font-semibold text-accent underline transition hover:bg-accent hover:text-white"
               >
                 📝 Chapter-wise notes for {subjectTitle} {classSlug} →
               </Link>

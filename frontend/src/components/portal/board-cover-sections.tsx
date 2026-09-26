@@ -22,25 +22,25 @@ export function BoardCoverSections({ sections }: Props) {
   if (sections.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-6xl space-y-14 px-4 pt-14 sm:px-6 lg:px-8" aria-label="Boards">
+    <section className="mx-auto max-w-6xl space-y-8 px-4 pt-14 sm:px-6 lg:px-8" aria-label="Boards">
       {sections.map((board) => {
         const classNum = parseInt(board.featuredClassSlug, 10) || 0;
         return (
-          <div key={board.slug}>
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <h2 className="font-serif text-2xl font-black text-foreground sm:text-3xl">
+          <div key={board.slug} className="py-2">
+            <div className="mb-3 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <h2 className="font-serif text-xl font-black text-foreground sm:text-2xl">
                 {board.title}{" "}
                 <span className="text-accent">({board.classNumbers.join(",")})</span>
               </h2>
               <Link
                 href={`/${board.slug}`}
-                className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
+                className="flex-grow-0 rounded-md border-2 border-accent px-2 py-1 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
               >
-                Click More →
+                Click More
               </Link>
             </div>
 
-            <div className="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
               {board.subjects.map((subject) => {
                 const cover = getBookCover(board.slug, classNum, subject.title);
                 const label = `${board.featuredClassSlug} ${subject.title}`;
@@ -48,22 +48,20 @@ export function BoardCoverSections({ sections }: Props) {
                   <Link
                     key={subject.slug}
                     href={`/${board.slug}/${board.featuredClassSlug}/${subject.slug}`}
-                    className="group"
+                    className="group relative block overflow-hidden rounded-md border border-border transition hover:grayscale-[60%]"
                   >
-                    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
-                      {cover ? (
-                        <Image
-                          src={cover}
-                          alt={`${label} book cover`}
-                          width={200}
-                          height={267}
-                          className="aspect-[3/4] w-full object-cover"
-                        />
-                      ) : (
-                        <CoverArt title={label} className="aspect-[3/4] w-full" />
-                      )}
-                    </div>
-                    <p className="mt-2 text-center text-xs font-semibold text-foreground group-hover:text-accent">
+                    {cover ? (
+                      <Image
+                        src={cover}
+                        alt={`${label} book cover`}
+                        width={200}
+                        height={300}
+                        className="aspect-[2/3] w-full object-cover"
+                      />
+                    ) : (
+                      <CoverArt title={label} className="aspect-[2/3] w-full" />
+                    )}
+                    <p className="absolute inset-x-0 bottom-0 bg-accent p-1 text-center text-xs font-bold text-white underline">
                       {label}
                     </p>
                   </Link>
