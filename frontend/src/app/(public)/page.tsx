@@ -1,4 +1,5 @@
 import { apiFetchOrNull } from "@/lib/api-client";
+import { getBookCover } from "@/lib/book-covers";
 import { PortalHome } from "@/components/portal/portal-home";
 import { type HomeBoardSection } from "@/components/portal/board-cover-sections";
 import {
@@ -23,6 +24,11 @@ type BoardDetail = {
   classes: { slug: string; title: string; subjects?: { slug: string; title: string }[] }[];
 };
 
+function countCovers(boardSlug: string, klass: BoardDetail["classes"][number]): number {
+  const classNum = parseInt(klass.slug, 10) || 0;
+  return (klass.subjects ?? []).filter((subject) => getBookCover(boardSlug, classNum, subject.title)).length;
+}
+
 export const dynamic = "force-dynamic";
 
 function buildSection(board: BoardDetail): HomeBoardSection | null {
@@ -44,6 +50,9 @@ function buildSection(board: BoardDetail): HomeBoardSection | null {
   const withSubjects = classes
     .filter((klass) => (klass.subjects?.length ?? 0) > 0)
     .sort((a, b) => {
+      const coverA = countCovers(board.slug, a);
+      const coverB = countCovers(board.slug, b);
+      if (coverA !== coverB) return coverB - coverA;
       const countDiff = (b.subjects?.length ?? 0) - (a.subjects?.length ?? 0);
       if (countDiff !== 0) return countDiff;
       return (classNumberBySlug.get(b.slug) ?? 0) - (classNumberBySlug.get(a.slug) ?? 0);

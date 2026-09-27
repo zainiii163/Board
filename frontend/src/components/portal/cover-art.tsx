@@ -22,14 +22,15 @@ export function coverGradient(value: string) {
 }
 
 export function coverInitial(title: string) {
-  const clean = title.replace(/^(9th|10th|11th|12th|Class|Textbook)\s+/gi, "").trim();
+  const clean = title.replace(/^(9th|10th|11th|12th|\d{1,2}|Class|Textbook)\s+/gi, "").trim();
   const letter = clean.charAt(0);
   return /[a-zA-Z0-9]/.test(letter) ? letter.toUpperCase() : "📘";
 }
 
 export function coverLabel(title: string) {
   const clean = title
-    .replace(/^(9th|10th|11th|12th)\s+Class\s*/gi, "")
+    .replace(/^(9th|10th|11th|12th|\d{1,2})\s+Class\s*/gi, "")
+    .replace(/^(9th|10th|11th|12th|\d{1,2})\s+(?=[A-Za-z])/gi, "")
     .replace(/\s+(PDF|Notes|Book|Guide|Papers?|Scheme|Tests?|MCQs|Bank|Worksheets?)$/gi, "");
   return clean.trim();
 }
