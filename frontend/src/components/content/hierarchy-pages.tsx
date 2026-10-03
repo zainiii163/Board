@@ -327,14 +327,25 @@ export function ClassPageContent({
               <p className="text-sm text-muted md:col-span-2 xl:col-span-3">{tr("noSubjectsYet")}</p>
             ) : (
               subjects.map((subject) => {
+                const cover = getBookCover(board, classNum, subject.title);
                 return (
                   <Link
                     key={subject.slug}
                     href={`/${board}/${classSlug}/${subject.slug}`}
                     className="group rounded-2xl border border-border bg-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md animate-fade-in-up"
                   >
-                    <span className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-lg text-accent transition group-hover:bg-accent group-hover:text-white">
-                      📖
+                    <span className="mb-3 flex h-16 w-11 items-center justify-center overflow-hidden rounded-md border border-border bg-accent/10 shadow-sm transition group-hover:border-accent/40">
+                      {cover ? (
+                        <Image
+                          src={cover}
+                          alt={`${subject.title} book cover`}
+                          width={44}
+                          height={64}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-lg text-accent">📖</span>
+                      )}
                     </span>
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{tr("subjectLabel")}</p>
                     <h2 className="mt-1 text-lg font-black text-foreground transition-colors group-hover:text-accent">{subject.title}</h2>
