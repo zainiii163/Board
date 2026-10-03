@@ -1,4 +1,5 @@
 import { Header } from "@/components/layout/header";
+import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
 import { Footer } from "@/components/layout/footer";
 import { PlatformIntro } from "@/components/layout/platform-intro";
 import { ProfessionalContent } from "@/components/layout/professional-content";
@@ -7,7 +8,6 @@ import { PwaInstallPrompt } from "@/components/layout/pwa-install-prompt";
 import { OfflineBanner } from "@/components/layout/offline-banner";
 import { ServiceWorkerRegister } from "@/components/layout/service-worker-register";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
-import { FloatingDarkToggle } from "@/components/layout/floating-dark-toggle";
 
 export default function PublicLayout({
   children,
@@ -20,13 +20,13 @@ export default function PublicLayout({
       <SearchShortcut />
       <Header />
       <OfflineBanner />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-20 lg:pb-0">{children}</main>
       <PlatformIntro />
       <ProfessionalContent />
       <Footer />
       <PwaInstallPrompt />
       <WhatsAppButton />
-      <FloatingDarkToggle />
+      <MobileTabBar />
     </div>
   );
 }

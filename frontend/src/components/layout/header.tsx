@@ -3,16 +3,37 @@
 import Link from "next/link";
 import { useState, useRef, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import {
+  BookOpen,
+  ChevronDown,
+  Compass,
+  FileText,
+  GraduationCap,
+  LayoutGrid,
+  LogOut,
+  Menu,
+  Search,
+  Sparkles,
+  Upload,
+  User,
+  X,
+} from "lucide-react";
 
 import { useLocale } from "@/lib/locale-context";
 import { useAuth } from "@/lib/auth-context";
+import { ThemeToggle } from "@/lib/theme-context";
 import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardShortName } from "@/lib/constants";
+import { POPOVER_SPRING } from "@/components/motion/hover-card";
 
 type DropdownItem = { label: string; href: string };
 type DropdownGroup = { heading?: string; items: DropdownItem[] };
-type DropdownDef = { label: string; groups: DropdownGroup[]; soon?: boolean };
+type DropdownDef = { label: string; groups: DropdownGroup[]; icon?: typeof BookOpen; soon?: boolean };
 
-const BOARDS_ITEM: DropdownDef = { label: "Boards", groups: [
+const BOARDS_ITEM: DropdownDef = {
+  label: "Boards",
+  icon: GraduationCap,
+  groups: [
     { heading: "Pakistani Boards", items: [
       { label: "Federal Board", href: "/fbise" },
       { label: "Punjab Board", href: "/punjab" },
@@ -26,10 +47,11 @@ const BOARDS_ITEM: DropdownDef = { label: "Boards", groups: [
       { label: "O Level", href: "/o-level" },
       { label: "A Level", href: "/a-level" },
     ]},
-  ]};
+  ],
+};
 
 const OTHER_NAV_ITEMS: DropdownDef[] = [
-  { label: "Pairing Schemes", groups: [
+  { label: "Pairing Schemes", icon: LayoutGrid, groups: [
     { items: [
       { label: "9th", href: "/categories/9th-class-pairing-schemes" },
       { label: "10th", href: "/categories/10th-class-pairing-schemes" },
@@ -37,7 +59,7 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "2nd Year", href: "/categories/2nd-year-pairing-schemes" },
     ]},
   ]},
-  { label: "Past Papers", groups: [
+  { label: "Past Papers", icon: FileText, groups: [
     { items: [
       { label: "All Past Papers", href: "/past-papers" },
     ]},
@@ -57,7 +79,7 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "IB", href: "/categories/ib-notes" },
     ]},
   ]},
-  { label: "Test Generator", groups: [
+  { label: "Test Generator", icon: Sparkles, groups: [
     { items: [
       { label: "9th Class Tests", href: "/categories/9th-class-tests" },
       { label: "10th Class Tests", href: "/categories/10th-class-tests" },
@@ -67,7 +89,7 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "MCQ Practice", href: "/online-quizzes" },
     ]},
   ]},
-  { label: "Tuition", groups: [
+  { label: "Tuition", icon: User, groups: [
     { items: [
       { label: "Malik Shahid (Maths)", href: "/tuition" },
       { label: "Online Academy Classes", href: "/categories/online-academy-classes" },
@@ -96,6 +118,7 @@ function buildBoardNav(boardSlug: string): DropdownDef {
   if (boardSlug === "apsacs") {
     return {
       label: boardShortName("apsacs"),
+      icon: GraduationCap,
       groups: [
         { heading: "Classes", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref("apsacs", n) })) },
         { items: [
@@ -113,6 +136,7 @@ function buildBoardNav(boardSlug: string): DropdownDef {
       : [{ label: "Year 12 · AS", href: "/a-level#year-12" }, { label: "Year 13 · A Level", href: "/a-level#year-13" }];
     return {
       label,
+      icon: Compass,
       groups: [
         { heading: "Years", items: years },
         { items: [
@@ -126,6 +150,7 @@ function buildBoardNav(boardSlug: string): DropdownDef {
   const label = boardShortName(boardSlug);
   return {
     label,
+    icon: BookOpen,
     groups: [
       { heading: "Notes", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref(boardSlug, n) })) },
       { heading: "Books", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: `${classHref(boardSlug, n)}?view=books` })) },
@@ -138,9 +163,15 @@ function buildBoardNav(boardSlug: string): DropdownDef {
   };
 }
 
+/* ── Desktop dropdown ─────────────────────────────────────────── */
 
-
-function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
+function NavDropdown({
+  item,
+  isOpen,
+  onOpen,
+  onClose,
+  onFocused,
+}: {
   item: DropdownDef;
   isOpen: boolean;
   onOpen: () => void;
@@ -148,10 +179,12 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
   onFocused: () => void;
 }) {
   const slug = item.label.toLowerCase().replace(/[^a-z]/g, "-");
+  const reduceMotion = useReducedMotion();
+  const Icon = item.icon;
 
   if (item.soon) {
     return (
-      <Link href={`/${slug}`} className="flex items-center gap-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold text-white/90 transition hover:bg-white/15 hover:text-white">
+      <Link href={`/${slug}`} className="pressable flex items-center gap-0.5 whitespace-nowrap rounded-md px-1.5 py-0.5 text-[10.5px] font-semibold transition hover:text-accent">
         {item.label}
         <span className="rounded bg-amber-300/90 px-1 py-px text-[7px] font-bold uppercase leading-none text-amber-950">Soon</span>
       </Link>
@@ -160,79 +193,75 @@ function Dropdown({ item, isOpen, onOpen, onClose, onFocused }: {
 
   return (
     <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
-      <button type="button" className={`flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold text-white/90 transition hover:bg-white/15 hover:text-white ${isOpen ? "bg-white/20 text-white" : ""}`}>
+      <button
+        type="button"
+        className={`pressable focus-ring flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold transition ${
+          isOpen ? "bg-accent/10 text-accent" : "text-foreground/80 hover:bg-accent/5 hover:text-accent"
+        }`}
+      >
+        {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}
         {item.label}
-        <svg viewBox="0 0 24 24" className={`h-3 w-3 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
+        <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }} className="inline-flex">
+          <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+        </motion.span>
       </button>
-      {isOpen && (
-        <div className={`absolute left-0 top-full z-50 mt-2 rounded-2xl border border-border bg-card p-2 shadow-2xl animate-scale-in backdrop-blur-sm ring-1 ring-accent/20 ${item.groups.length > 1 ? "w-80" : "w-64"}`} onMouseEnter={onFocused} onMouseLeave={onClose}>
-          {item.groups.map((g, gi) => (
-            <div key={gi}>
-              {g.heading && <div className="mb-1 mt-2 px-3 text-xs font-bold uppercase tracking-wider text-accent">{g.heading}</div>}
-              {g.items.map((itm) => (
-                <Link key={itm.href} href={itm.href} onClick={onClose} className="block rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-all duration-200 hover:bg-accent/10 hover:text-accent hover:pl-4">
-                  {itm.label}
-                </Link>
-              ))}
-              {gi < item.groups.length - 1 && <div className="my-2 border-t border-border/50" />}
-            </div>
-          ))}
-        </div>
-      )}
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: -6, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.97 }}
+            transition={POPOVER_SPRING}
+            className={`glass-card absolute left-0 top-full z-50 mt-2 overflow-hidden rounded-2xl p-2 shadow-lift ${item.groups.length > 1 ? "w-80" : "w-64"}`}
+            onMouseEnter={onFocused}
+            onMouseLeave={onClose}
+          >
+            {item.groups.map((g, gi) => (
+              <div key={gi}>
+                {g.heading && (
+                  <div className="mb-1 mt-2 px-3 text-[11px] font-bold uppercase tracking-wider text-accent">{g.heading}</div>
+                )}
+                {g.items.map((itm) => (
+                  <Link
+                    key={itm.href}
+                    href={itm.href}
+                    onClick={onClose}
+                    className="block rounded-xl px-3 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-accent/10 hover:text-accent"
+                  >
+                    {itm.label}
+                  </Link>
+                ))}
+                {gi < item.groups.length - 1 && <div className="my-2 border-t border-border/60" />}
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-function MobileSection({ item, onLink }: { item: DropdownDef; onLink: () => void }) {
-  const [open, setOpen] = useState(false);
-  if (item.soon) {
-    return (
-      <Link href={`/${item.label.toLowerCase().replace(/[^a-z]/g, "-")}`} onClick={onLink} className="mb-1 flex items-center justify-between rounded-lg px-4 py-3 text-base font-semibold text-foreground transition hover:bg-accent/10">
-        {item.label}
-        <span className="rounded bg-amber-100 px-2 py-1 text-xs font-bold uppercase text-amber-600 dark:bg-amber-900/40 dark:text-amber-300">Soon</span>
-      </Link>
-    );
-  }
-  return (
-    <div className="mb-1">
-      <button type="button" onClick={() => setOpen((o) => !o)} className="flex w-full items-center justify-between rounded-lg px-4 py-3 text-base font-semibold text-foreground transition hover:bg-accent/10">
-        {item.label}
-        <svg viewBox="0 0 24 24" className={`h-4 w-4 text-muted transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6" /></svg>
-      </button>
-      {open && (
-        <div className="ml-4 pb-2">
-          {item.groups.map((g, gi) => (
-            <div key={gi}>
-              {g.heading && <div className="mb-2 mt-2 text-xs font-bold uppercase tracking-wider text-muted">{g.heading}</div>}
-              {g.items.map((itm) => (
-                <Link key={itm.href} href={itm.href} onClick={onLink} className="block rounded-lg px-4 py-2 text-sm font-medium text-foreground transition hover:bg-accent/10 hover:text-accent">
-                  {itm.label}
-                </Link>
-              ))}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+/* ── Header ───────────────────────────────────────────────────── */
 
 export function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
   const { user, loading, isStaff, signOut } = useAuth();
   const { tr, locale } = useLocale();
   const pathname = usePathname();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reduceMotion = useReducedMotion();
 
   const activeBoard = useMemo(() => {
     const first = (pathname ?? "/").split("/").filter(Boolean)[0];
     return first && KNOWN_BOARD_SLUGS.has(first) ? first : null;
   }, [pathname]);
 
-  const navItems = useMemo<DropdownDef[]>(() => {
-    return [BOARDS_ITEM, ...(activeBoard ? [buildBoardNav(activeBoard)] : []), ...OTHER_NAV_ITEMS];
-  }, [activeBoard]);
+  const navItems = useMemo<DropdownDef[]>(
+    () => [BOARDS_ITEM, ...(activeBoard ? [buildBoardNav(activeBoard)] : []), ...OTHER_NAV_ITEMS],
+    [activeBoard],
+  );
 
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
@@ -244,95 +273,220 @@ export function Header() {
   }, [clearClose]);
 
   return (
-    <header className="sticky top-0 z-20 print:hidden shadow-lg shadow-teal-950/15">
-      {/* Top Utility Bar — stylish gradient */}
-      <div className="bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-700 dark:from-teal-800 dark:via-emerald-800 dark:to-slate-900">
-        <nav className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8" aria-label="Utility">
-          {/* Logo */}
-          <Link href="/" className="group flex shrink-0 items-center gap-2.5 transition-transform duration-300 hover:scale-105">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 text-sm font-black text-white ring-1 ring-white/30 backdrop-blur-sm transition group-hover:bg-white/25 group-hover:ring-white/50">B</span>
-            <span className="hidden bg-gradient-to-r from-white via-teal-50 to-emerald-100 bg-clip-text font-serif text-lg font-black text-transparent drop-shadow-sm sm:block">BoardNotes</span>
-          </Link>
-
-          {/* Search Bar */}
-          <form action="/search" role="search" className="hidden items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-2 backdrop-blur-md transition focus-within:border-white/50 focus-within:bg-white/25 sm:flex">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 text-white/80" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-            <input name="q" autoComplete="off" placeholder={locale === "ur" ? "تلاش…" : "Search…"} aria-label={tr("search")} className="w-28 bg-transparent text-sm font-medium text-white outline-none placeholder:text-white/70 focus:w-40 transition-all" />
-          </form>
-
-          {/* Auth Buttons + Upload CTA */}
-          <div className="flex items-center gap-2.5 shrink-0 sm:gap-3">
-            {!loading && user ? (
-              <>
-                {isStaff && <Link href="/admin" className="hidden rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 lg:inline-block">Admin</Link>}
-                {user.name.split(" ")[0].toLowerCase() !== "admin" && (
-                  <Link href="/account" className="hidden rounded-full border border-white/30 bg-white/10 px-3.5 py-1.5 text-sm font-semibold text-white transition hover:bg-white/20 sm:inline-block">{user.name.split(" ")[0]}</Link>
-                )}
-              </>
-            ) : (
-              <>
-                <Link href="/login" className="shine-on-hover rounded-full bg-white px-4 py-1.5 text-sm font-black text-[#0f766e] shadow-sm transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-black/20">{tr("signUp")}</Link>
-              </>
-            )}
-            <Link href="/upload" className="shine-on-hover rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-4 py-1.5 text-sm font-black text-white shadow-md shadow-orange-900/25 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-900/30">
-              {tr("uploadTitle")}
+    <>
+      <header className="sticky top-0 z-40 print:hidden">
+        <div className="glass-bar border-b border-border/70 shadow-soft">
+          <nav
+            className="mx-auto flex h-16 w-full max-w-[1400px] items-center gap-3 px-4 sm:px-6 lg:px-8"
+            aria-label="Main navigation"
+          >
+            {/* Logo */}
+            <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-sm font-black text-white shadow-md shadow-accent/30 transition-transform duration-300 group-hover:scale-105">
+                B
+              </span>
+              <span className="hidden font-serif text-lg font-black tracking-tight sm:block">
+                <span className="text-gradient">BoardNotes</span>
+              </span>
             </Link>
-          </div>
-        </nav>
-      </div>
 
-      {/* Secondary Main Navbar — deeper gradient */}
-      <div className="border-t border-white/10 bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 dark:from-emerald-900/95 dark:via-teal-950 dark:to-slate-900/95">
-        <nav className="mx-auto flex w-full max-w-[1400px] items-center px-4 py-2.5 sm:px-6 lg:px-8" aria-label="Main navigation">
-          {/* Nav items */}
-          <div className="hidden items-center gap-1 overflow-visible xl:flex">
-            {navItems.map((item) => (
-              <Dropdown
-                key={item.label}
-                item={item}
-                isOpen={dropdownSlug === item.label.toLowerCase().replace(/[^a-z]/g, "-")}
-                onOpen={() => { clearClose(); setDropdownSlug(item.label.toLowerCase().replace(/[^a-z]/g, "-")); }}
-                onClose={() => scheduleClose()}
-                onFocused={clearClose}
-              />
-            ))}
-          </div>
+            {/* Desktop nav */}
+            <div className="hidden items-center gap-0.5 lg:flex">
+              {navItems.map((item) => (
+                <NavDropdown
+                  key={item.label}
+                  item={item}
+                  isOpen={dropdownSlug === item.label.toLowerCase().replace(/[^a-z]/g, "-")}
+                  onOpen={() => { clearClose(); setDropdownSlug(item.label.toLowerCase().replace(/[^a-z]/g, "-")); }}
+                  onClose={() => scheduleClose()}
+                  onFocused={clearClose}
+                />
+              ))}
+            </div>
 
-          {/* Mobile hamburger */}
-          <button type="button" onClick={() => setMenuOpen((o) => !o)} className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/30 bg-white/10 text-white transition hover:bg-white/20 xl:hidden" aria-label={menuOpen ? tr("closeMenu") : tr("openMenu")}>
-            <span className="flex flex-col gap-1.5" aria-hidden="true">
-              <span className={`h-0.5 w-5 bg-current transition-all ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
-              <span className={`h-0.5 w-5 bg-current transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
-              <span className={`h-0.5 w-5 bg-current transition-all ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
-            </span>
-          </button>
-        </nav>
-      </div>
+            <div className="ml-auto flex items-center gap-2">
+              {/* Search */}
+              <Link
+                href="/search"
+                aria-label={tr("search")}
+                className="pressable focus-ring hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-card/60 text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:bg-accent/10 hover:text-accent sm:inline-flex"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </Link>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div className="border-t border-border bg-card px-4 py-4 shadow-xl xl:hidden">
-          <form action="/search" role="search" className="mb-3 flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 text-muted" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-            <input name="q" autoComplete="off" placeholder={tr("portalSearchPlaceholder")} aria-label={tr("search")} className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted" />
-          </form>
-          {navItems.map((item) => (
-            <MobileSection key={item.label} item={item} onLink={() => setMenuOpen(false)} />
-          ))}
-          <div className="mt-3 border-t border-border pt-3">
-            {!loading && user ? (
-              <div className="flex flex-col gap-1.5">
-                <Link href="/account" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium">{user.name}</Link>
-                {isStaff && <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-accent">{tr("admin")}</Link>}
-                <button type="button" onClick={() => { signOut(); setMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left text-sm font-medium text-muted">{tr("signOut")}</button>
-              </div>
-            ) : (
-              <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-full bg-accent px-5 py-2.5 text-center text-sm font-bold text-white">{tr("signUp")}</Link>
-            )}
-            <Link href="/upload" onClick={() => setMenuOpen(false)} className="mt-2 block rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-center text-sm font-bold text-accent">{tr("uploadTitle")}</Link>
-          </div>
+              <ThemeToggle />
+
+              {/* Upload CTA */}
+              <Link
+                href="/upload"
+                className="pressable focus-ring hidden items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-sm font-bold text-white shadow-md shadow-accent/25 transition hover:shadow-lg hover:shadow-accent/40 sm:inline-flex"
+              >
+                <Upload className="h-4 w-4" aria-hidden="true" />
+                {tr("uploadTitle")}
+              </Link>
+
+              {/* Auth */}
+              {!loading && user ? (
+                <div className="hidden items-center gap-2 lg:flex">
+                  {isStaff && (
+                    <Link href="/admin" className="pressable rounded-xl px-3 py-2 text-sm font-semibold text-foreground/80 transition hover:bg-accent/10 hover:text-accent">
+                      {tr("admin")}
+                    </Link>
+                  )}
+                  <Link
+                    href="/account"
+                    className="pressable inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card/60 text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
+                    aria-label={user.name}
+                  >
+                    <span className="text-xs font-black">{user.name.slice(0, 1).toUpperCase()}</span>
+                  </Link>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="pressable focus-ring hidden rounded-xl bg-foreground px-4 py-2 text-sm font-bold text-background transition hover:opacity-90 lg:inline-flex"
+                >
+                  {tr("signUp")}
+                </Link>
+              )}
+
+              {/* Mobile trigger */}
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                aria-label={tr("openMenu")}
+                className="pressable focus-ring inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card/60 text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent lg:hidden"
+              >
+                <Menu className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+          </nav>
         </div>
-      )}
-    </header>
+      </header>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDrawerOpen(false)}
+              className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm lg:hidden"
+              aria-hidden="true"
+            />
+            <motion.aside
+              initial={reduceMotion ? false : { x: "100%" }}
+              animate={{ x: 0 }}
+              exit={reduceMotion ? undefined : { x: "100%" }}
+              transition={POPOVER_SPRING}
+              className="glass-bar fixed right-0 top-0 z-50 flex h-full w-[86%] max-w-sm flex-col border-l border-border shadow-lift lg:hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation menu"
+            >
+              <div className="flex items-center justify-between border-b border-border/70 px-5 py-4">
+                <Link href="/" onClick={() => setDrawerOpen(false)} className="flex items-center gap-2.5">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-sm font-black text-white shadow-md shadow-accent/30">
+                    B
+                  </span>
+                  <span className="font-serif text-lg font-black">
+                    <span className="text-gradient">BoardNotes</span>
+                  </span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setDrawerOpen(false)}
+                  aria-label={tr("closeMenu")}
+                  className="pressable focus-ring inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border text-foreground transition hover:border-accent/50 hover:text-accent"
+                >
+                  <X className="h-5 w-5" aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-4 py-4">
+                <form action="/search" role="search" className="glass-field mb-5 flex items-center gap-2 rounded-xl px-3 py-2.5">
+                  <Search className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
+                  <input
+                    name="q"
+                    autoComplete="off"
+                    placeholder={locale === "ur" ? "تلاش…" : "Search notes, books, papers…"}
+                    aria-label={tr("search")}
+                    className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted"
+                  />
+                </form>
+
+                <nav className="space-y-5" aria-label="Mobile navigation">
+                  {navItems.map((item) => {
+                    const Icon = item.icon ?? LayoutGrid;
+                    return (
+                      <div key={item.label}>
+                        <p className="mb-2 flex items-center gap-2 px-1 text-[11px] font-bold uppercase tracking-wider text-accent">
+                          <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                          {item.label}
+                        </p>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {item.groups.flatMap((g) => g.items).map((itm) => (
+                            <Link
+                              key={itm.href}
+                              href={itm.href}
+                              onClick={() => setDrawerOpen(false)}
+                              className="rounded-xl border border-border/70 bg-card/50 px-3 py-2.5 text-sm font-medium text-foreground transition hover:border-accent/50 hover:bg-accent/10 hover:text-accent"
+                            >
+                              {itm.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              <div className="border-t border-border/70 px-4 py-4">
+                {!loading && user ? (
+                  <div className="space-y-2">
+                    <Link
+                      href="/account"
+                      onClick={() => setDrawerOpen(false)}
+                      className="flex items-center gap-2 rounded-xl border border-border bg-card/60 px-4 py-3 text-sm font-semibold text-foreground"
+                    >
+                      <User className="h-4 w-4" aria-hidden="true" />
+                      {user.name}
+                    </Link>
+                    {isStaff && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setDrawerOpen(false)}
+                        className="block rounded-xl bg-accent/10 px-4 py-3 text-center text-sm font-bold text-accent"
+                      >
+                        {tr("admin")}
+                      </Link>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => { signOut(); setDrawerOpen(false); }}
+                      className="flex w-full items-center gap-2 rounded-xl border border-border px-4 py-3 text-sm font-semibold text-muted"
+                    >
+                      <LogOut className="h-4 w-4" aria-hidden="true" />
+                      {tr("signOut")}
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setDrawerOpen(false)}
+                    className="pressable block rounded-xl bg-gradient-to-r from-accent to-accent-2 px-4 py-3 text-center text-sm font-bold text-white shadow-md shadow-accent/25"
+                  >
+                    {tr("signUp")}
+                  </Link>
+                )}
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
