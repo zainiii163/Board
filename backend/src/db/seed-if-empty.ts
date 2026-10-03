@@ -1,3 +1,5 @@
+import { sql } from "drizzle-orm";
+
 import { db } from "./index.js";
 import * as schema from "./schema.js";
 import { seedBoardContent } from "./seed-content.js";
@@ -7,7 +9,27 @@ import { seedLogarithmsEnrichment } from "./seed-logarithms-enrichment.js";
 import { seedBookCovers } from "./seed-book-covers.js";
 import { seedSubjectsAndMCQs } from "./seed-subjects-mcqs.js";
 
+async function ensurePastPaperColumns() {
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "past_papers" (
+      "id" serial PRIMARY KEY NOT NULL,
+      "board_slug" text NOT NULL,
+      "board_title" text NOT NULL,
+      "class_slug" text NOT NULL,
+      "class_title" text NOT NULL,
+      "subject_slug" text NOT NULL,
+      "subject_title" text NOT NULL,
+      "year" text NOT NULL,
+      "session_type" text DEFAULT 'annual' NOT NULL,
+      "pdf_url" text
+    )
+  `);
+  await db.execute(sql`ALTER TABLE "past_papers" ADD COLUMN IF NOT EXISTS "paper_type" text DEFAULT 'first-annual' NOT NULL`);
+  await db.execute(sql`ALTER TABLE "past_papers" ADD COLUMN IF NOT EXISTS "drive_url" text`);
+}
+
 export async function seedIfEmpty() {
+  await ensurePastPaperColumns();
   const existing = await db.select({ id: schema.boards.id }).from(schema.boards).limit(1);
   if (existing.length > 0) {
     console.log("[db] Content already seeded — using PostgreSQL as source of truth.");

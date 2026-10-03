@@ -3,8 +3,14 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { useDb } from "../../db/mode.js";
 import * as schema from "../../db/schema.js";
-import { resourcesStore, type PastPaperRecord } from "../../store/resources-store.js";
+import { resourcesStore, type PastPaperRecord, type PastPaperType } from "../../store/resources-store.js";
 import { ApiError } from "../../utils/api-error.js";
+
+const PAPER_TYPES: PastPaperType[] = ["model", "first-annual", "second-annual", "pba"];
+
+function normalizePaperType(value: unknown): PastPaperType {
+  return PAPER_TYPES.includes(value as PastPaperType) ? (value as PastPaperType) : "first-annual";
+}
 
 function mapPastPaperRow(row: typeof schema.pastPapers.$inferSelect): PastPaperRecord {
   return {
@@ -17,19 +23,22 @@ function mapPastPaperRow(row: typeof schema.pastPapers.$inferSelect): PastPaperR
     subjectTitle: row.subjectTitle,
     year: row.year,
     sessionType: row.sessionType,
+    paperType: row.paperType ?? "first-annual",
     pdfUrl: row.pdfUrl,
+    driveUrl: row.driveUrl ?? null,
   };
 }
 
-export async function listPastPapers(boardSlug?: string, year?: string): Promise<PastPaperRecord[]> {
+export async function listPastPapers(boardSlug?: string, year?: string, paperType?: string): Promise<PastPaperRecord[]> {
   if (useDb()) {
     const rows = await db.select().from(schema.pastPapers);
     let mapped = rows.map(mapPastPaperRow);
     if (boardSlug) mapped = mapped.filter((p) => p.boardSlug === boardSlug);
     if (year) mapped = mapped.filter((p) => p.year === year);
+    if (paperType) mapped = mapped.filter((p) => p.paperType === paperType);
     return mapped;
   }
-  return resourcesStore.listPastPapers(boardSlug, year);
+  return resourcesStore.listPastPapers(boardSlug, year, paperType);
 }
 
 export async function getPastPaper(id: number): Promise<PastPaperRecord> {
@@ -60,13 +69,15 @@ export async function createPastPaper(input: Omit<PastPaperRecord, "id">): Promi
         subjectSlug: input.subjectSlug,
         subjectTitle: input.subjectTitle,
         year: input.year,
-        sessionType: input.sessionType,
+        sessionType: input.sessionType ?? "annual",
+        paperType: normalizePaperType(input.paperType),
         pdfUrl: input.pdfUrl,
+        driveUrl: input.driveUrl ?? null,
       })
       .returning();
     return mapPastPaperRow(row);
   }
-  return resourcesStore.createPastPaper(input);
+  return resourcesStore.createPastPaper({ ...input, paperType: normalizePaperType(input.paperType) });
 }
 
 export async function updatePastPaper(
@@ -74,15 +85,21 @@ export async function updatePastPaper(
   input: Partial<Omit<PastPaperRecord, "id">>,
 ): Promise<PastPaperRecord> {
   if (useDb()) {
+    const patch: Partial<Omit<PastPaperRecord, "id">> = { ...input };
+    if ("paperType" in patch) patch.paperType = normalizePaperType(patch.paperType);
+    if ("driveUrl" in patch) patch.driveUrl = patch.driveUrl ?? null;
     const [row] = await db
       .update(schema.pastPapers)
-      .set(input)
+      .set(patch)
       .where(eq(schema.pastPapers.id, id))
       .returning();
     if (!row) throw ApiError.notFound("Past paper not found.");
     return mapPastPaperRow(row);
   }
-  const updated = resourcesStore.updatePastPaper(id, input);
+  const patch: Partial<Omit<PastPaperRecord, "id">> = { ...input };
+  if ("paperType" in patch) patch.paperType = normalizePaperType(patch.paperType);
+  if ("driveUrl" in patch) patch.driveUrl = patch.driveUrl ?? null;
+  const updated = resourcesStore.updatePastPaper(id, patch);
   if (!updated) throw ApiError.notFound("Past paper not found.");
   return updated;
 }

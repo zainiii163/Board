@@ -1969,7 +1969,7 @@ export const BOOKS = [
 ];
 
 export const PAST_PAPERS = [
-    { year: "2026", subject: "Mathematics", board: "FBISE" },
-    { year: "2025", subject: "Physics", board: "Punjab" },
-    { year: "2024", subject: "Chemistry", board: "KPK" },
+    { year: "2026", subject: "Mathematics", board: "FBISE", paperType: "model" as const },
+    { year: "2025", subject: "Physics", board: "Punjab", paperType: "first-annual" as const },
+    { year: "2024", subject: "Chemistry", board: "KPK", paperType: "second-annual" as const },
 ];

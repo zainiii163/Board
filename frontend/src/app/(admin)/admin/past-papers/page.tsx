@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { apiAuthFetch, apiDelete, apiPost, apiPut } from "@/lib/api-client";
+import { PAPER_TYPE_LABELS, type PastPaperType } from "@/components/content/past-papers-list";
 
 type PastPaper = {
   id: number;
@@ -14,7 +15,9 @@ type PastPaper = {
   subjectTitle: string;
   year: string;
   sessionType: "annual" | "supply";
+  paperType: PastPaperType;
   pdfUrl: string | null;
+  driveUrl: string | null;
 };
 
 const emptyForm = {
@@ -25,8 +28,9 @@ const emptyForm = {
   subjectSlug: "mathematics",
   subjectTitle: "Mathematics",
   year: new Date().getFullYear().toString(),
-  sessionType: "annual" as "annual" | "supply",
+  paperType: "first-annual" as PastPaperType,
   pdfUrl: "",
+  driveUrl: "",
 };
 
 export default function ManagePastPapersPage() {
@@ -52,7 +56,12 @@ export default function ManagePastPapersPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { ...form, pdfUrl: form.pdfUrl || null };
+    const payload = {
+      ...form,
+      sessionType: form.paperType === "second-annual" ? ("supply" as const) : ("annual" as const),
+      pdfUrl: form.pdfUrl || null,
+      driveUrl: form.driveUrl || null,
+    };
     if (editingId) await apiPut(`/api/past-papers/${editingId}`, payload);
     else await apiPost("/api/past-papers", payload, true);
     resetForm();
@@ -69,8 +78,9 @@ export default function ManagePastPapersPage() {
       subjectSlug: paper.subjectSlug,
       subjectTitle: paper.subjectTitle,
       year: paper.year,
-      sessionType: paper.sessionType,
+      paperType: paper.paperType ?? "first-annual",
       pdfUrl: paper.pdfUrl ?? "",
+      driveUrl: paper.driveUrl ?? "",
     });
   }
 
@@ -98,11 +108,13 @@ export default function ManagePastPapersPage() {
           <input value={form.classSlug} onChange={(e) => setForm({ ...form, classSlug: e.target.value })} placeholder="Class slug" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground" required />
           <input value={form.classTitle} onChange={(e) => setForm({ ...form, classTitle: e.target.value })} placeholder="Class title" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground" required />
           <input value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} placeholder="Year" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground" required />
-          <select value={form.sessionType} onChange={(e) => setForm({ ...form, sessionType: e.target.value as "annual" | "supply" })} className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground">
-            <option value="annual">Annual</option>
-            <option value="supply">Supply</option>
+          <select value={form.paperType} onChange={(e) => setForm({ ...form, paperType: e.target.value as PastPaperType })} className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground">
+            {(Object.keys(PAPER_TYPE_LABELS) as PastPaperType[]).map((value) => (
+              <option key={value} value={value}>{PAPER_TYPE_LABELS[value]}</option>
+            ))}
           </select>
           <input value={form.pdfUrl} onChange={(e) => setForm({ ...form, pdfUrl: e.target.value })} placeholder="PDF URL (from Uploads)" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground md:col-span-2" />
+          <input value={form.driveUrl} onChange={(e) => setForm({ ...form, driveUrl: e.target.value })} placeholder="Google Drive link (optional)" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground md:col-span-2" />
         </div>
         <div className="flex gap-2">
           <button type="submit" className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white">
@@ -122,7 +134,7 @@ export default function ManagePastPapersPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-semibold text-foreground">
-                  {paper.subjectTitle} — {paper.year} ({paper.sessionType})
+                  {paper.subjectTitle} — {paper.year} ({PAPER_TYPE_LABELS[paper.paperType] ?? paper.sessionType})
                 </p>
                 <p className="mt-1 text-sm text-muted">
                   {paper.boardTitle} • {paper.classTitle}

@@ -15,6 +15,8 @@ export type BookRecord = {
   notesPath: string | null;
 };
 
+export type PastPaperType = "model" | "first-annual" | "second-annual" | "pba";
+
 export type PastPaperRecord = {
   id: number;
   boardSlug: string;
@@ -25,7 +27,9 @@ export type PastPaperRecord = {
   subjectTitle: string;
   year: string;
   sessionType: "annual" | "supply";
+  paperType: PastPaperType;
   pdfUrl: string | null;
+  driveUrl: string | null;
 };
 
 const boardMeta: Record<string, { slug: string; title: string }> = {
@@ -95,8 +99,10 @@ const pastPapers: PastPaperRecord[] = PAST_PAPERS.map((paper) => {
     subjectSlug: subject.slug,
     subjectTitle: subject.title,
     year: paper.year,
-    sessionType: "annual" as const,
+    sessionType: paper.paperType === "second-annual" ? ("supply" as const) : ("annual" as const),
+    paperType: paper.paperType ?? "first-annual",
     pdfUrl: null,
+    driveUrl: null,
   };
 });
 
@@ -131,10 +137,11 @@ export const resourcesStore = {
     return true;
   },
 
-  listPastPapers: (boardSlug?: string, year?: string) => {
+  listPastPapers: (boardSlug?: string, year?: string, paperType?: string) => {
     let rows = [...pastPapers];
     if (boardSlug) rows = rows.filter((p) => p.boardSlug === boardSlug);
     if (year) rows = rows.filter((p) => p.year === year);
+    if (paperType) rows = rows.filter((p) => p.paperType === paperType);
     return rows;
   },
 

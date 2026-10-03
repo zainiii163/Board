@@ -206,7 +206,12 @@ export const pastPapers = pgTable("past_papers", {
   subjectTitle: text("subject_title").notNull(),
   year: text("year").notNull(),
   sessionType: text("session_type").$type<"annual" | "supply">().notNull().default("annual"),
+  paperType: text("paper_type")
+    .$type<"model" | "first-annual" | "second-annual" | "pba">()
+    .notNull()
+    .default("first-annual"),
   pdfUrl: text("pdf_url"),
+  driveUrl: text("drive_url"),
 });
 
 export const authors = pgTable("authors", {
