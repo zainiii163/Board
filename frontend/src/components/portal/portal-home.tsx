@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo } from "react";
 
 import { useLocale } from "@/lib/locale-context";
+import { getApiBaseUrl } from "@/lib/api-client";
 import { BadgePercent, Smartphone, Target, Zap } from "lucide-react";
 import { CategoryCard } from "@/components/portal/category-card";
-import { HeroSearch } from "@/components/portal/hero-search";
 import { HoverCard } from "@/components/motion/hover-card";
 import { Reveal } from "@/components/motion/reveal";
+import { HeroSlider, type HeroSlide } from "@/components/portal/hero-slider";
 import { ResourceCard } from "@/components/portal/resource-card";
 import { AdBanner } from "@/components/portal/ad-banner";
 import { BoardCoverSections, type HomeBoardSection } from "@/components/portal/board-cover-sections";
@@ -24,10 +26,40 @@ type Props = {
 export function PortalHome({ categories, latest, trending, categoryNameById, boardSections }: Props) {
   const { tr } = useLocale();
 
+  // Hero slides: real book covers where available, branded gradients otherwise.
+  const slides = useMemo<HeroSlide[]>(() => {
+    // Cover URLs come from the API and are often root-relative (served by the
+    // backend), so they must be resolved before use in a CSS background.
+    const absolute = (url: string | null) => {
+      if (!url) return null;
+      if (url.startsWith("http")) return url;
+      return `${getApiBaseUrl()}${url.startsWith("/") ? url : `/${url}`}`;
+    };
+
+    const fromCovers = (latest ?? [])
+      .filter((r) => r.coverUrl)
+      .slice(0, 4)
+      .map((r) => ({
+        id: `res-${r.id}`,
+        title: r.title,
+        href: `/books/${r.slug}`,
+        image: absolute(r.coverUrl),
+      }));
+
+    const fallbacks: HeroSlide[] = boardSections.slice(0, 3).map((b) => ({
+      id: `board-${b.slug}`,
+      title: `${b.title} — classes ${b.classNumbers.slice(0, 4).join(", ")}`,
+      href: `/${b.slug}`,
+      image: null,
+    }));
+
+    return [...fromCovers, ...fallbacks].slice(0, 4);
+  }, [latest, boardSections]);
+
   return (
     <div>
-      {/* ─── Hero — instant search experience ─── */}
-      <HeroSearch />
+      {/* ─── Hero — compact auto-rotating banner ─── */}
+      <HeroSlider slides={slides} />
 
       {/* ─── Board cover sections (Study++ style) ─── */}
       <BoardCoverSections sections={boardSections} />

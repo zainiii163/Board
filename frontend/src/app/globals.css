@@ -70,7 +70,13 @@ html[dir="rtl"] body {
 
   body {
     min-height: 100vh;
-    background: var(--background);
+    /* Soft brand-tinted canvas instead of a flat grey. */
+    background-color: var(--background);
+    background-image:
+      radial-gradient(1100px 520px at 8% -8%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 60%),
+      radial-gradient(900px 480px at 92% 2%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 60%),
+      radial-gradient(760px 420px at 50% 100%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 65%);
+    background-attachment: fixed;
     color: var(--foreground);
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
     font-size: calc(1rem * var(--text-scale, 1));

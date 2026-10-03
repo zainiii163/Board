@@ -12,7 +12,6 @@ import {
   Library,
   Loader2,
   Search,
-  Sparkles,
 } from "lucide-react";
 
 import { useLocale } from "@/lib/locale-context";
@@ -95,6 +94,10 @@ function localSuggestions(query: string): Suggestion[] {
   return out.slice(0, 6);
 }
 
+/**
+ * Compact hero content: eyebrow, headline, instant search with live autocomplete
+ * and quick-filter chips. Rendered inside <HeroSlider>.
+ */
 export function HeroSearch() {
   const { tr } = useLocale();
   const router = useRouter();
@@ -180,11 +183,14 @@ export function HeroSearch() {
     };
   }, []);
 
-  const go = useCallback((href: string) => {
-    setOpen(false);
-    inputRef.current?.blur();
-    router.push(href);
-  }, [router]);
+  const go = useCallback(
+    (href: string) => {
+      setOpen(false);
+      inputRef.current?.blur();
+      router.push(href);
+    },
+    [router],
+  );
 
   const submit = useCallback(() => {
     const q = query.trim();
@@ -211,172 +217,139 @@ export function HeroSearch() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#4338CA] via-[#4F46E5] to-[#7C3AED] text-white dark:from-[#1E1B4B] dark:via-[#312E81] dark:to-[#0B0B14]">
-      {/* Ambient orbs + grid */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -right-24 -top-28 h-96 w-96 rounded-full bg-white/15 blur-3xl animate-float" />
-        <div className="absolute -bottom-40 -left-24 h-[28rem] w-[28rem] rounded-full bg-fuchsia-400/20 blur-3xl animate-float-slow" />
-        <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-300/10 blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: "radial-gradient(circle, white 1.2px, transparent 1.2px)", backgroundSize: "22px 22px" }}
-        />
-      </div>
+    <div className="mx-auto max-w-3xl">
+      <motion.p
+        initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-bold backdrop-blur-md"
+      >
+        {ACADEMIC_YEAR} · free resources for every board
+      </motion.p>
 
-      <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-4 py-1.5 text-[11px] font-bold backdrop-blur-md"
-        >
-          <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-          {ACADEMIC_YEAR} — free resources for every board
-        </motion.div>
+      <motion.h1
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+        className="text-balance font-serif text-2xl font-black leading-[1.15] drop-shadow-[0_2px_14px_rgba(15,23,42,0.25)] sm:text-3xl lg:text-4xl"
+      >
+        {tr("portalHeroTitle")}
+      </motion.h1>
 
-        <motion.h1
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
-          className="text-balance font-serif text-3xl font-black leading-[1.1] drop-shadow-[0_2px_18px_rgba(15,23,42,0.25)] sm:text-4xl lg:text-5xl"
-        >
-          {tr("portalHeroTitle")}
-        </motion.h1>
+      <motion.p
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+        className="mx-auto mt-2 hidden max-w-2xl text-sm leading-relaxed text-white/85 sm:block"
+      >
+        {tr("portalHeroDesc")}
+      </motion.p>
 
-        <motion.p
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base"
-        >
-          {tr("portalHeroDesc")}
-        </motion.p>
+      {/* Instant search */}
+      <motion.div
+        ref={boxRef}
+        initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        className="relative mx-auto mt-5 max-w-2xl"
+      >
+        <div className="glass-card flex items-center gap-3 rounded-2xl px-4 py-3">
+          <Search className="h-4.5 w-4.5 shrink-0 text-accent" aria-hidden="true" />
+          <input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
+            onFocus={() => setOpen(true)}
+            onKeyDown={onKeyDown}
+            type="search"
+            role="combobox"
+            aria-expanded={open && suggestions.length > 0}
+            aria-controls="hero-suggestions"
+            aria-autocomplete="list"
+            placeholder={tr("portalSearchPlaceholder")}
+            className="w-full bg-transparent text-[15px] text-white outline-none placeholder:text-white/60"
+          />
+          {loading ? (
+            <Loader2 className="h-4 w-4 shrink-0 animate-spin text-white/70" aria-hidden="true" />
+          ) : (
+            <kbd className="hidden shrink-0 rounded-md border border-white/25 bg-white/10 px-1.5 py-0.5 text-[10px] font-bold text-white/70 sm:block">
+              /
+            </kbd>
+          )}
+        </div>
 
-        {/* Instant search */}
-        <motion.div
-          ref={boxRef}
-          initial={reduceMotion ? false : { opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto mt-8 max-w-2xl"
-        >
-          <div className="glass-card flex items-center gap-3 rounded-2xl px-4 py-3.5 sm:px-5 sm:py-4">
-            <Search className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
-            <input
-              ref={inputRef}
-              value={query}
-              onChange={(e) => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
-              onFocus={() => setOpen(true)}
-              onKeyDown={onKeyDown}
-              type="search"
-              role="combobox"
-              aria-expanded={open && suggestions.length > 0}
-              aria-controls="hero-suggestions"
-              aria-autocomplete="list"
-              placeholder={tr("portalSearchPlaceholder")}
-              className="w-full bg-transparent text-base text-white outline-none placeholder:text-white/60 sm:text-lg"
-            />
-            {loading ? (
-              <Loader2 className="h-4 w-4 shrink-0 animate-spin text-white/70" aria-hidden="true" />
-            ) : (
-              <kbd className="hidden shrink-0 rounded-md border border-white/25 bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white/70 sm:block">
-                /
-              </kbd>
-            )}
-          </div>
+        <AnimatePresence>
+          {open && suggestions.length > 0 && (
+            <motion.ul
+              id="hero-suggestions"
+              role="listbox"
+              initial={reduceMotion ? false : { opacity: 0, y: -8, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -8, scale: 0.98 }}
+              transition={POPOVER_SPRING}
+              className="absolute inset-x-0 top-full z-30 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-border bg-card p-1.5 text-left shadow-lift"
+            >
+              {suggestions.map((s, i) => {
+                const Icon = KIND_ICON[s.kind];
+                return (
+                  <li key={s.key}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={i === activeIndex}
+                      onMouseEnter={() => setActiveIndex(i)}
+                      onClick={() => go(s.href)}
+                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition ${
+                        i === activeIndex ? "bg-accent/10" : "hover:bg-accent/5"
+                      }`}
+                    >
+                      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                        <Icon className="h-4 w-4" aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-bold text-foreground">{s.label}</span>
+                        <span className="block truncate text-xs text-muted">{s.meta}</span>
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+              <li className="border-t border-border/70 px-3 py-2">
+                <button
+                  type="button"
+                  onClick={submit}
+                  className="flex w-full items-center justify-between text-xs font-semibold text-accent"
+                >
+                  <span>See all results for “{query.trim()}”</span>
+                  <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </li>
+            </motion.ul>
+          )}
+        </AnimatePresence>
+      </motion.div>
 
-          <AnimatePresence>
-            {open && suggestions.length > 0 && (
-              <motion.ul
-                id="hero-suggestions"
-                role="listbox"
-                initial={reduceMotion ? false : { opacity: 0, y: -8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={reduceMotion ? undefined : { opacity: 0, y: -8, scale: 0.98 }}
-                transition={POPOVER_SPRING}
-                className="absolute inset-x-0 top-full z-30 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-border bg-card p-1.5 text-left shadow-lift"
-              >
-                {suggestions.map((s, i) => {
-                  const Icon = KIND_ICON[s.kind];
-                  return (
-                    <li key={s.key}>
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={i === activeIndex}
-                        onMouseEnter={() => setActiveIndex(i)}
-                        onClick={() => go(s.href)}
-                        className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition ${
-                          i === activeIndex ? "bg-accent/10" : "hover:bg-accent/5"
-                        }`}
-                      >
-                        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                          <Icon className="h-4 w-4" aria-hidden="true" />
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block truncate text-sm font-bold text-foreground">{s.label}</span>
-                          <span className="block truncate text-xs text-muted">{s.meta}</span>
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-                <li className="border-t border-border/70 px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={submit}
-                    className="flex w-full items-center justify-between text-xs font-semibold text-accent"
-                  >
-                    <span>See all results for “{query.trim()}”</span>
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </button>
-                </li>
-              </motion.ul>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* Quick filters */}
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-6 flex flex-wrap items-center justify-center gap-2"
-        >
-          {QUICK_FILTERS.map((chip) => {
-            const Icon = chip.icon;
-            return (
-              <Link
-                key={chip.href + chip.label}
-                href={chip.href}
-                className="pressable inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-bold text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:border-white/50 hover:bg-white/20"
-              >
-                <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                {chip.label}
-              </Link>
-            );
-          })}
-        </motion.div>
-
-        {/* Glass stat strip */}
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-10 grid max-w-2xl grid-cols-3 gap-2 sm:gap-3"
-        >
-          {[
-            { value: "8+", label: "Boards" },
-            { value: "500+", label: "Chapters" },
-            { value: "100%", label: "Free" },
-          ].map((stat) => (
-            <div key={stat.label} className="glass-card rounded-2xl px-3 py-3.5 text-center">
-              <p className="font-serif text-xl font-black text-white sm:text-2xl">{stat.value}</p>
-              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wider text-white/70 sm:text-[11px]">{stat.label}</p>
-            </div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+      {/* Quick filters */}
+      <motion.div
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        className="mt-4 flex flex-wrap items-center justify-center gap-2"
+      >
+        {QUICK_FILTERS.map((chip) => {
+          const Icon = chip.icon;
+          return (
+            <Link
+              key={chip.href + chip.label}
+              href={chip.href}
+              className="pressable inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:border-white/50 hover:bg-white/20"
+            >
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+              {chip.label}
+            </Link>
+          );
+        })}
+      </motion.div>
+    </div>
   );
 }
