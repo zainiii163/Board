@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -13,6 +14,7 @@ import {
   LayoutGrid,
   LogOut,
   Menu,
+  MoreHorizontal,
   Search,
   Sparkles,
   Upload,
@@ -109,6 +111,9 @@ const KNOWN_BOARD_SLUGS = new Set<string>([
   "a-level",
 ]);
 
+/** Lower-priority menus that collapse into "More" on narrow desktops. */
+const SECONDARY_LABELS = new Set(["Pairing Schemes", "Tuition"]);
+
 function classHref(boardSlug: string, num: number): string {
   if (boardSlug === "apsacs") return `/apsacs/class-${num}`;
   return `/${boardSlug}/${num}`;
@@ -165,6 +170,13 @@ function buildBoardNav(boardSlug: string): DropdownDef {
 
 /* ── Desktop dropdown ─────────────────────────────────────────── */
 
+/**
+ * Panel is rendered in a portal on <body> and positioned with `fixed`
+ * coordinates measured from its trigger. The glass navbar uses
+ * `backdrop-filter`, which turns it into the containing block for BOTH
+ * `absolute` and `fixed` descendants — an in-tree panel would be offset from
+ * the wrong element and get clipped, so it escapes to the body instead.
+ */
 function NavDropdown({
   item,
   isOpen,
@@ -181,6 +193,31 @@ function NavDropdown({
   const slug = item.label.toLowerCase().replace(/[^a-z]/g, "-");
   const reduceMotion = useReducedMotion();
   const Icon = item.icon;
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  const measure = useCallback(() => {
+    const el = triggerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const panelWidth = Math.min(320, window.innerWidth - 32);
+    setPos({
+      top: Math.min(r.bottom + 8, window.innerHeight - 80),
+      left: Math.max(16, Math.min(r.left, window.innerWidth - panelWidth - 16)),
+    });
+  }, []);
+
+  // Keep the panel glued to its trigger while scrolling or resizing.
+  useEffect(() => {
+    if (!isOpen) return;
+    measure();
+    window.addEventListener("scroll", measure, true);
+    window.addEventListener("resize", measure);
+    return () => {
+      window.removeEventListener("scroll", measure, true);
+      window.removeEventListener("resize", measure);
+    };
+  }, [isOpen, measure]);
 
   if (item.soon) {
     return (
@@ -191,52 +228,67 @@ function NavDropdown({
     );
   }
 
+  const handleEnter = () => {
+    measure();
+    onOpen();
+  };
+
   return (
-    <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
+    <div className="relative shrink-0" onMouseEnter={handleEnter} onMouseLeave={onClose}>
       <button
+        ref={triggerRef}
         type="button"
-        className={`pressable focus-ring flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold transition ${
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        className={`pressable focus-ring flex items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 py-2 text-[13px] font-semibold transition lg:text-sm ${
           isOpen ? "bg-accent/10 text-accent" : "text-foreground/80 hover:bg-accent/5 hover:text-accent"
         }`}
       >
-        {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}
+        {Icon && <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />}
         {item.label}
         <motion.span animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }} className="inline-flex">
-          <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+          <ChevronDown className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
         </motion.span>
       </button>
 
       <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0, y: -6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.97 }}
-            transition={POPOVER_SPRING}
-            className={`glass-card absolute left-0 top-full z-50 mt-2 overflow-hidden rounded-2xl p-2 shadow-lift ${item.groups.length > 1 ? "w-80" : "w-64"}`}
-            onMouseEnter={onFocused}
-            onMouseLeave={onClose}
-          >
-            {item.groups.map((g, gi) => (
-              <div key={gi}>
-                {g.heading && (
-                  <div className="mb-1 mt-2 px-3 text-[11px] font-bold uppercase tracking-wider text-accent">{g.heading}</div>
-                )}
-                {g.items.map((itm) => (
-                  <Link
-                    key={itm.href}
-                    href={itm.href}
-                    onClick={onClose}
-                    className="block rounded-xl px-3 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-accent/10 hover:text-accent"
-                  >
-                    {itm.label}
-                  </Link>
-                ))}
-                {gi < item.groups.length - 1 && <div className="my-2 border-t border-border/60" />}
-              </div>
-            ))}
-          </motion.div>
-        )}
+        {isOpen &&
+          pos &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <motion.div
+              initial={reduceMotion ? false : { opacity: 0, y: -6, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.97 }}
+              transition={POPOVER_SPRING}
+              style={{ top: pos.top, left: pos.left }}
+              className={`fixed z-[70] max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-2 shadow-lift ${
+                item.groups.length > 1 ? "w-80" : "w-64"
+              }`}
+              onMouseEnter={onFocused}
+              onMouseLeave={onClose}
+            >
+              {item.groups.map((g, gi) => (
+                <div key={gi}>
+                  {g.heading && (
+                    <div className="mb-1 mt-2 px-3 text-[11px] font-bold uppercase tracking-wider text-accent">{g.heading}</div>
+                  )}
+                  {g.items.map((itm) => (
+                    <Link
+                      key={itm.href}
+                      href={itm.href}
+                      onClick={onClose}
+                      className="block whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-accent/10 hover:text-accent"
+                    >
+                      {itm.label}
+                    </Link>
+                  ))}
+                  {gi < item.groups.length - 1 && <div className="my-2 border-t border-border/60" />}
+                </div>
+              ))}
+            </motion.div>,
+            document.body,
+          )}
       </AnimatePresence>
     </div>
   );
@@ -263,6 +315,25 @@ export function Header() {
     [activeBoard],
   );
 
+  // Lower-priority menus collapse into a single "More" dropdown on narrow desktops
+  // so the bar never overflows (and never pushes the page sideways).
+  const primaryItems = useMemo(
+    () => navItems.filter((i) => !SECONDARY_LABELS.has(i.label)),
+    [navItems],
+  );
+  const secondaryItems = useMemo(
+    () => navItems.filter((i) => SECONDARY_LABELS.has(i.label)),
+    [navItems],
+  );
+  const moreItem: DropdownDef = useMemo(
+    () => ({
+      label: "More",
+      icon: MoreHorizontal,
+      groups: secondaryItems.map((i) => ({ heading: i.label, items: i.groups.flatMap((g) => g.items) })),
+    }),
+    [secondaryItems],
+  );
+
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
   }, []);
@@ -277,7 +348,7 @@ export function Header() {
       <header className="sticky top-0 z-40 print:hidden">
         <div className="glass-bar border-b border-border/70 shadow-soft">
           <nav
-            className="mx-auto flex h-16 w-full max-w-[1400px] items-center gap-3 px-4 sm:px-6 lg:px-8"
+            className="mx-auto flex h-16 w-full max-w-[1600px] items-center gap-2 px-3 sm:gap-3 sm:px-6 lg:px-8"
             aria-label="Main navigation"
           >
             {/* Logo */}
@@ -285,14 +356,14 @@ export function Header() {
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-sm font-black text-white shadow-md shadow-accent/30 transition-transform duration-300 group-hover:scale-105">
                 B
               </span>
-              <span className="hidden font-serif text-lg font-black tracking-tight sm:block">
+              <span className="hidden font-serif text-lg font-black tracking-tight lg:block">
                 <span className="text-gradient">BoardNotes</span>
               </span>
             </Link>
 
-            {/* Desktop nav */}
-            <div className="hidden items-center gap-0.5 lg:flex">
-              {navItems.map((item) => (
+            {/* Desktop nav — scrolls internally instead of widening the page */}
+            <div className="scrollbar-none hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
+              {primaryItems.map((item) => (
                 <NavDropdown
                   key={item.label}
                   item={item}
@@ -302,9 +373,33 @@ export function Header() {
                   onFocused={clearClose}
                 />
               ))}
+              {/* Secondary menus: inline on wide screens, collapsed below xl */}
+              <div className="hidden items-center gap-0.5 xl:flex">
+                {secondaryItems.map((item) => (
+                  <NavDropdown
+                    key={item.label}
+                    item={item}
+                    isOpen={dropdownSlug === item.label.toLowerCase().replace(/[^a-z]/g, "-")}
+                    onOpen={() => { clearClose(); setDropdownSlug(item.label.toLowerCase().replace(/[^a-z]/g, "-")); }}
+                    onClose={() => scheduleClose()}
+                    onFocused={clearClose}
+                  />
+                ))}
+              </div>
+              {secondaryItems.length > 0 && (
+                <div className="xl:hidden">
+                  <NavDropdown
+                    item={moreItem}
+                    isOpen={dropdownSlug === "more"}
+                    onOpen={() => { clearClose(); setDropdownSlug("more"); }}
+                    onClose={() => scheduleClose()}
+                    onFocused={clearClose}
+                  />
+                </div>
+              )}
             </div>
 
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
               {/* Search */}
               <Link
                 href="/search"
@@ -316,20 +411,20 @@ export function Header() {
 
               <ThemeToggle />
 
-              {/* Upload CTA */}
+              {/* Upload CTA — label only when there is room */}
               <Link
                 href="/upload"
-                className="pressable focus-ring hidden items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-4 py-2 text-sm font-bold text-white shadow-md shadow-accent/25 transition hover:shadow-lg hover:shadow-accent/40 sm:inline-flex"
+                className="pressable focus-ring inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-3 py-2 text-sm font-bold text-white shadow-md shadow-accent/25 transition hover:shadow-lg hover:shadow-accent/40 sm:px-4"
               >
-                <Upload className="h-4 w-4" aria-hidden="true" />
-                {tr("uploadTitle")}
+                <Upload className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="hidden xl:inline">{tr("uploadTitle")}</span>
               </Link>
 
               {/* Auth */}
               {!loading && user ? (
-                <div className="hidden items-center gap-2 lg:flex">
+                <div className="hidden items-center gap-1.5 lg:flex">
                   {isStaff && (
-                    <Link href="/admin" className="pressable rounded-xl px-3 py-2 text-sm font-semibold text-foreground/80 transition hover:bg-accent/10 hover:text-accent">
+                    <Link href="/admin" className="pressable whitespace-nowrap rounded-xl px-2.5 py-2 text-[13px] font-semibold text-foreground/80 transition hover:bg-accent/10 hover:text-accent">
                       {tr("admin")}
                     </Link>
                   )}
@@ -344,7 +439,7 @@ export function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="pressable focus-ring hidden rounded-xl bg-foreground px-4 py-2 text-sm font-bold text-background transition hover:opacity-90 lg:inline-flex"
+                  className="pressable focus-ring hidden whitespace-nowrap rounded-xl bg-foreground px-3.5 py-2 text-[13px] font-bold text-background transition hover:opacity-90 lg:inline-flex"
                 >
                   {tr("signUp")}
                 </Link>

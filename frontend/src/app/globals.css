@@ -59,6 +59,8 @@ html[dir="rtl"] body {
 html {
   background: var(--background);
   scroll-behavior: smooth;
+  /* Safety net: no element may widen the page sideways (e.g. a long nav row). */
+  overflow-x: clip;
 }
 
 body {
@@ -67,6 +69,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   font-size: calc(1rem * var(--text-scale, 1));
+  overflow-x: clip;
 }
 
 .question-page {
