@@ -7,7 +7,7 @@ const FEATURES = [
     icon: "\uD83D\uDCDA",
     title: "Books & Notes",
     desc: "Curated textbooks, notes, and solved exercises from Class 5 to 12 \u2014 organized by board, class, and subject.",
-    gradient: "from-teal-500 to-emerald-600",
+    gradient: "from-indigo-500 to-violet-600",
     href: "/books",
   },
   {
@@ -45,7 +45,7 @@ export function PlatformIntro() {
     <section className="relative overflow-hidden border-t border-border bg-gradient-to-b from-background via-accent/[0.02] to-background">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -right-40 top-10 h-80 w-80 rounded-full bg-accent/5 blur-3xl" />
-        <div className="absolute -left-40 bottom-10 h-80 w-80 rounded-full bg-emerald-500/5 blur-3xl" />
+        <div className="absolute -left-40 bottom-10 h-80 w-80 rounded-full bg-indigo-500/5 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">

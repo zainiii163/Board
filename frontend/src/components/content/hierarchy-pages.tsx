@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { LocalizedBreadcrumbs } from "@/components/layout/localized-breadcrumbs";
+import { BookOpen, FileText, GraduationCap, NotebookPen, School } from "lucide-react";
 import { ChapterQuiz } from "@/components/content/chapter-quiz";
 import { BookmarkButton } from "@/components/content/bookmark-button";
 import { SaveOfflineButton } from "@/components/content/save-offline-button";
@@ -309,7 +310,10 @@ export function ClassPageContent({
       {/* Header */}
       <div className="mt-6">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">🏫 {displayTitle}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">
+            <School className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+            {displayTitle}
+          </span>
           <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{short}</span>
           <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">{ACADEMIC_YEAR}</span>
         </div>
@@ -331,7 +335,7 @@ export function ClassPageContent({
           onClick={() => selectView("notes")}
           className={tabClass(view === "notes")}
         >
-          📝 {tr("notes")}
+          <NotebookPen className="h-4 w-4" aria-hidden="true" /> {tr("notes")}
         </button>
         <button
           type="button"
@@ -340,7 +344,7 @@ export function ClassPageContent({
           onClick={() => selectView("books")}
           className={tabClass(view === "books")}
         >
-          📚 {tr("books")}
+          <BookOpen className="h-4 w-4" aria-hidden="true" /> {tr("books")}
         </button>
         <button
           type="button"
@@ -349,7 +353,7 @@ export function ClassPageContent({
           onClick={() => selectView("past-papers")}
           className={tabClass(view === "past-papers")}
         >
-          📝 Past Papers
+          <FileText className="h-4 w-4" aria-hidden="true" /> Past Papers
         </button>
       </div>
 
@@ -378,7 +382,7 @@ export function ClassPageContent({
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <span className="text-lg text-accent">📖</span>
+                        <BookOpen className="h-5 w-5 text-accent" aria-hidden="true" />
                       )}
                     </span>
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{tr("subjectLabel")}</p>
@@ -567,8 +571,14 @@ export function SubjectPageContent({
       {/* Header chips + bookmark */}
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
-          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {displayTitle}</span>
-          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🎓 {classTitle}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-0.5">
+            <School className="h-3 w-3 text-accent" aria-hidden="true" />
+            {displayTitle}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-0.5">
+            <GraduationCap className="h-3 w-3 text-accent" aria-hidden="true" />
+            {classTitle}
+          </span>
           <span className="rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-accent">{short}</span>
           {sscLabel && (
             <span className="rounded-full border border-border bg-card px-2.5 py-0.5">{sscLabel}-{classNum === 9 || classNum === 11 ? "I" : "II"}</span>
@@ -851,9 +861,18 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
       {/* Header — simple */}
       <div className="mt-6">
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
-          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🏫 {displayTitle}</span>
-          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">🎓 {props.classTitle}</span>
-          <span className="rounded-full border border-border bg-card px-2.5 py-0.5">📖 {props.subjectTitle}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-0.5">
+            <School className="h-3 w-3 text-accent" aria-hidden="true" />
+            {displayTitle}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-0.5">
+            <GraduationCap className="h-3 w-3 text-accent" aria-hidden="true" />
+            {props.classTitle}
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-0.5">
+            <BookOpen className="h-3 w-3 text-accent" aria-hidden="true" />
+            {props.subjectTitle}
+          </span>
         </div>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -1000,7 +1019,10 @@ export function ExercisePageContent(props: ExercisePageContentProps) {
       <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold text-muted">
-            <span className="rounded-full border border-border bg-card px-2.5 py-0.5">📖 {props.subjectTitle}</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-0.5">
+              <BookOpen className="h-3 w-3 text-accent" aria-hidden="true" />
+              {props.subjectTitle}
+            </span>
             <span className="rounded-full border border-border bg-card px-2.5 py-0.5">📑 {props.chapterTitle}</span>
           </div>
           <p className="mt-3 text-sm font-bold uppercase tracking-[0.18em] text-accent">{tr("exerciseLabel")}</p>
