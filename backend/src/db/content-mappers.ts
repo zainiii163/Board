@@ -12,6 +12,7 @@ type ChapterRow = {
   formulasUr: string[];
   definitions?: { term: string; definition: string; termUr?: string; definitionUr?: string }[];
   videoUrl: string | null;
+  driveUrl: string | null;
   status: ContentStatus;
   exercises: { id: number }[];
   subject: {
@@ -42,6 +43,7 @@ export function mapChapterRow(row: ChapterRow): CmsChapterRecord {
     formulasUr: row.formulasUr ?? [],
     definitions: row.definitions ?? [],
     videoUrl: row.videoUrl ?? undefined,
+    driveUrl: row.driveUrl ?? undefined,
     status: row.status ?? "published",
     exerciseCount: row.exercises.length,
   };

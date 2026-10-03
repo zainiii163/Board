@@ -50,6 +50,7 @@ export type Board = BoardSummary & {
                 formulasUr?: string[];
                 definitions?: ChapterDefinition[];
                 videoUrl?: string;
+                driveUrl?: string;
                 exercises: Exercise[];
             }[];
         }[];

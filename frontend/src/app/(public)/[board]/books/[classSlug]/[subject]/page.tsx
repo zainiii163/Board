@@ -27,6 +27,7 @@ type Book = {
   priceLabel: string;
   coverUrl: string | null;
   pdfUrl: string | null;
+  driveUrl: string | null;
   notesPath: string | null;
 };
 
@@ -79,8 +80,11 @@ export default async function BookDetailPage({ params }: PageProps) {
   const classTitle = book?.classTitle ?? `Class ${classSlug}`;
   const cover = resolveCover(book, board, classNum, subjectTitle);
   const fileUrl = book?.pdfUrl ?? null;
+  const driveLink = book?.driveUrl ?? null;
   const notesHref = book?.notesPath ?? `/${board}/${classSlug}/${subject}`;
-  const isDrive = !!fileUrl && (fileUrl.includes("drive.google.com") || fileUrl.includes("docs.google.com"));
+  const fileIsDrive = !!fileUrl && (fileUrl.includes("drive.google.com") || fileUrl.includes("docs.google.com"));
+  const canReadOnline = !!fileUrl && !fileIsDrive;
+  const hasDownload = !!fileUrl || !!driveLink;
 
   if (!book && !cover) notFound();
 
@@ -140,16 +144,20 @@ export default async function BookDetailPage({ params }: PageProps) {
               </span>
             </div>
 
-            {fileUrl ? (
+            {hasDownload ? (
               <div className="mt-6 flex flex-wrap items-center gap-3">
-                <DownloadGate url={pdfUrl(fileUrl)} showAd={false} />
-                <a
-                  href="#pdf-reader"
-                  className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-4 py-2.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
-                >
-                  Read Online
-                </a>
-                {isDrive && <DriveLinkButton href={fileUrl} label="Open in Google Drive" />}
+                {fileUrl && <DownloadGate url={pdfUrl(fileUrl)} showAd={false} />}
+                {canReadOnline && (
+                  <a
+                    href="#pdf-reader"
+                    className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-4 py-2.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
+                  >
+                    Read Online
+                  </a>
+                )}
+                {(driveLink || fileIsDrive) && (
+                  <DriveLinkButton href={(driveLink ?? fileUrl)!} label="Open in Google Drive" />
+                )}
               </div>
             ) : (
               <div className="mt-6 rounded-xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm text-muted">
@@ -174,7 +182,7 @@ export default async function BookDetailPage({ params }: PageProps) {
       </section>
 
       {/* PDF reader */}
-      {fileUrl && (
+      {canReadOnline && (
         <section className="mx-auto max-w-6xl px-4 pb-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
             <div id="pdf-reader">

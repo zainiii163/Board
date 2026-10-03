@@ -14,7 +14,7 @@ export type ContentStatus = "draft" | "in_review" | "published" | "archived";
 
 export type UserRole = "admin" | "editor" | "teacher" | "student";
 
-export type SearchResultType = "chapter" | "exercise" | "question";
+export type SearchResultType = "chapter" | "exercise" | "question" | "paper";
 
 // ── API health ──
 

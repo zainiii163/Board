@@ -19,6 +19,7 @@ export const PAPER_TYPE_LABELS: Record<PastPaperType, string> = {
 
 export type PastPaperItem = {
   id: number;
+  boardSlug: string;
   boardTitle: string;
   subjectTitle: string;
   classTitle: string;
@@ -40,15 +41,43 @@ function normalizeBoardLabel(boardTitle: string, classTitle: string): string {
   return boardTitle.replace(/\s*\(FBISE\)/i, "").trim() || "Federal Board";
 }
 
-export function PastPapersList({ papers }: { papers: PastPaperItem[] }) {
+export function PastPapersList({
+  papers,
+  hideHeading = false,
+  initialBoard,
+  initialYear,
+  initialType,
+}: {
+  papers: PastPaperItem[];
+  hideHeading?: boolean;
+  initialBoard?: string;
+  initialYear?: string;
+  initialType?: string;
+}) {
   const { tr } = useLocale();
-  const [filter, setFilter] = useState<"all" | PastPaperType>("all");
+  const [filter, setFilter] = useState<"all" | PastPaperType>(
+    initialType && (FILTERS as string[]).includes(initialType) && initialType !== "all"
+      ? (initialType as PastPaperType)
+      : "all",
+  );
+  const [boardFilter, setBoardFilter] = useState(initialBoard && papers.some((p) => p.boardSlug === initialBoard) ? initialBoard : "all");
+  const [yearFilter, setYearFilter] = useState(initialYear && papers.some((p) => p.year === initialYear) ? initialYear : "all");
 
-  const visible = filter === "all" ? papers : papers.filter((p) => p.paperType === filter);
+  const boards = Array.from(new Map(papers.map((p) => [p.boardSlug, p.boardTitle])));
+  const years = Array.from(new Set(papers.map((p) => p.year))).sort().reverse();
+
+  const visible = papers.filter(
+    (p) =>
+      (filter === "all" || p.paperType === filter) &&
+      (boardFilter === "all" || p.boardSlug === boardFilter) &&
+      (yearFilter === "all" || p.year === yearFilter),
+  );
+  const selectClass =
+    "rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground/80 transition hover:border-accent/50";
 
   return (
     <>
-      <PageHeading titleKey="pastPapers" subtitleKey="pastPapersSubtitle" />
+      {!hideHeading && <PageHeading titleKey="pastPapers" subtitleKey="pastPapersSubtitle" />}
       <div className="mt-6 flex flex-wrap gap-2">
         {FILTERS.map((value) => (
           <button
@@ -64,6 +93,32 @@ export function PastPapersList({ papers }: { papers: PastPaperItem[] }) {
             {value === "all" ? "All" : PAPER_TYPE_LABELS[value]}
           </button>
         ))}
+        {boards.length > 1 && (
+          <select
+            value={boardFilter}
+            onChange={(e) => setBoardFilter(e.target.value)}
+            aria-label="Filter by board"
+            className={selectClass}
+          >
+            <option value="all">All boards</option>
+            {boards.map(([slug, title]) => (
+              <option key={slug} value={slug}>{title}</option>
+            ))}
+          </select>
+        )}
+        {years.length > 1 && (
+          <select
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+            aria-label="Filter by year"
+            className={selectClass}
+          >
+            <option value="all">All years</option>
+            {years.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        )}
       </div>
       <div className="mt-4 space-y-3">
         {visible.length === 0 && (

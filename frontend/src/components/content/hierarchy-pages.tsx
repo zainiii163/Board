@@ -16,6 +16,8 @@ import { SubjectFaq } from "@/components/content/subject-faq";
 import { MathText } from "@/components/content/math-text";
 import { PdfSection } from "@/components/content/pdf-section";
 import { DownloadGate } from "@/components/content/download-gate";
+import { DriveLinkButton } from "@/components/content/drive-link-button";
+import { PastPapersList, type PastPaperItem } from "@/components/content/past-papers-list";
 import { AdBanner } from "@/components/portal/ad-banner";
 import { CoverArt } from "@/components/portal/cover-art";
 import { useLocale } from "@/lib/locale-context";
@@ -30,6 +32,7 @@ type BoardPageContentProps = {
   board: string;
   title: string;
   classes: BoardClass[];
+  pastPapers?: PastPaperItem[];
 };
 
 function classNumber(slug: string): number {
@@ -37,7 +40,7 @@ function classNumber(slug: string): number {
   return Number.isNaN(n) ? 0 : n;
 }
 
-export function BoardPageContent({ board, title, classes }: BoardPageContentProps) {
+export function BoardPageContent({ board, title, classes, pastPapers = [] }: BoardPageContentProps) {
   const { tr } = useLocale();
   const displayTitle = boardDisplayTitle(title, board);
 
@@ -207,6 +210,26 @@ export function BoardPageContent({ board, title, classes }: BoardPageContentProp
         </>
       )}
 
+      {/* Past papers — Drive-linked board exam papers */}
+      <div className="mt-12">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Exam Prep</p>
+            <h2 className="mt-1 text-2xl font-black text-foreground">Past Papers — {displayTitle}</h2>
+            <p className="mt-1 text-sm text-muted">Model papers, 1st &amp; 2nd annual, and PBAs with Drive links.</p>
+          </div>
+          <Link
+            href="/past-papers"
+            className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-3 py-1.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
+          >
+            Browse all past papers →
+          </Link>
+        </div>
+        <div className="mt-4">
+          <PastPapersList papers={pastPapers} hideHeading />
+        </div>
+      </div>
+
       {/* SEO Content Block */}
       <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">
@@ -242,7 +265,8 @@ type ClassPageContentProps = {
   boardTitle: string;
   classTitle: string;
   subjects: { slug: string; title: string }[];
-  initialView?: "notes" | "books";
+  initialView?: "notes" | "books" | "past-papers";
+  pastPapers?: PastPaperItem[];
 };
 
 export function ClassPageContent({
@@ -252,9 +276,10 @@ export function ClassPageContent({
   classTitle,
   subjects,
   initialView = "notes",
+  pastPapers = [],
 }: ClassPageContentProps) {
   const { tr } = useLocale();
-  const [view, setView] = useState<"notes" | "books">(initialView);
+  const [view, setView] = useState<"notes" | "books" | "past-papers">(initialView);
   const classNum = classNumber(classSlug);
   const short = boardShortName(board, classNum);
   const displayTitle = boardDisplayTitle(boardTitle, board, classNum);
@@ -263,11 +288,11 @@ export function ClassPageContent({
   const tabClass = (active: boolean) =>
     `rounded-full px-5 py-2 text-sm font-bold transition ${active ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`;
 
-  function selectView(next: "notes" | "books") {
+  function selectView(next: "notes" | "books" | "past-papers") {
     setView(next);
     const url = new URL(window.location.href);
-    if (next === "books") url.searchParams.set("view", "books");
-    else url.searchParams.delete("view");
+    if (next === "notes") url.searchParams.delete("view");
+    else url.searchParams.set("view", next);
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
@@ -317,6 +342,15 @@ export function ClassPageContent({
         >
           📚 {tr("books")}
         </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "past-papers"}
+          onClick={() => selectView("past-papers")}
+          className={tabClass(view === "past-papers")}
+        >
+          📝 Past Papers
+        </button>
       </div>
 
       {view === "notes" ? (
@@ -360,6 +394,23 @@ export function ClassPageContent({
                 );
               })
             )}
+          </div>
+        </>
+      ) : view === "past-papers" ? (
+        <>
+          <p className="mt-4 text-sm text-muted">
+            Board exam papers — filter by type, open from Google Drive.
+          </p>
+          <div className="mt-4">
+            <PastPapersList papers={pastPapers} hideHeading />
+          </div>
+          <div className="mt-6">
+            <Link
+              href="/past-papers"
+              className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-3 py-1.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
+            >
+              View all past papers →
+            </Link>
           </div>
         </>
       ) : (
@@ -767,6 +818,7 @@ type ChapterPageContentProps = {
   formulasUr?: string[];
   definitions?: Flashcard[];
   videoUrl?: string;
+  driveUrl?: string;
   exercises: { slug: string; title: string }[];
 };
 
@@ -815,6 +867,11 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
       <div className="mt-6 rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
         <p className="text-base leading-7 text-muted">{summary}</p>
         <ChapterVideo videoUrl={props.videoUrl} title={props.chapterTitle} />
+        {props.driveUrl && (
+          <div className="mt-4">
+            <DriveLinkButton href={props.driveUrl} label="Open chapter resource on Drive" />
+          </div>
+        )}
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-border bg-background p-5">
             <h2 className="text-lg font-bold text-foreground">{tr("keyFormulas")}</h2>

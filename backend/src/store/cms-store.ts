@@ -32,6 +32,7 @@ export type CmsChapterRecord = {
   formulasUr?: string[];
   definitions?: ChapterDefinition[];
   videoUrl?: string;
+  driveUrl?: string;
   status: ContentStatus;
   exerciseCount: number;
 };
@@ -464,6 +465,7 @@ export const cmsStore = {
               formulasUr: chapter.formulasUr,
               definitions: chapter.definitions ?? [],
               videoUrl: chapter.videoUrl,
+              driveUrl: chapter.driveUrl,
               status,
               exerciseCount: chapter.exercises.length,
             });
@@ -485,6 +487,7 @@ export const cmsStore = {
     formulasUr?: string[];
     definitions?: ChapterDefinition[];
     videoUrl?: string;
+    driveUrl?: string;
     status?: ContentStatus;
   }) => {
     const board = content[input.boardSlug];
@@ -509,6 +512,7 @@ export const cmsStore = {
       formulasUr: input.formulasUr,
       definitions: input.definitions ?? [],
       videoUrl: input.videoUrl,
+      driveUrl: input.driveUrl,
       exercises: [],
     });
 
@@ -537,6 +541,7 @@ export const cmsStore = {
       formulasUr: string[];
       definitions: ChapterDefinition[];
       videoUrl: string;
+      driveUrl: string;
       status: ContentStatus;
     }>,
   ) => {
@@ -557,6 +562,7 @@ export const cmsStore = {
       if (input.formulasUr !== undefined) found.chapter.formulasUr = input.formulasUr;
       if (input.definitions !== undefined) found.chapter.definitions = input.definitions;
       if (input.videoUrl !== undefined) found.chapter.videoUrl = input.videoUrl || undefined;
+      if (input.driveUrl !== undefined) found.chapter.driveUrl = input.driveUrl || undefined;
       if (input.status) {
         setChapterPublishStatus(
           chapterKey({

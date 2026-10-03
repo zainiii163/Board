@@ -30,6 +30,7 @@ type Chapter = {
   formulasUr?: string[];
   definitions?: ChapterDefinition[];
   videoUrl?: string;
+  driveUrl?: string;
   status: ContentStatus;
   exerciseCount: number;
 };
@@ -137,6 +138,7 @@ export default function ManageChaptersPage() {
     formulas: "",
     formulasUr: "",
     videoUrl: "",
+    driveUrl: "",
     definitions: [] as ChapterDefinition[],
   });
 
@@ -185,6 +187,7 @@ export default function ManageChaptersPage() {
       formulas: chapter.formulas.join("\n"),
       formulasUr: (chapter.formulasUr ?? []).join("\n"),
       videoUrl: chapter.videoUrl ?? "",
+      driveUrl: chapter.driveUrl ?? "",
       definitions: (chapter.definitions ?? []).map((d) => ({ ...d })),
     });
   }
@@ -205,6 +208,7 @@ export default function ManageChaptersPage() {
       formulas: editForm.formulas.split("\n").filter(Boolean),
       formulasUr: editForm.formulasUr.split("\n").filter(Boolean),
       videoUrl: editForm.videoUrl.trim(),
+      driveUrl: editForm.driveUrl.trim(),
       definitions,
     });
     setEditingId(null);
@@ -307,6 +311,9 @@ export default function ManageChaptersPage() {
                 {!editingId && chapter.videoUrl && (
                   <p className="mt-1 text-xs font-semibold text-accent">Video lesson linked</p>
                 )}
+                {!editingId && chapter.driveUrl && (
+                  <p className="mt-1 text-xs font-semibold text-accent">Drive link attached</p>
+                )}
                 {editingId === chapter.id ? (
                   <div className="mt-4 space-y-2">
                     <textarea value={editForm.summary} onChange={(e) => setEditForm({ ...editForm, summary: e.target.value })} placeholder="Summary (English)" className="min-h-20 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground" />
@@ -317,6 +324,12 @@ export default function ManageChaptersPage() {
                       value={editForm.videoUrl}
                       onChange={(e) => setEditForm({ ...editForm, videoUrl: e.target.value })}
                       placeholder="YouTube URL (optional)"
+                      className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground"
+                    />
+                    <input
+                      value={editForm.driveUrl}
+                      onChange={(e) => setEditForm({ ...editForm, driveUrl: e.target.value })}
+                      placeholder="Google Drive link (optional)"
                       className="w-full rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground"
                     />
                     <DefinitionsEditor

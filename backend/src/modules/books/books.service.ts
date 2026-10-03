@@ -20,6 +20,7 @@ function mapBookRow(row: typeof schema.books.$inferSelect): BookRecord {
     priceLabel: row.priceLabel,
     coverUrl: row.coverUrl,
     pdfUrl: row.pdfUrl,
+    driveUrl: row.driveUrl ?? null,
     notesPath: row.notesPath,
   };
 }
@@ -74,12 +75,13 @@ export async function createBook(input: Omit<BookRecord, "id">): Promise<BookRec
         priceLabel: input.priceLabel,
         coverUrl: input.coverUrl,
         pdfUrl: input.pdfUrl,
+        driveUrl: input.driveUrl ?? null,
         notesPath: input.notesPath,
       })
       .returning();
     return mapBookRow(row);
   }
-  return resourcesStore.createBook(input);
+  return resourcesStore.createBook({ ...input, driveUrl: input.driveUrl ?? null });
 }
 
 export async function updateBook(

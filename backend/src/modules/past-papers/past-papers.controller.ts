@@ -14,7 +14,8 @@ export const list = async (req: AuthedRequest, res: Response, next: NextFunction
     const board = readQueryValue(req.query.board);
     const year = readQueryValue(req.query.year);
     const paperType = readQueryValue(req.query.type);
-    res.json(await pastPapersService.listPastPapers(board, year, paperType));
+    const classSlug = readQueryValue(req.query.class);
+    res.json(await pastPapersService.listPastPapers(board, year, paperType, classSlug));
   } catch (error) {
     next(error);
   }

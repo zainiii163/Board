@@ -36,6 +36,7 @@ export const chapters = pgTable("chapters", {
     .default([])
     .notNull(),
   videoUrl: text("video_url"),
+  driveUrl: text("drive_url"),
   status: text("status").$type<import("@boardnotes/shared").ContentStatus>().notNull().default("published"),
 });
 
@@ -193,6 +194,7 @@ export const books = pgTable("books", {
   priceLabel: text("price_label").notNull().default("Free PDF"),
   coverUrl: text("cover_url"),
   pdfUrl: text("pdf_url"),
+  driveUrl: text("drive_url"),
   notesPath: text("notes_path"),
 });
 

@@ -4,8 +4,34 @@ import { BOARD_DATA } from "../../demo-data.js";
 import { db } from "../../db/index.js";
 import { useDb } from "../../db/mode.js";
 import { portalStore } from "../../store/portal-store.js";
+import { listPastPapers } from "../past-papers/past-papers.service.js";
 
 const asLower = (value: string) => value.toLowerCase().trim();
+
+async function searchPastPapers(normalizedQuery: string): Promise<SearchResult[]> {
+  try {
+    const papers = await listPastPapers();
+    const results: SearchResult[] = [];
+    for (const paper of papers) {
+      const text = `${paper.subjectTitle} ${paper.classTitle} ${paper.boardTitle} ${paper.year} past papers ${paper.paperType}`;
+      if (normalizedQuery && !asLower(text).includes(normalizedQuery)) continue;
+      results.push({
+        title: `${paper.subjectTitle} ${paper.classTitle} — Past Papers ${paper.year}`,
+        board: paper.boardTitle,
+        boardSlug: paper.boardSlug,
+        className: paper.classTitle,
+        classSlug: paper.classSlug,
+        subject: paper.subjectTitle,
+        subjectSlug: paper.subjectSlug,
+        path: `/${paper.boardSlug}/${paper.classSlug}?view=past-papers`,
+        type: "paper",
+      });
+    }
+    return results;
+  } catch {
+    return [];
+  }
+}
 
 function searchDemoData(normalizedQuery: string) {
   const seen = new Set<string>();
@@ -155,7 +181,9 @@ export async function searchContent(query: string) {
   const results = useDb()
     ? await searchDatabase(normalizedQuery)
     : searchDemoData(normalizedQuery);
-  const finalResults = normalizedQuery ? results : results.slice(0, 10);
+  const papers = await searchPastPapers(normalizedQuery);
+  const combined = [...results, ...papers];
+  const finalResults = normalizedQuery ? combined : combined.slice(0, 10);
 
   const resources = portalStore
     .listResources({ q: query, sort: "popular" })

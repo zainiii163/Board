@@ -29,16 +29,22 @@ function mapPastPaperRow(row: typeof schema.pastPapers.$inferSelect): PastPaperR
   };
 }
 
-export async function listPastPapers(boardSlug?: string, year?: string, paperType?: string): Promise<PastPaperRecord[]> {
+export async function listPastPapers(
+  boardSlug?: string,
+  year?: string,
+  paperType?: string,
+  classSlug?: string,
+): Promise<PastPaperRecord[]> {
   if (useDb()) {
     const rows = await db.select().from(schema.pastPapers);
     let mapped = rows.map(mapPastPaperRow);
     if (boardSlug) mapped = mapped.filter((p) => p.boardSlug === boardSlug);
     if (year) mapped = mapped.filter((p) => p.year === year);
     if (paperType) mapped = mapped.filter((p) => p.paperType === paperType);
+    if (classSlug) mapped = mapped.filter((p) => p.classSlug === classSlug);
     return mapped;
   }
-  return resourcesStore.listPastPapers(boardSlug, year, paperType);
+  return resourcesStore.listPastPapers(boardSlug, year, paperType, classSlug);
 }
 
 export async function getPastPaper(id: number): Promise<PastPaperRecord> {

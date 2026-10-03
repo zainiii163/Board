@@ -68,6 +68,7 @@ export function UploadForm({ defaultCategoryId }: UploadFormProps) {
   const [board, setBoard] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [driveLink, setDriveLink] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -87,7 +88,10 @@ export function UploadForm({ defaultCategoryId }: UploadFormProps) {
   }, []);
 
   const needsSignIn = !authLoading && !user;
-  const canSubmit = Boolean(title.trim() && categoryId && file && !busy);
+  const linkTrimmed = driveLink.trim();
+  const linkValid = !linkTrimmed || linkTrimmed.includes("drive.google.com") || linkTrimmed.includes("docs.google.com");
+  const hasSource = Boolean(file) || Boolean(linkTrimmed);
+  const canSubmit = Boolean(title.trim() && categoryId && hasSource && linkValid && !busy);
 
   const handleFile = useCallback(
     (f: File) => {
@@ -138,7 +142,8 @@ export function UploadForm({ defaultCategoryId }: UploadFormProps) {
       if (subject.trim()) form.append("subject", subject.trim());
       if (board.trim()) form.append("board", board.trim());
       if (description.trim()) form.append("description", description.trim());
-      form.append("file", file as File);
+      if (file) form.append("file", file);
+      else if (linkTrimmed) form.append("fileUrl", linkTrimmed);
 
       const xhr = new XMLHttpRequest();
       const result = await new Promise<{ ok: boolean; body: string }>((resolve) => {
@@ -161,6 +166,7 @@ export function UploadForm({ defaultCategoryId }: UploadFormProps) {
       setBoard("");
       setDescription("");
       setFile(null);
+      setDriveLink("");
       setUploadProgress(0);
       setMessage(tr("uploadSuccess"));
     } catch (err) {
@@ -235,6 +241,22 @@ export function UploadForm({ defaultCategoryId }: UploadFormProps) {
             }}
           />
         </label>
+        <div className="mt-4">
+          <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-muted" htmlFor="u-drive-link">
+            …or paste a Google Drive link
+          </label>
+          <input
+            id="u-drive-link"
+            type="url"
+            className={inputClass}
+            value={driveLink}
+            onChange={(e) => setDriveLink(e.target.value)}
+            placeholder="https://drive.google.com/file/d/…/view"
+          />
+          {linkTrimmed && !linkValid && (
+            <p className="mt-1.5 text-xs font-semibold text-red-600">Only Google Drive links are allowed.</p>
+          )}
+        </div>
       </div>
 
       {/* Card: Upload Progress */}

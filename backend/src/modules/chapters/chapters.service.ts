@@ -135,6 +135,8 @@ export async function createChapter(
 
     videoUrl?: string;
 
+    driveUrl?: string;
+
     status?: ContentStatus;
 
   },
@@ -176,6 +178,8 @@ export async function createChapter(
         definitions: input.definitions ?? [],
 
         videoUrl: input.videoUrl?.trim() || null,
+
+        driveUrl: input.driveUrl?.trim() || null,
 
         status: input.status ?? "draft",
 
@@ -231,6 +235,8 @@ export async function updateChapter(
 
     videoUrl: string;
 
+    driveUrl: string;
+
     status: ContentStatus;
 
   }>,
@@ -245,6 +251,9 @@ export async function updateChapter(
     const patch = { ...input } as Record<string, unknown>;
     if (typeof patch.videoUrl === "string") {
       patch.videoUrl = patch.videoUrl.trim() || null;
+    }
+    if (typeof patch.driveUrl === "string") {
+      patch.driveUrl = patch.driveUrl.trim() || null;
     }
 
     const [row] = await db

@@ -111,6 +111,12 @@ export const create = async (req: AuthedRequest, res: Response, next: NextFuncti
     if (req.file) {
       const saved = await savePdfUpload(req.file.originalname, req.file.buffer);
       fileUrl = saved.url;
+    } else if (req.body.fileUrl) {
+      const link = String(req.body.fileUrl).trim();
+      if (!link.includes("drive.google.com") && !link.includes("docs.google.com")) {
+        throw ApiError.badRequest("Only Google Drive links are allowed.");
+      }
+      fileUrl = link;
     }
 
     const { getUserById } = await import("../auth/auth.service.js");
@@ -151,13 +157,17 @@ export const update = (req: AuthedRequest, res: Response, next: NextFunction) =>
     const resource = portalStore.getResourceById(id);
     if (!resource) throw ApiError.notFound("Resource not found.");
 
-    const patch: Partial<Pick<PortalResource, "status" | "title" | "categoryId" | "board" | "description" | "subject">> = {};
+    const patch: Partial<Pick<PortalResource, "status" | "title" | "categoryId" | "board" | "description" | "subject" | "fileUrl">> = {};
     if (typeof req.body.status === "string") patch.status = req.body.status;
     if (typeof req.body.title === "string" && req.body.title.trim()) patch.title = req.body.title.trim();
     if (req.body.categoryId) patch.categoryId = Number(req.body.categoryId);
     if (typeof req.body.board === "string") patch.board = req.body.board;
     if (typeof req.body.subject === "string" && req.body.subject.trim()) patch.subject = req.body.subject.trim();
     if (typeof req.body.description === "string") patch.description = req.body.description.trim();
+    if (typeof req.body.fileUrl === "string") {
+      const link = req.body.fileUrl.trim();
+      if (link.includes("drive.google.com") || link.includes("docs.google.com")) patch.fileUrl = link;
+    }
 
     const updated = portalStore.updateResource(id, patch);
     res.json(toPublicResource(updated!));

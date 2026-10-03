@@ -31,7 +31,8 @@ export function Footer() {
   const studyLinks = [
     { href: "/categories", label: tr("browseCategories") },
     { href: "/books", label: tr("books") },
-    { href: "/model-papers", label: "Model & Past Papers" },
+    { href: "/past-papers", label: "Past Papers" },
+    { href: "/model-papers", label: "Model Papers" },
     { href: "/guess-papers", label: "Guess Papers" },
     { href: "/tuition", label: "Tuition" },
     { href: "/upload", label: tr("uploadTitle") },

@@ -20,6 +20,7 @@ type ChapterData = {
     formulasUr?: string[];
     definitions?: { term: string; definition: string; termUr?: string; definitionUr?: string }[];
     videoUrl?: string;
+    driveUrl?: string;
     exercises: { slug: string; title: string }[];
   };
 };
@@ -67,6 +68,7 @@ export default async function ChapterPage({
       formulasUr={data.chapter.formulasUr}
       definitions={data.chapter.definitions}
       videoUrl={data.chapter.videoUrl ?? undefined}
+      driveUrl={data.chapter.driveUrl ?? undefined}
       exercises={data.chapter.exercises}
     />
   );

@@ -34,6 +34,10 @@ export function DownloadGate({ url, label, seconds = 12, compact = false, showAd
   const btnClass = compact
     ? "inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition hover:opacity-90"
     : "inline-flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-90";
+
+  const isDrive = url.includes("drive.google.com") || url.includes("docs.google.com");
+  const skipGate = isDrive;
+
   const [state, setState] = useState<"idle" | "waiting" | "ready">("idle");
   const [left, setLeft] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -44,6 +48,17 @@ export function DownloadGate({ url, label, seconds = 12, compact = false, showAd
     },
     [],
   );
+
+  if (skipGate) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" onClick={onDownload} className={btnClass}>
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+          <path d="M12.01 1.485c0 0-5.304 1.5-7.673 2.236C3.23 3.96 2.5 4.81 2.5 5.82v10.36c0 1.01.73 1.86 1.837 2.099 2.369.736 7.673 2.236 7.673 2.236s5.304-1.5 7.673-2.236c1.107-.239 1.837-1.089 1.837-2.099V5.82c0-1.01-.73-1.86-1.837-2.099-2.369-.736-7.673-2.236-7.673-2.236zM12 17.5l-5-2.5v-5l5 2.5v5zm0-6.5l-5-2.5 5-2.5 5 2.5-5 2.5zm5 4l-5 2.5v-5l5-2.5v5z" />
+        </svg>
+        Open in Drive
+      </a>
+    );
+  }
 
   function start() {
     if (timer.current) clearInterval(timer.current);

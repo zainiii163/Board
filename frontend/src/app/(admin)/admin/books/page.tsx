@@ -15,6 +15,7 @@ type Book = {
   title: string;
   priceLabel: string;
   pdfUrl: string | null;
+  driveUrl: string | null;
   notesPath: string | null;
 };
 
@@ -28,6 +29,7 @@ const emptyForm = {
   title: "",
   priceLabel: "Free PDF",
   pdfUrl: "",
+  driveUrl: "",
   notesPath: "",
 };
 
@@ -59,6 +61,7 @@ export default function ManageBooksPage() {
       subjectSlug: form.subjectSlug || null,
       subjectTitle: form.subjectTitle || null,
       pdfUrl: form.pdfUrl || null,
+      driveUrl: form.driveUrl || null,
       notesPath: form.notesPath || null,
     };
     if (editingId) await apiPut(`/api/books/${editingId}`, payload);
@@ -79,6 +82,7 @@ export default function ManageBooksPage() {
       title: book.title,
       priceLabel: book.priceLabel,
       pdfUrl: book.pdfUrl ?? "",
+      driveUrl: book.driveUrl ?? "",
       notesPath: book.notesPath ?? "",
     });
   }
@@ -113,6 +117,7 @@ export default function ManageBooksPage() {
           <input value={form.priceLabel} onChange={(e) => setForm({ ...form, priceLabel: e.target.value })} placeholder="Price label" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground" />
           <input value={form.notesPath} onChange={(e) => setForm({ ...form, notesPath: e.target.value })} placeholder="Notes path (/fbise/9/mathematics)" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground md:col-span-2" />
           <input value={form.pdfUrl} onChange={(e) => setForm({ ...form, pdfUrl: e.target.value })} placeholder="PDF URL (from Uploads)" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground md:col-span-2" />
+          <input value={form.driveUrl} onChange={(e) => setForm({ ...form, driveUrl: e.target.value })} placeholder="Google Drive link (optional)" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground md:col-span-2" />
         </div>
         <div className="flex gap-2">
           <button type="submit" className="rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white">

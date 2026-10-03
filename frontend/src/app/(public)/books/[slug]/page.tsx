@@ -138,8 +138,10 @@ export default async function BookDetailPage({ params }: { params: Promise<{ slu
         </div>
       </section>
 
-      {/* PDF reader */}
-      {resource.fileUrl && (
+      {/* PDF reader — skip for Google Drive links (cannot be iframed) */}
+      {resource.fileUrl &&
+        !resource.fileUrl.includes("drive.google.com") &&
+        !resource.fileUrl.includes("docs.google.com") && (
         <section className="mx-auto max-w-6xl px-4 pb-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
             <div id="pdf-reader">

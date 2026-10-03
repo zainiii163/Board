@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { BoardPageContent } from "@/components/content/hierarchy-pages";
-import { apiFetchOrNull } from "@/lib/api-client";
+import { apiFetch, apiFetchOrNull } from "@/lib/api-client";
 import { boardDisplayTitle } from "@/lib/constants";
+import type { PastPaperItem } from "@/components/content/past-papers-list";
 
 export const dynamic = "force-dynamic";
 
@@ -39,5 +40,7 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
     subjects: (klass.subjects ?? []).map((s) => ({ slug: s.slug, title: s.title })),
   }));
 
-  return <BoardPageContent board={board} title={data.title} classes={classes} />;
+  const pastPapers = await apiFetch<PastPaperItem[]>(`/api/past-papers?board=${board}`).catch(() => []);
+
+  return <BoardPageContent board={board} title={data.title} classes={classes} pastPapers={pastPapers} />;
 }

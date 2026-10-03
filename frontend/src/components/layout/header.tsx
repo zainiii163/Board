@@ -38,6 +38,9 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
     ]},
   ]},
   { label: "Past Papers", groups: [
+    { items: [
+      { label: "All Past Papers", href: "/past-papers" },
+    ]},
     { heading: "Pakistani Boards", items: [
       { label: "9th", href: "/categories/9th-class-model-papers" },
       { label: "10th", href: "/categories/10th-class-model-papers" },

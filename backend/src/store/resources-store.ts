@@ -12,6 +12,7 @@ export type BookRecord = {
   priceLabel: string;
   coverUrl: string | null;
   pdfUrl: string | null;
+  driveUrl: string | null;
   notesPath: string | null;
 };
 
@@ -83,6 +84,7 @@ const books: BookRecord[] = BOOKS.map((book, index) => {
     priceLabel: book.price,
     coverUrl: null,
     pdfUrl: MEMORY_BOOK_PDFS[index % MEMORY_BOOK_PDFS.length],
+    driveUrl: null,
     notesPath: isMath ? `/${board.slug}/${classSlug}/mathematics` : null,
   };
 });
@@ -137,11 +139,12 @@ export const resourcesStore = {
     return true;
   },
 
-  listPastPapers: (boardSlug?: string, year?: string, paperType?: string) => {
+  listPastPapers: (boardSlug?: string, year?: string, paperType?: string, classSlug?: string) => {
     let rows = [...pastPapers];
     if (boardSlug) rows = rows.filter((p) => p.boardSlug === boardSlug);
     if (year) rows = rows.filter((p) => p.year === year);
     if (paperType) rows = rows.filter((p) => p.paperType === paperType);
+    if (classSlug) rows = rows.filter((p) => p.classSlug === classSlug);
     return rows;
   },
 

@@ -26,6 +26,10 @@ async function ensurePastPaperColumns() {
   `);
   await db.execute(sql`ALTER TABLE "past_papers" ADD COLUMN IF NOT EXISTS "paper_type" text DEFAULT 'first-annual' NOT NULL`);
   await db.execute(sql`ALTER TABLE "past_papers" ADD COLUMN IF NOT EXISTS "drive_url" text`);
+  await db.execute(sql`ALTER TABLE "books" ADD COLUMN IF NOT EXISTS "cover_url" text`);
+  await db.execute(sql`ALTER TABLE "books" ADD COLUMN IF NOT EXISTS "drive_url" text`);
+  await db.execute(sql`ALTER TABLE "chapters" ADD COLUMN IF NOT EXISTS "video_url" text`);
+  await db.execute(sql`ALTER TABLE "chapters" ADD COLUMN IF NOT EXISTS "drive_url" text`);
 }
 
 export async function seedIfEmpty() {
