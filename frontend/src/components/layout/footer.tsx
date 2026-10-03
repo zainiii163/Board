@@ -58,11 +58,11 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-[#182333] bg-[#182333] text-slate-300 print:hidden">
+    <footer className="border-t border-border bg-[#0B0B18] text-slate-300 print:hidden">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] lg:px-8">
         <div>
-          <Link href="/" className="inline-block font-serif text-2xl font-black tracking-tight text-white transition-all duration-300 hover:text-accent hover:scale-105">
-            BoardNotes
+          <Link href="/" className="inline-block font-serif text-2xl font-black tracking-tight transition-transform duration-300 hover:scale-105">
+            <span className="text-gradient">BoardNotes</span>
           </Link>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-slate-400">{tr("footerTagline")}</p>
           {stats && (
@@ -73,7 +73,7 @@ export function Footer() {
                 { value: stats.users, label: "Users" },
               ].map((stat) => (
                 <div key={stat.label} className="group cursor-default">
-                  <p className="text-lg font-black text-white transition-colors duration-200 group-hover:text-accent">{stat.value}</p>
+                  <p className="text-lg font-black text-white transition-colors duration-200 group-hover:text-accent-2">{stat.value}</p>
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 transition-colors duration-200 group-hover:text-slate-400">{stat.label}</p>
                 </div>
               ))}
@@ -139,54 +139,57 @@ export function Footer() {
       </div>
 
       {/* Essential Links Section */}
-      <div className="border-t border-white/10 bg-[#0f1729]">
+      <div className="border-t border-white/10 bg-[#08080F]">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
             <div className="flex flex-wrap gap-4">
-              <Link href="/about" className="hover:text-white transition-colors">About Us</Link>
-              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-              <Link href="/copyright" className="hover:text-white transition-colors">Copyright</Link>
+              <Link href="/about" className="transition-colors hover:text-white">About Us</Link>
+              <Link href="/contact" className="transition-colors hover:text-white">Contact</Link>
+              <Link href="/privacy" className="transition-colors hover:text-white">Privacy Policy</Link>
+              <Link href="/terms" className="transition-colors hover:text-white">Terms of Service</Link>
+              <Link href="/copyright" className="transition-colors hover:text-white">Copyright</Link>
             </div>
-            <div className="flex items-center gap-4">
-              {/* Social Media Icons */}
-              <a
-                href={YOUTUBE_CHANNEL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center transition-all duration-300 hover:scale-110"
-                aria-label="YouTube Channel"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="#FF0000"/>
-                </svg>
-              </a>
-              <a
-                href={FACEBOOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center transition-all duration-300 hover:scale-110"
-                aria-label="Facebook"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
-                </svg>
-              </a>
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center transition-all duration-300 hover:scale-110"
-                aria-label="Instagram"
-              >
-                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" fill="#E4405F"/>
-                </svg>
-              </a>
-              <span className="text-slate-500">National Curriculum 2026–27</span>
-              <span className="text-slate-500">•</span>
-              <span className="text-slate-500">Session: {new Date().getFullYear()}–{new Date().getFullYear() + 1}</span>
+            <div className="flex items-center gap-3">
+              {/* Social Media Icons — frosted pills (brand marks are inline SVG by design) */}
+              {[
+                {
+                  label: "YouTube Channel",
+                  href: YOUTUBE_CHANNEL_URL,
+                  tint: "hover:border-rose-400/50 hover:text-rose-400",
+                  path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z",
+                  fill: "#FF0000",
+                },
+                {
+                  label: "Facebook",
+                  href: FACEBOOK_URL,
+                  tint: "hover:border-sky-400/50 hover:text-sky-400",
+                  path: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z",
+                  fill: "#1877F2",
+                },
+                {
+                  label: "Instagram",
+                  href: INSTAGRAM_URL,
+                  tint: "hover:border-pink-400/50 hover:text-pink-400",
+                  path: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z",
+                  fill: "#E4405F",
+                },
+              ].map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 ${social.tint}`}
+                >
+                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+                    <path d={social.path} fill={social.fill} />
+                  </svg>
+                </a>
+              ))}
+              <span className="ml-2 hidden text-slate-500 sm:inline">National Curriculum 2026–27</span>
+              <span className="hidden text-slate-500 sm:inline">•</span>
+              <span className="hidden text-slate-500 sm:inline">Session: {new Date().getFullYear()}–{new Date().getFullYear() + 1}</span>
             </div>
           </div>
         </div>

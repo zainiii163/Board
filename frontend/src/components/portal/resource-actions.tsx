@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BookOpen, Check, Link2, MessageCircle } from "lucide-react";
 
 import { apiFetch, pdfUrl } from "@/lib/api-client";
 import { useLocale } from "@/lib/locale-context";
@@ -55,27 +56,32 @@ export function ResourceActions({ slug, fileUrl, downloads }: Props) {
               showAd={false}
               onDownload={trackDownload}
             />
-            <a
-              href="#pdf-reader"
-              className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-6 py-3 text-sm font-bold text-accent transition hover:bg-accent/20"
-            >
-              {tr("readOnline")}
-            </a>
+            {!fileUrl.includes("drive.google.com") && !fileUrl.includes("docs.google.com") && (
+              <a
+                href="#pdf-reader"
+                className="pressable inline-flex items-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-6 py-3 text-sm font-bold text-accent transition hover:bg-accent/20"
+              >
+                <BookOpen className="h-4 w-4" aria-hidden="true" />
+                {tr("readOnline")}
+              </a>
+            )}
           </>
         )}
         <button
           type="button"
           onClick={handleCopy}
-          className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-card"
+          className="pressable inline-flex items-center gap-2 rounded-xl border border-border bg-card/60 px-5 py-3 text-sm font-semibold text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
         >
+          {copied ? <Check className="h-4 w-4 text-emerald-500" aria-hidden="true" /> : <Link2 className="h-4 w-4" aria-hidden="true" />}
           {copied ? tr("copied") : tr("copyLink")}
         </button>
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground transition hover:bg-card"
+          className="pressable inline-flex items-center gap-2 rounded-xl border border-border bg-card/60 px-5 py-3 text-sm font-semibold text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
         >
+          <MessageCircle className="h-4 w-4" aria-hidden="true" />
           {tr("whatsApp")}
         </a>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 import { apiFetch } from "@/lib/api-client";
 import { useLocale } from "@/lib/locale-context";
@@ -111,15 +112,15 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
 
       {loading && (
         <div className="flex justify-center py-8">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+          <Loader2 className="h-8 w-8 animate-spin text-accent" aria-hidden="true" />
         </div>
       )}
 
       {!loading && resources.length > 0 ? (
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {resources.map((r) => (
-              <ResourceCard key={r.id} resource={r} categoryName={categoryNameById[String(r.categoryId)]} />
+            {resources.map((r, i) => (
+              <ResourceCard key={r.id} resource={r} categoryName={categoryNameById[String(r.categoryId)]} index={i} />
             ))}
           </div>
 
@@ -129,9 +130,10 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
                 type="button"
                 disabled={filter.page <= 1}
                 onClick={() => setFilter((f) => ({ ...f, page: f.page - 1 }))}
-                className="rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+                className="pressable inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/60 px-3.5 py-2 text-sm font-semibold text-foreground transition hover:border-accent/50 hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
               >
-                ← Prev
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                Prev
               </button>
               {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
                 let pageNum: number;
@@ -149,10 +151,10 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
                     key={pageNum}
                     type="button"
                     onClick={() => setFilter((f) => ({ ...f, page: pageNum }))}
-                    className={`h-9 w-9 rounded-lg text-sm font-semibold transition ${
+                    className={`pressable h-9 w-9 rounded-xl text-sm font-semibold transition ${
                       filter.page === pageNum
-                        ? "bg-accent text-white"
-                        : "border border-border text-foreground hover:bg-card"
+                        ? "bg-gradient-to-br from-accent to-accent-2 text-white shadow-md shadow-accent/25"
+                        : "border border-border text-foreground hover:border-accent/50 hover:text-accent"
                     }`}
                   >
                     {pageNum}
@@ -163,9 +165,10 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
                 type="button"
                 disabled={filter.page >= totalPages}
                 onClick={() => setFilter((f) => ({ ...f, page: f.page + 1 }))}
-                className="rounded-lg border border-border px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-card disabled:opacity-40 disabled:cursor-not-allowed"
+                className="pressable inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/60 px-3.5 py-2 text-sm font-semibold text-foreground transition hover:border-accent/50 hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Next →
+                Next
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
           )}
