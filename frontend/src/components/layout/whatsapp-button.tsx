@@ -17,7 +17,7 @@ export function WhatsAppButton() {
       href={WHATSAPP_CHAT_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-5 right-5 z-[9999] flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:bg-[#1ebe5d] hover:scale-110"
+      className="fixed bottom-24 right-4 z-[9999] flex h-12 w-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition hover:bg-[#1ebe5d] hover:scale-110 lg:bottom-5 lg:right-5"
       aria-label="Contact us on WhatsApp"
     >
       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#25D366] opacity-30" />

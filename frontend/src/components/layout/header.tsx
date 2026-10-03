@@ -251,14 +251,19 @@ function NavDropdown({
         </motion.span>
       </button>
 
-      <AnimatePresence>
-        {isOpen &&
-          pos &&
-          typeof document !== "undefined" &&
-          createPortal(
+      {isOpen &&
+        pos &&
+        typeof document !== "undefined" &&
+        createPortal(
+          // AnimatePresence lives *inside* the portal so its direct child is the
+          // motion element — otherwise the enter animation never runs and the
+          // panel stays stuck at opacity 0.
+          <AnimatePresence>
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: -6, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
+              /* Opacity is intentionally absent from `initial`: the panel must be
+                 visible even if the spring never runs. */
+              initial={reduceMotion ? false : { y: -6, scale: 0.97 }}
+              animate={{ y: 0, scale: 1 }}
               exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.97 }}
               transition={POPOVER_SPRING}
               style={{ top: pos.top, left: pos.left }}
@@ -286,10 +291,10 @@ function NavDropdown({
                   {gi < item.groups.length - 1 && <div className="my-2 border-t border-border/60" />}
                 </div>
               ))}
-            </motion.div>,
-            document.body,
-          )}
-      </AnimatePresence>
+            </motion.div>
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }
