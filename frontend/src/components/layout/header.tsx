@@ -12,18 +12,17 @@ type DropdownItem = { label: string; href: string };
 type DropdownGroup = { heading?: string; items: DropdownItem[] };
 type DropdownDef = { label: string; groups: DropdownGroup[]; soon?: boolean };
 
-const BOOKS_NOTES_ITEM: DropdownDef = { label: "Books & Notes", groups: [
+const BOARDS_ITEM: DropdownDef = { label: "Boards", groups: [
     { heading: "Pakistani Boards", items: [
-      { label: "Federal Board", href: "/categories/federal-text-books" },
-      { label: "Punjab Board", href: "/categories/punjab-text-books" },
-      { label: "Sindh Board", href: "/categories/sindh-text-books" },
-      { label: "Balochistan Board", href: "/categories/balochistan-text-books" },
-      { label: "KPK Board", href: "/categories/kpk-text-books" },
+      { label: "Federal Board", href: "/fbise" },
+      { label: "Punjab Board", href: "/punjab" },
+      { label: "KPK Board", href: "/kpk" },
+      { label: "Sindh Board", href: "/sindh" },
       { label: "APSACS", href: "/apsacs" },
     ]},
     { heading: "International", items: [
-      { label: "Oxford", href: "/categories/oxford-text-books" },
-      { label: "Cambridge", href: "/categories/cambridge-text-books" },
+      { label: "Oxford Board", href: "/oxford" },
+      { label: "Cambridge Board", href: "/cambridge" },
       { label: "O Level", href: "/o-level" },
       { label: "A Level", href: "/a-level" },
     ]},
@@ -229,8 +228,7 @@ export function Header() {
   }, [pathname]);
 
   const navItems = useMemo<DropdownDef[]>(() => {
-    if (!activeBoard) return [BOOKS_NOTES_ITEM, ...OTHER_NAV_ITEMS];
-    return [buildBoardNav(activeBoard), ...OTHER_NAV_ITEMS];
+    return [BOARDS_ITEM, ...(activeBoard ? [buildBoardNav(activeBoard)] : []), ...OTHER_NAV_ITEMS];
   }, [activeBoard]);
 
   const clearClose = useCallback(() => {
