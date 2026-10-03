@@ -1,6 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { PlatformIntro } from "@/components/layout/platform-intro";
+import { ProfessionalContent } from "@/components/layout/professional-content";
 import { SearchShortcut } from "@/components/layout/search-shortcut";
 import { PwaInstallPrompt } from "@/components/layout/pwa-install-prompt";
 import { OfflineBanner } from "@/components/layout/offline-banner";
@@ -21,6 +22,7 @@ export default function PublicLayout({
       <OfflineBanner />
       <main className="flex-1">{children}</main>
       <PlatformIntro />
+      <ProfessionalContent />
       <Footer />
       <PwaInstallPrompt />
       <WhatsAppButton />
