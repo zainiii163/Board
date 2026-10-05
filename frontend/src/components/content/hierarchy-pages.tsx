@@ -60,7 +60,7 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
 
       <div className="mt-6">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">{tr("boardLabel")}</p>
-        <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{displayTitle} Notes &amp; Books</h1>
+        <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{displayTitle}</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">{tr("chooseClassContinue")}</p>
       </div>
 
@@ -260,7 +260,12 @@ export function ClassPageContent({
         return false;
       }
     }
-    // Classes 9-12: Allow all science subjects
+    // Classes 9-10: Keep Islamiyat, Tarjuma-tul-Quran, Pakistan Studies separate
+    // Classes 11-12: Restrict advanced electives
+    if (classNum >= 11 && classNum <= 12) {
+      // Allow all subjects for Class 11-12 (advanced electives are appropriate here)
+      return true;
+    }
     return true;
   });
 
@@ -287,15 +292,7 @@ export function ClassPageContent({
 
       {/* Header */}
       <div className="mt-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">
-            <School className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
-            {displayTitle}
-          </span>
-          <span className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{short}</span>
-          <span className="rounded-full border border-border bg-card px-3 py-1 text-xs font-bold text-muted">{ACADEMIC_YEAR}</span>
-        </div>
-        <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
             <p className="mt-2 max-w-lg text-sm text-muted">{tr("chooseSubjectContinue").replace("{board}", displayTitle)}</p>

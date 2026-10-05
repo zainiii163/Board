@@ -96,6 +96,16 @@ export function PastPapersList({
       if (yearDiff !== 0) return yearDiff;
       return getSortOrder(a.paperType) - getSortOrder(b.paperType);
     });
+
+  // Group papers by subject for PBA organization
+  const groupedBySubject = visible.reduce((acc, paper) => {
+    const subject = paper.subjectTitle;
+    if (!acc[subject]) {
+      acc[subject] = [];
+    }
+    acc[subject].push(paper);
+    return acc;
+  }, {} as Record<string, typeof visible>);
   const selectClass =
     "rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground/80 transition hover:border-accent/50";
 
@@ -183,33 +193,40 @@ export function PastPapersList({
           </button>
         </div>
       </div>
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 space-y-6">
         {visible.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted">
             No papers in this category yet. Check back soon.
           </p>
         )}
-        {visible.map((paper) => (
-          <div
-            key={paper.id}
-            className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-                {normalizeBoardLabel(paper.boardTitle, paper.classTitle)}
-              </p>
-              <h2 className="mt-1 text-lg font-bold text-foreground">{paper.subjectTitle}</h2>
-              <p className="text-sm text-muted">{paper.classTitle}</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-accent/15 px-3 py-1 text-sm font-semibold text-accent">
-                {paper.year}
-              </span>
-              <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-foreground/90">
-                {PAPER_TYPE_LABELS[paper.paperType] ?? (paper.sessionType === "annual" ? tr("annual") : tr("supply"))}
-              </span>
-              {paper.driveUrl && <DriveLinkButton href={paper.driveUrl} className="px-3 py-2 text-xs" />}
-              {paper.pdfUrl && <DownloadGate url={pdfUrl(paper.pdfUrl)} compact />}
+        {Object.entries(groupedBySubject).map(([subject, papers]) => (
+          <div key={subject}>
+            <h3 className="mb-3 text-lg font-bold text-foreground">{subject}</h3>
+            <div className="space-y-3">
+              {papers.map((paper) => (
+                <div
+                  key={paper.id}
+                  className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                      {normalizeBoardLabel(paper.boardTitle, paper.classTitle)}
+                    </p>
+                    <h2 className="mt-1 text-lg font-bold text-foreground">{paper.subjectTitle}</h2>
+                    <p className="text-sm text-muted">{paper.classTitle}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-accent/15 px-3 py-1 text-sm font-semibold text-accent">
+                      {paper.year}
+                    </span>
+                    <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-foreground/90">
+                      {PAPER_TYPE_LABELS[paper.paperType] ?? (paper.sessionType === "annual" ? tr("annual") : tr("supply"))}
+                    </span>
+                    {paper.driveUrl && <DriveLinkButton href={paper.driveUrl} className="px-3 py-2 text-xs" />}
+                    {paper.pdfUrl && <DownloadGate url={pdfUrl(paper.pdfUrl)} compact />}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}
