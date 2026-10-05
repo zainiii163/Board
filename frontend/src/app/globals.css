@@ -453,6 +453,17 @@ html.dark .glass {
   border: 1px solid var(--glass-border);
 }
 
+/* Solid header variant to prevent background bleed */
+.glass-bar-solid {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--glass-border);
+}
+html.dark .glass-bar-solid {
+  background: rgba(18, 18, 32, 0.95);
+}
+
 /* Card-level glass with soft inner highlight */
 .glass-card {
   position: relative;

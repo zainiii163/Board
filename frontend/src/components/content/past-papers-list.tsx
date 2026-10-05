@@ -97,15 +97,21 @@ export function PastPapersList({
       return getSortOrder(a.paperType) - getSortOrder(b.paperType);
     });
 
-  // Group papers by subject for PBA organization
-  const groupedBySubject = visible.reduce((acc, paper) => {
-    const subject = paper.subjectTitle;
-    if (!acc[subject]) {
-      acc[subject] = [];
+  // Group papers by class (Class 9, 10, 11, 12)
+  const groupedByClass = visible.reduce((acc, paper) => {
+    const classTitle = paper.classTitle;
+    if (!acc[classTitle]) {
+      acc[classTitle] = [];
     }
-    acc[subject].push(paper);
+    acc[classTitle].push(paper);
     return acc;
   }, {} as Record<string, typeof visible>);
+
+  // Get unique subjects for each class
+  const getSubjectsForClass = (classPapers: typeof visible) => {
+    return Array.from(new Set(classPapers.map((p) => p.subjectTitle))).sort();
+  };
+
   const selectClass =
     "rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground/80 transition hover:border-accent/50";
 
@@ -199,30 +205,63 @@ export function PastPapersList({
             No papers in this category yet. Check back soon.
           </p>
         )}
-        {Object.entries(groupedBySubject).map(([subject, papers]) => (
-          <div key={subject}>
-            <h3 className="mb-3 text-lg font-bold text-foreground">{subject}</h3>
-            <div className="space-y-3">
-              {papers.map((paper) => (
+        {Object.entries(groupedByClass).map(([classTitle, classPapers]) => (
+          <div key={classTitle} className="rounded-2xl border border-border bg-card p-4">
+            {/* Row Header: Class Name */}
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/70 pb-3">
+              <h3 className="text-xl font-bold text-foreground">{classTitle}</h3>
+              {/* Filter Chips: Paper Types */}
+              <div className="flex flex-wrap gap-2">
+                {FILTERS.filter((f) => f !== "all").map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setFilter(type as PastPaperType)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                      filter === type
+                        ? "border-accent bg-accent text-white"
+                        : "border-border bg-background text-foreground/80 hover:border-accent/50 hover:text-accent"
+                    }`}
+                  >
+                    {PAPER_TYPE_LABELS[type as PastPaperType]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Subject Options - Horizontal Row */}
+            <div className="mb-4 flex flex-wrap gap-2">
+              {getSubjectsForClass(classPapers).map((subject) => (
+                <span
+                  key={subject}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground/90 hover:border-accent/50 hover:text-accent cursor-pointer transition"
+                >
+                  {subject}
+                </span>
+              ))}
+            </div>
+
+            {/* Papers List for this class - Horizontal Cards */}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {classPapers.map((paper) => (
                 <div
                   key={paper.id}
-                  className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
+                  className="flex flex-col gap-2 rounded-xl border border-border/50 bg-background/50 p-3 transition hover:border-accent/40 hover:shadow-sm"
                 >
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
                       {normalizeBoardLabel(paper.boardTitle, paper.classTitle)}
                     </p>
-                    <h2 className="mt-1 text-lg font-bold text-foreground">{paper.subjectTitle}</h2>
-                    <p className="text-sm text-muted">{paper.classTitle}</p>
+                    <h4 className="mt-0.5 text-sm font-bold text-foreground">{paper.subjectTitle}</h4>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-accent/15 px-3 py-1 text-sm font-semibold text-accent">
+                  <div className="mt-auto flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold text-accent">
                       {paper.year}
                     </span>
-                    <span className="rounded-full bg-background px-3 py-1 text-xs font-semibold text-foreground/90">
+                    <span className="rounded-full bg-background px-2.5 py-0.5 text-[10px] font-semibold text-foreground/90">
                       {PAPER_TYPE_LABELS[paper.paperType] ?? (paper.sessionType === "annual" ? tr("annual") : tr("supply"))}
                     </span>
-                    {paper.driveUrl && <DriveLinkButton href={paper.driveUrl} className="px-3 py-2 text-xs" />}
+                    {paper.driveUrl && <DriveLinkButton href={paper.driveUrl} className="px-2.5 py-1.5 text-[10px]" />}
                     {paper.pdfUrl && <DownloadGate url={pdfUrl(paper.pdfUrl)} compact />}
                   </div>
                 </div>

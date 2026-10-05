@@ -14,7 +14,7 @@ import {
   LayoutGrid,
   LogOut,
   Menu,
-  MoreHorizontal,
+  NotebookPen,
   Search,
   Sparkles,
   Upload,
@@ -53,6 +53,36 @@ const BOARDS_ITEM: DropdownDef = {
 };
 
 const OTHER_NAV_ITEMS: DropdownDef[] = [
+  { label: "Notes", icon: NotebookPen, groups: [
+    { heading: "Pakistani Boards", items: [
+      { label: "Federal Board", href: "/fbise" },
+      { label: "Punjab Board", href: "/punjab" },
+      { label: "KPK Board", href: "/kpk" },
+      { label: "Sindh Board", href: "/sindh" },
+      { label: "APSACS", href: "/apsacs" },
+    ]},
+    { heading: "International", items: [
+      { label: "Oxford Board", href: "/oxford" },
+      { label: "Cambridge Board", href: "/cambridge" },
+      { label: "O Level", href: "/o-level" },
+      { label: "A Level", href: "/a-level" },
+    ]},
+  ]},
+  { label: "Books", icon: BookOpen, groups: [
+    { heading: "Pakistani Boards", items: [
+      { label: "Federal Board", href: "/fbise" },
+      { label: "Punjab Board", href: "/punjab" },
+      { label: "KPK Board", href: "/kpk" },
+      { label: "Sindh Board", href: "/sindh" },
+      { label: "APSACS", href: "/apsacs" },
+    ]},
+    { heading: "International", items: [
+      { label: "Oxford Board", href: "/oxford" },
+      { label: "Cambridge Board", href: "/cambridge" },
+      { label: "O Level", href: "/o-level" },
+      { label: "A Level", href: "/a-level" },
+    ]},
+  ]},
   { label: "Pairing Schemes", icon: LayoutGrid, groups: [
     { items: [
       { label: "9th", href: "/categories/9th-class-pairing-schemes" },
@@ -66,10 +96,11 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "All Past Papers", href: "/past-papers" },
     ]},
     { heading: "Pakistani Boards", items: [
-      { label: "9th", href: "/categories/9th-class-model-papers" },
-      { label: "10th", href: "/categories/10th-class-model-papers" },
-      { label: "1st Year", href: "/categories/1st-year-model-papers" },
-      { label: "2nd Year", href: "/categories/2nd-year-model-papers" },
+      { label: "Federal Board", href: "/past-papers?board=fbise" },
+      { label: "Punjab Board", href: "/past-papers?board=punjab" },
+      { label: "KPK Board", href: "/past-papers?board=kpk" },
+      { label: "Sindh Board", href: "/past-papers?board=sindh" },
+      { label: "APSACS", href: "/past-papers?board=apsacs" },
     ]},
     { heading: "International", items: [
       { label: "Cambridge IGCSE", href: "/categories/cambridge-intl-notes" },
@@ -110,9 +141,6 @@ const KNOWN_BOARD_SLUGS = new Set<string>([
   "o-level",
   "a-level",
 ]);
-
-/** Lower-priority menus that collapse into "More" on narrow desktops. */
-const SECONDARY_LABELS = new Set(["Pairing Schemes", "Tuition"]);
 
 function classHref(boardSlug: string, num: number): string {
   if (boardSlug === "apsacs") return `/apsacs/class-${num}`;
@@ -157,8 +185,7 @@ function buildBoardNav(boardSlug: string): DropdownDef {
     label,
     icon: BookOpen,
     groups: [
-      { heading: "Notes", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref(boardSlug, n) })) },
-      { heading: "Books", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: `${classHref(boardSlug, n)}?view=books` })) },
+      { heading: "Classes", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref(boardSlug, n) })) },
       { items: [
         { label: `All ${label}`, href: `/${boardSlug}` },
         { label: "MCQ Practice", href: "/online-quizzes" },
@@ -320,25 +347,6 @@ export function Header() {
     [activeBoard],
   );
 
-  // Lower-priority menus collapse into a single "More" dropdown on narrow desktops
-  // so the bar never overflows (and never pushes the page sideways).
-  const primaryItems = useMemo(
-    () => navItems.filter((i) => !SECONDARY_LABELS.has(i.label)),
-    [navItems],
-  );
-  const secondaryItems = useMemo(
-    () => navItems.filter((i) => SECONDARY_LABELS.has(i.label)),
-    [navItems],
-  );
-  const moreItem: DropdownDef = useMemo(
-    () => ({
-      label: "More",
-      icon: MoreHorizontal,
-      groups: secondaryItems.map((i) => ({ heading: i.label, items: i.groups.flatMap((g) => g.items) })),
-    }),
-    [secondaryItems],
-  );
-
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
   }, []);
@@ -350,10 +358,10 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 print:hidden">
-        <div className="glass-bar border-b border-border/70 shadow-soft">
+      <header className="sticky top-0 z-[100] isolate bg-background print:hidden">
+        <div className="glass-bar-solid border-b border-border/70 shadow-soft">
           <nav
-            className="mx-auto flex h-16 w-full max-w-[1600px] items-center gap-2 px-3 sm:gap-3 sm:px-6 lg:px-8"
+            className="mx-auto flex h-16 w-full max-w-[1800px] items-center gap-2 px-3 sm:gap-3 sm:px-6 lg:px-8"
             aria-label="Main navigation"
           >
             {/* Logo */}
@@ -367,8 +375,8 @@ export function Header() {
             </Link>
 
             {/* Desktop nav — scrolls internally instead of widening the page */}
-            <div className="scrollbar-none hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
-              {primaryItems.map((item) => (
+            <div className="scrollbar-none hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:flex">
+              {navItems.map((item) => (
                 <NavDropdown
                   key={item.label}
                   item={item}
@@ -378,30 +386,6 @@ export function Header() {
                   onFocused={clearClose}
                 />
               ))}
-              {/* Secondary menus: inline on wide screens, collapsed below xl */}
-              <div className="hidden items-center gap-0.5 xl:flex">
-                {secondaryItems.map((item) => (
-                  <NavDropdown
-                    key={item.label}
-                    item={item}
-                    isOpen={dropdownSlug === item.label.toLowerCase().replace(/[^a-z]/g, "-")}
-                    onOpen={() => { clearClose(); setDropdownSlug(item.label.toLowerCase().replace(/[^a-z]/g, "-")); }}
-                    onClose={() => scheduleClose()}
-                    onFocused={clearClose}
-                  />
-                ))}
-              </div>
-              {secondaryItems.length > 0 && (
-                <div className="xl:hidden">
-                  <NavDropdown
-                    item={moreItem}
-                    isOpen={dropdownSlug === "more"}
-                    onOpen={() => { clearClose(); setDropdownSlug("more"); }}
-                    onClose={() => scheduleClose()}
-                    onFocused={clearClose}
-                  />
-                </div>
-              )}
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">

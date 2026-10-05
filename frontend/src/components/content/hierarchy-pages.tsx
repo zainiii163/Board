@@ -6,7 +6,6 @@ import Image from "next/image";
 
 import { LocalizedBreadcrumbs } from "@/components/layout/localized-breadcrumbs";
 import { BookOpen, FileText, GraduationCap, NotebookPen, School } from "lucide-react";
-import { ClassRibbon } from "@/components/layout/class-ribbon";
 import { ChapterQuiz } from "@/components/content/chapter-quiz";
 import { BookmarkButton } from "@/components/content/bookmark-button";
 import { SaveOfflineButton } from "@/components/content/save-offline-button";
@@ -55,17 +54,11 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
   });
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <LocalizedBreadcrumbs items={[{ label: "Home", href: "/" }, { label: displayTitle }]} />
-
-      <div className="mt-6">
+    <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
+      <div>
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">{tr("boardLabel")}</p>
         <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{displayTitle}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted">{tr("chooseClassContinue")}</p>
       </div>
-
-      {/* Sticky Class Ribbon */}
-      <ClassRibbon board={board} classes={uniqueClasses} />
 
       {/* Books | Notes Toggle */}
       <div className="mt-6 inline-flex rounded-full border border-border bg-card p-1" role="tablist" aria-label="View mode">
@@ -100,9 +93,9 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
             const subjects = klass.subjects ?? [];
             const displaySubjects = subjects.filter((subject) => {
               const title = subject.title.toLowerCase();
-              // Classes 5-8: Remove individual Physics, Chemistry, Biology, Computer Science
-              if (num >= 5 && num <= 8) {
-                if (title.includes("physics") || title.includes("chemistry") || title.includes("biology") || title.includes("computer")) {
+              // Classes 5-6: Remove individual Physics, Chemistry, Biology (should be under General Science)
+              if (num >= 5 && num <= 6) {
+                if (title.includes("physics") || title.includes("chemistry") || title.includes("biology")) {
                   return false;
                 }
               }
@@ -254,9 +247,9 @@ export function ClassPageContent({
   // Filter subjects based on grade-wise curriculum mapping
   const filteredSubjects = subjects.filter((subject) => {
     const title = subject.title.toLowerCase();
-    // Classes 5-8: Remove individual Physics, Chemistry, Biology, Computer Science - should be under General Science
-    if (classNum >= 5 && classNum <= 8) {
-      if (title.includes("physics") || title.includes("chemistry") || title.includes("biology") || title.includes("computer")) {
+    // Classes 5-6: Remove individual Physics, Chemistry, Biology (should be under General Science)
+    if (classNum >= 5 && classNum <= 6) {
+      if (title.includes("physics") || title.includes("chemistry") || title.includes("biology")) {
         return false;
       }
     }
@@ -281,21 +274,12 @@ export function ClassPageContent({
   }
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-      <LocalizedBreadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: displayTitle, href: `/${board}` },
-          { label: classTitle },
-        ]}
-      />
-
+    <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="mt-6">
+      <div>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
-            <p className="mt-2 max-w-lg text-sm text-muted">{tr("chooseSubjectContinue").replace("{board}", displayTitle)}</p>
           </div>
           <BookmarkButton title={`${classTitle} · ${displayTitle}`} path={`/${board}/${classSlug}`} />
         </div>
@@ -519,10 +503,10 @@ export function SubjectPageContent({
   const sscLabel = classNum === 9 || classNum === 10 ? "SSC" : classNum === 11 || classNum === 12 ? "HSSC" : null;
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Detail hero — Study++ style */}
-      <div className="hero-band -mx-4 -mt-10 sm:-mx-6 lg:-mx-8">
-        <div className="px-4 py-8 sm:px-6 lg:px-8">
+      <div className="hero-band -mx-4 -mt-8 sm:-mx-6 lg:-mx-8">
+        <div className="px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-xs font-bold uppercase tracking-[0.18em] text-white/70 md:text-left">
             {displayTitle} · {classTitle}
           </p>
@@ -530,17 +514,6 @@ export function SubjectPageContent({
             {classTitle} {subjectTitle} Notes {short}
           </h1>
         </div>
-      </div>
-
-      <div className="mt-5">
-        <LocalizedBreadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: displayTitle, href: `/${board}` },
-            { label: classTitle, href: `/${board}/${classSlug}` },
-            { label: subjectTitle },
-          ]}
-        />
       </div>
 
       {/* Header chips + bookmark */}
