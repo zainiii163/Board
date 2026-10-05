@@ -8,14 +8,12 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   BookOpen,
   ChevronDown,
-  Compass,
   FileText,
   GraduationCap,
+  Layers,
   LayoutGrid,
   LogOut,
   Menu,
-  MoreHorizontal,
-  NotebookPen,
   Search,
   Sparkles,
   Upload,
@@ -26,7 +24,7 @@ import {
 import { useLocale } from "@/lib/locale-context";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/lib/theme-context";
-import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardLabel, boardShortName, classLabel } from "@/lib/constants";
+import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardLabel, classLabel } from "@/lib/constants";
 import { POPOVER_SPRING } from "@/components/motion/hover-card";
 
 type DropdownItem = { label: string; href: string };
@@ -65,40 +63,12 @@ const BOARDS_ITEM: DropdownDef = {
   ],
 };
 
-/** Menus that move into the "More" dropdown below the 2xl breakpoint. */
-const COLLAPSIBLE_NAV_IDS = new Set(["pairing-schemes", "test-generator", "tuition"]);
-
+/**
+ * Static, always-visible menus. The board-aware "Books & Notes" menu is built
+ * separately (see `buildBooksAndNotesNav`) so its id stays constant while its
+ * contents follow the active board.
+ */
 const OTHER_NAV_ITEMS: DropdownDef[] = [
-  { id: "notes", label: "Notes", icon: NotebookPen, groups: [
-    { heading: "Pakistani Boards", items: [
-      { label: "Federal Board", href: "/fbise" },
-      { label: "Punjab Board", href: "/punjab" },
-      { label: "KPK Board", href: "/kpk" },
-      { label: "Sindh Board", href: "/sindh" },
-      { label: "APSACS", href: "/apsacs" },
-    ]},
-    { heading: "International", items: [
-      { label: "Oxford Board", href: "/oxford" },
-      { label: "Cambridge Board", href: "/cambridge" },
-      { label: "O Level", href: "/o-level" },
-      { label: "A Level", href: "/a-level" },
-    ]},
-  ]},
-  { id: "books", label: "Books", icon: BookOpen, groups: [
-    { heading: "Pakistani Boards", items: [
-      { label: "Federal Board", href: "/fbise?view=books" },
-      { label: "Punjab Board", href: "/punjab?view=books" },
-      { label: "KPK Board", href: "/kpk?view=books" },
-      { label: "Sindh Board", href: "/sindh?view=books" },
-      { label: "APSACS", href: "/apsacs?view=books" },
-    ]},
-    { heading: "International", items: [
-      { label: "Oxford Board", href: "/oxford?view=books" },
-      { label: "Cambridge Board", href: "/cambridge?view=books" },
-      { label: "O Level", href: "/o-level?view=books" },
-      { label: "A Level", href: "/a-level?view=books" },
-    ]},
-  ]},
   { id: "pairing-schemes", label: "Pairing Schemes", icon: LayoutGrid, groups: [
     { items: [
       { label: "9th", href: "/categories/9th-class-pairing-schemes" },
@@ -162,56 +132,60 @@ function classHref(boardSlug: string, num: number): string {
   return `/${boardSlug}/${num}`;
 }
 
-function boardNavId(boardSlug: string): string {
-  return `board:${boardSlug}`;
-}
+/**
+ * The single board-aware menu. Its `id` and label never change — only the group
+ * contents follow the active board — so the open/close state cannot leak from one
+ * board to the next, and the navbar always shows exactly one "Books & Notes"
+ * entry instead of a board menu plus separate Notes/Books menus.
+ */
+const BOOKS_AND_NOTES_ID = "books-and-notes";
 
-function buildBoardNav(boardSlug: string): DropdownDef {
-  if (boardSlug === "apsacs") {
+function buildBooksAndNotesNav(activeBoard: string | null): DropdownDef {
+  const base = { id: BOOKS_AND_NOTES_ID, label: "Books & Notes", icon: Layers };
+
+  // Neutral pages list every board so the menu is never empty or board-specific.
+  if (!activeBoard) {
     return {
-      id: boardNavId(boardSlug),
-      label: boardShortName("apsacs"),
-      icon: GraduationCap,
+      ...base,
       groups: [
-        { heading: "Classes — Notes", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref("apsacs", n) })) },
-        { items: [
-          { label: "All APSACS", href: "/apsacs" },
-          { label: "MCQ Practice", href: "/online-quizzes" },
-          { label: "Test Generator", href: "/test-generator" },
-        ]},
+        { heading: "Notes — Chapter-wise", items: NAV_BOARDS.map((b) => ({ label: b.label, href: `/${b.slug}` })) },
+        { heading: "Books — Official Textbooks", items: NAV_BOARDS.map((b) => ({ label: b.label, href: `/${b.slug}?view=books` })) },
       ],
     };
   }
-  if (boardSlug === "o-level" || boardSlug === "a-level") {
-    const label = boardShortName(boardSlug);
-    const years = boardSlug === "o-level"
+
+  if (activeBoard === "apsacs") {
+    return {
+      ...base,
+      groups: [
+        { heading: "APSACS — Notes", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref("apsacs", n) })) },
+        { heading: "APSACS — Books", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: `${classHref("apsacs", n)}?view=books` })) },
+        { items: [{ label: "All APSACS", href: "/apsacs" }] },
+      ],
+    };
+  }
+
+  if (activeBoard === "o-level" || activeBoard === "a-level") {
+    const years = activeBoard === "o-level"
       ? [{ label: "Year 10", href: "/o-level#year-10" }, { label: "Year 11", href: "/o-level#year-11" }]
       : [{ label: "Year 12 · AS", href: "/a-level#year-12" }, { label: "Year 13 · A Level", href: "/a-level#year-13" }];
     return {
-      id: boardNavId(boardSlug),
-      label,
-      icon: Compass,
+      ...base,
       groups: [
         { heading: "Years", items: years },
-        { items: [
-          { label: `All ${label}`, href: `/${boardSlug}` },
-          { label: "MCQ Practice", href: "/online-quizzes" },
-          { label: "Test Generator", href: "/test-generator" },
-        ]},
+        { items: [{ label: `All ${boardLabel(activeBoard)}`, href: `/${activeBoard}` }] },
       ],
     };
   }
-  const label = boardLabel(boardSlug);
+
+  const label = boardLabel(activeBoard);
   return {
-    id: boardNavId(boardSlug),
-    label,
-    icon: BookOpen,
+    ...base,
     groups: [
-      { heading: "Notes — Chapter-wise", items: NAV_CLASSES.map((n) => ({ label: classLabel(n) || `Class ${n}`, href: classHref(boardSlug, n) })) },
-      { heading: "Books — Official Textbooks", items: NAV_CLASSES.map((n) => ({ label: classLabel(n) || `Class ${n}`, href: `${classHref(boardSlug, n)}?view=books` })) },
+      { heading: `${label} — Notes`, items: NAV_CLASSES.map((n) => ({ label: classLabel(n), href: classHref(activeBoard, n) })) },
+      { heading: `${label} — Books`, items: NAV_CLASSES.map((n) => ({ label: classLabel(n), href: `${classHref(activeBoard, n)}?view=books` })) },
       { items: [
-        { label: `All ${label}`, href: `/${boardSlug}` },
-        { label: "Past Papers", href: "/past-papers" },
+        { label: `All ${label}`, href: `/${activeBoard}` },
         { label: "MCQ Practice", href: "/online-quizzes" },
         { label: "Test Generator", href: "/test-generator" },
       ]},
@@ -227,7 +201,13 @@ function buildBoardNav(boardSlug: string): DropdownDef {
  * `backdrop-filter`, which turns it into the containing block for BOTH
  * `absolute` and `fixed` descendants — an in-tree panel would be offset from
  * the wrong element and get clipped, so it escapes to the body instead.
+ *
+ * Because it escapes to <body>, the panel is a sibling of the sticky header, so
+ * its z-index has to sit ABOVE the header's (see PANEL_Z below) — otherwise it
+ * paints underneath the bar and reads as a clipped/bleeding panel.
  */
+const PANEL_Z = "z-[200]";
+
 function NavDropdown({
   item,
   isOpen,
@@ -249,9 +229,9 @@ function NavDropdown({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   // The panel records which menu it was measured for. A menu can swap its
-  // contents while closed (the board menu is rebuilt when the active board
-  // changes), so a measurement for a different `slug` is simply discarded —
-  // no effect, no stale coordinates at the old trigger's position.
+  // contents while closed (Books & Notes follows the active board), so a
+  // measurement for a different `slug` is simply discarded — no effect, no
+  // stale coordinates at the old trigger's position.
   const [placement, setPlacement] = useState<{ slug: string; top: number; left: number } | null>(null);
 
   const measure = useCallback(() => {
@@ -356,7 +336,7 @@ function NavDropdown({
               exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: 0.97 }}
               transition={POPOVER_SPRING}
               style={{ top: pos.top, left: pos.left }}
-              className={`fixed z-[70] max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-2 shadow-lift ${
+              className={`fixed ${PANEL_Z} max-h-[70vh] overflow-y-auto overscroll-contain rounded-2xl border border-border bg-card p-2 shadow-lift ${
                 item.groups.length > 1 ? "w-80" : "w-64"
               }`}
               onMouseEnter={onFocused}
@@ -405,45 +385,27 @@ export function Header() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reduceMotion = useReducedMotion();
 
+  /**
+   * Board slug for the current route, or null on neutral pages. This is derived
+   * from the URL only, so "Federal Board" can never linger after navigating to a
+   * non-board page — there is no stored board state to go stale.
+   */
   const activeBoard = useMemo(() => {
     const first = (pathname ?? "/").split("/").filter(Boolean)[0];
     return first && KNOWN_BOARD_SLUGS.has(first) ? first : null;
   }, [pathname]);
 
+  // Fixed set of visible menus: Boards, Books & Notes, Pairing Schemes,
+  // Past Papers, Test Generator, Tuitions. Nothing hides behind a "More".
   const navItems = useMemo<DropdownDef[]>(
-    () => [BOARDS_ITEM, ...(activeBoard ? [buildBoardNav(activeBoard)] : []), ...OTHER_NAV_ITEMS],
+    () => [BOARDS_ITEM, buildBooksAndNotesNav(activeBoard), ...OTHER_NAV_ITEMS],
     [activeBoard],
   );
 
   /**
-   * The bar must never need horizontal scrolling at common laptop widths, so the
-   * lower-priority menus collapse into a single "More" dropdown below 2xl and only
-   * sit inline when there is genuinely room for them.
-   */
-  const primaryNavItems = useMemo(
-    () => navItems.filter((item) => !COLLAPSIBLE_NAV_IDS.has(item.id ?? "")),
-    [navItems],
-  );
-  const collapsibleNavItems = useMemo(
-    () => navItems.filter((item) => COLLAPSIBLE_NAV_IDS.has(item.id ?? "")),
-    [navItems],
-  );
-  const moreNavItem: DropdownDef = useMemo(
-    () => ({
-      id: "more",
-      label: "More",
-      icon: MoreHorizontal,
-      groups: collapsibleNavItems.map((item) => ({
-        heading: item.label,
-        items: item.groups.flatMap((g) => g.items),
-      })),
-    }),
-    [collapsibleNavItems],
-  );
-
-/**
    * Full current URL, so a dropdown entry that differs from the current page only
    * by `?view=books` is still recognised as the active destination.
    */
@@ -455,7 +417,8 @@ export function Header() {
   const activeHrefFor = useCallback(
     (item: DropdownDef): string | undefined => {
       if (item.id === BOARDS_ITEM.id) return boardsHref;
-      if (activeBoard && item.id === boardNavId(activeBoard)) {
+      if (item.id === BOOKS_AND_NOTES_ID) {
+        if (!activeBoard) return undefined;
         const segments = (pathname ?? "").split("/").filter(Boolean);
         if (segments[0] !== activeBoard) return boardsHref;
         const classNum = parseInt(segments[1] ?? "", 10);
@@ -467,6 +430,7 @@ export function Header() {
     },
     [activeBoard, boardsHref, pathname, searchParams, currentUrl],
   );
+
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
   }, []);
@@ -475,6 +439,36 @@ export function Header() {
     clearClose();
     closeTimer.current = setTimeout(() => setOpenMenuId(null), ms);
   }, [clearClose]);
+
+  const clearPendingOpen = useCallback(() => {
+    if (openTimer.current) { clearTimeout(openTimer.current); openTimer.current = null; }
+  }, []);
+
+  /**
+   * Hover-to-switch between menus. The triggers sit in a tight row, so sliding the
+   * pointer across the bar passes over every trigger in between — opening on the
+   * raw hover event made menus flicker open/closed and re-trigger each other.
+   * A menu now opens instantly only when nothing else is open, otherwise the
+   * switch waits for the pointer to dwell (and is cancelled if it leaves).
+   */
+  const hoverOpen = useCallback((id: string) => {
+    clearClose();
+    clearPendingOpen();
+    setOpenMenuId((current) => {
+      if (current === id) return current;
+      if (current !== null) {
+        openTimer.current = setTimeout(() => setOpenMenuId(id), 160);
+      } else {
+        setOpenMenuId(id);
+      }
+      return current;
+    });
+  }, [clearClose, clearPendingOpen]);
+
+  const closeMenu = useCallback(() => {
+    clearPendingOpen();
+    scheduleClose();
+  }, [clearPendingOpen, scheduleClose]);
 
   // Any navigation (board switch, class switch, view toggle) must not leave a
   // menu open showing the previous page's list. Resetting during render (rather
@@ -489,6 +483,7 @@ export function Header() {
 
   useEffect(() => () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
+    if (openTimer.current) clearTimeout(openTimer.current);
   }, []);
 
   return (
@@ -509,45 +504,19 @@ export function Header() {
               </span>
             </Link>
 
-            {/* Desktop nav — secondary menus collapse into "More" on narrow desktops */}
+            {/* Desktop nav — every menu is a visible trigger, nothing hides in "More" */}
             <div className="scrollbar-none hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
-              {primaryNavItems.map((item) => (
+              {navItems.map((item) => (
                 <NavDropdown
                   key={item.id}
                   item={item}
                   isOpen={openMenuId === item.id}
                   activeHref={activeHrefFor(item)}
-                  onOpen={() => { clearClose(); setOpenMenuId(item.id); }}
-                  onClose={() => scheduleClose()}
+                  onOpen={() => hoverOpen(item.id)}
+                  onClose={closeMenu}
                   onFocused={clearClose}
                 />
               ))}
-              {collapsibleNavItems.length > 0 && (
-                <>
-                  <div className="hidden items-center gap-0.5 2xl:flex">
-                    {collapsibleNavItems.map((item) => (
-                      <NavDropdown
-                        key={item.id}
-                        item={item}
-                        isOpen={openMenuId === item.id}
-                        activeHref={activeHrefFor(item)}
-                        onOpen={() => { clearClose(); setOpenMenuId(item.id); }}
-                        onClose={() => scheduleClose()}
-                        onFocused={clearClose}
-                      />
-                    ))}
-                  </div>
-                  <div className="2xl:hidden">
-                    <NavDropdown
-                      item={moreNavItem}
-                      isOpen={openMenuId === "more"}
-                      onOpen={() => { clearClose(); setOpenMenuId("more"); }}
-                      onClose={() => scheduleClose()}
-                      onFocused={clearClose}
-                    />
-                  </div>
-                </>
-              )}
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">

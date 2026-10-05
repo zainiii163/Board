@@ -95,6 +95,25 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
         <p className="mt-8 text-sm text-muted">{tr("noClassesYet")}</p>
       ) : (
         <>
+          {/* Single sticky class ribbon — one horizontal, non-wrapping strip that
+              scrolls. The board page used to render one anchor-tab list for the
+              Notes sections and another for the Books sections, so the pills read
+              "Class 5 … Class 12, Class 5 … Class 12" again on the same screen. */}
+          <nav
+            className="scrollbar-none sticky top-16 z-20 -mx-4 mt-5 flex gap-2 overflow-x-auto border-b border-border/50 bg-background/85 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+            aria-label="Jump to class"
+          >
+            {uniqueClasses.map((klass) => (
+              <a
+                key={klass.slug}
+                href={`#class-${klass.slug}`}
+                className="shrink-0 whitespace-nowrap rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
+              >
+                {classLabel(parseClassNumber(klass.slug)) || `Class ${klass.slug}`}
+              </a>
+            ))}
+          </nav>
+
           {/* ─── Class Sections ─── */}
           {uniqueClasses.map((klass) => {
             const num = parseClassNumber(klass.slug);
@@ -114,7 +133,7 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
               return true;
             });
             return (
-              <div key={klass.slug} id={`class-${klass.slug}`} className="mt-10 scroll-mt-24">
+              <div key={klass.slug} id={`class-${klass.slug}`} className="mt-10 scroll-mt-32">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
 <h2 className="text-xl font-black text-foreground sm:text-2xl">

@@ -35,13 +35,38 @@ export type PastPaperItem = {
 
 const TYPE_CHIPS: ("all" | PastPaperType)[] = ["all", "second-annual", "model", "first-annual", "pba"];
 
-/** Display order: 2nd Annual → Model → 1st Annual, with PBA grouped last. */
-const GROUPS: { type: PastPaperType; title: string; blurb?: string }[] = [
-  { type: "second-annual", title: "2nd Annual Exams" },
-  { type: "model", title: "Model Papers" },
-  { type: "first-annual", title: "1st Annual Exams" },
-  { type: "pba", title: "Practical Based Assessments (PBA)", blurb: "Practical / internal assessment papers" },
-];
+/**
+ * Display order within a single exam year: 2nd Annual → Model Paper → 1st Annual.
+ * Years themselves render newest-first, giving the exact sequence
+ * 2nd Annual 2026, Model 2026, 1st Annual 2026, 2nd Annual 2025, 1st Annual 2025…
+ */
+const TYPE_RANK: Record<PastPaperType, number> = {
+  "second-annual": 0,
+  model: 1,
+  "first-annual": 2,
+  pba: 3,
+};
+
+const TYPE_TITLES: Record<Exclude<PastPaperType, "pba">, string> = {
+  "second-annual": "2nd Annual",
+  model: "Model Paper",
+  "first-annual": "1st Annual",
+};
+
+/**
+ * Practical papers are grouped under the science subject they belong to instead of
+ * forming their own top-level block.
+ */
+const PBA_SUBJECTS = ["Physics", "Chemistry", "Biology", "Computer Science"];
+
+function pbaBucket(subjectTitle: string): string | null {
+  const title = subjectTitle.toLowerCase();
+  if (title.includes("physics")) return "Physics";
+  if (title.includes("chemistry")) return "Chemistry";
+  if (title.includes("biology")) return "Biology";
+  if (title.includes("computer")) return "Computer Science";
+  return null;
+}
 
 const CHIP_LABEL: Record<(typeof TYPE_CHIPS)[number], string> = {
   all: "All",
@@ -80,6 +105,13 @@ export function PastPapersList({
     [papers],
   );
   const years = useMemo(() => [...new Set(papers.map((p) => p.year))].sort().reverse(), [papers]);
+  const subjects = useMemo(
+    () =>
+      [...new Set(papers.map((p) => p.subjectTitle))]
+        .sort((a, b) => a.localeCompare(b))
+        .filter(Boolean),
+    [papers],
+  );
 
   const [board, setBoard] = useState(
     initialBoard && papers.some((p) => p.boardSlug === initialBoard) ? initialBoard : "all",
@@ -93,6 +125,7 @@ export function PastPapersList({
   // Old-syllabus papers are hidden by default; the toggle reveals them.
   const [syllabus, setSyllabus] = useState<"new" | "all">("new");
   const [solved, setSolved] = useState<"all" | "solved" | "unsolved">("all");
+  const [subject, setSubject] = useState("all");
 
   const visible = useMemo(
     () =>
@@ -101,11 +134,52 @@ export function PastPapersList({
           (board === "all" || p.boardSlug === board) &&
           (type === "all" || p.paperType === type) &&
           (year === "all" || p.year === year) &&
+          (subject === "all" || p.subjectTitle === subject) &&
           (syllabus === "all" || (p.syllabus ?? "new") === "new") &&
           (solved === "all" || (solved === "solved" ? p.isSolved : !p.isSolved)),
       ),
-    [papers, board, type, year, syllabus, solved],
+    [papers, board, type, year, subject, syllabus, solved],
   );
+
+  /**
+   * Chronological hierarchy: years newest-first, and inside a year the exam types
+   * in TYPE_RANK order. Practical papers are split out and nested under their
+   * science subject further down.
+   */
+  const byYear = useMemo(() => {
+    const exams = visible.filter((p) => p.paperType !== "pba");
+    const grouped = new Map<string, { type: Exclude<PastPaperType, "pba">; rows: PastPaperItem[] }[]>();
+    for (const paper of exams) {
+      const yearKey = paper.year;
+      const typeKey = paper.paperType as Exclude<PastPaperType, "pba">;
+      const buckets = grouped.get(yearKey) ?? [];
+      const bucket = buckets.find((b) => b.type === typeKey);
+      if (bucket) bucket.rows.push(paper);
+      else buckets.push({ type: typeKey, rows: [paper] });
+      grouped.set(yearKey, buckets);
+    }
+    return [...grouped.entries()]
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .map(([yearKey, buckets]) => [
+        yearKey,
+        buckets.sort((a, b) => TYPE_RANK[a.type] - TYPE_RANK[b.type]),
+      ] as const);
+  }, [visible]);
+
+  /** Practical papers bucketed by their parent science subject. */
+  const pbaBySubject = useMemo(() => {
+    const buckets = new Map<string, PastPaperItem[]>();
+    for (const paper of visible) {
+      if (paper.paperType !== "pba") continue;
+      const key = pbaBucket(paper.subjectTitle) ?? "Other Practical";
+      const rows = buckets.get(key) ?? [];
+      rows.push(paper);
+      buckets.set(key, rows);
+    }
+    return PBA_SUBJECTS.map((name) => [name, buckets.get(name)] as const).filter(
+      (entry): entry is readonly [string, PastPaperItem[]] => Boolean(entry[1]),
+    );
+  }, [visible]);
 
   const segmented =
     "pressable focus-ring whitespace-nowrap rounded-xl border px-3 py-1.5 text-xs font-bold transition";
@@ -190,6 +264,37 @@ export function PastPapersList({
         </div>
       )}
 
+      {/* ── Subject grid ───────────────────────────────────────────── */}
+      {subjects.length > 1 && (
+        <div className={hideHeading ? "mt-4" : "mt-6"}>
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Subject</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            <button
+              type="button"
+              onClick={() => setSubject("all")}
+              className={`pressable rounded-2xl border px-4 py-3 text-left text-sm font-bold transition ${
+                subject === "all" ? chipActive : chipIdle
+              }`}
+            >
+              All subjects
+            </button>
+            {subjects.map((name) => (
+              <button
+                key={name}
+                type="button"
+                onClick={() => setSubject(subject === name ? "all" : name)}
+                aria-pressed={subject === name}
+                className={`pressable rounded-2xl border px-4 py-3 text-left text-sm font-bold transition ${
+                  subject === name ? chipActive : chipIdle
+                }`}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── Filters ─────────────────────────────────────────────── */}
       <div className="mt-5 flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
@@ -261,36 +366,60 @@ export function PastPapersList({
         </div>
       </div>
 
-      {/* ── Grouped results ─────────────────────────────────────── */}
-      <div className="mt-6 space-y-7">
+      {/* ── Results: year-major chronology ─────────────────────────── */}
+      <div className="mt-6 space-y-8">
         {visible.length === 0 && (
           <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted">
             No papers match these filters yet.
           </p>
         )}
 
-        {GROUPS.map((group) => {
-          const rows = visible.filter((p) => p.paperType === group.type);
-          if (rows.length === 0) return null;
-          return (
-            <section key={group.type}>
-              <div className="mb-3 flex items-center gap-2">
-                <span className="inline-block h-5 w-1 rounded-full bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
-                <h2 className="text-lg font-black text-foreground">{group.title}</h2>
-                {group.blurb && <span className="text-xs text-muted">{group.blurb}</span>}
-              </div>
-              <motion.div
-                key={`${group.type}-${rows.length}`}
-                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-2.5"
-              >
-                {rows.map(renderRow)}
-              </motion.div>
-            </section>
-          );
-        })}
+        {byYear.map(([yearKey, buckets]) => (
+          <section key={yearKey}>
+            <div className="mb-3 flex items-center gap-2">
+              <span className="inline-block h-5 w-1 rounded-full bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
+              <h2 className="text-lg font-black text-foreground">{yearKey}</h2>
+            </div>
+            <div className="space-y-5">
+              {buckets.map((bucket) => (
+                <div key={bucket.type}>
+                  <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-muted">
+                    {TYPE_TITLES[bucket.type]}
+                  </h3>
+                  <motion.div
+                    initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="space-y-2.5"
+                  >
+                    {bucket.rows.map(renderRow)}
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+
+        {/* Practical papers nest under their own science subject */}
+        {pbaBySubject.length > 0 && (
+          <section>
+            <div className="mb-1 flex items-center gap-2">
+              <span className="inline-block h-5 w-1 rounded-full bg-gradient-to-b from-accent to-accent-2" aria-hidden="true" />
+              <h2 className="text-lg font-black text-foreground">Practical Based Assessment</h2>
+            </div>
+            <p className="mb-3 text-xs text-muted">Practical / internal assessment papers, grouped by subject.</p>
+            <div className="space-y-5">
+              {pbaBySubject.map(([name, rows]) => (
+                <div key={name}>
+                  <h3 className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-muted">
+                    {name} — PBA
+                  </h3>
+                  <div className="space-y-2.5">{rows.map(renderRow)}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </>
   );
