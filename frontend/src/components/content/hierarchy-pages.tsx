@@ -64,13 +64,13 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">{tr("boardLabel")}</p>
-        <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{displayTitle}</h1>
-      </div>
+      {/* The H1 is the board name and the navbar already shows it as the active
+          menu, so there is no eyebrow or repeated board label above it. */}
+      <h1 className="text-3xl font-black text-foreground sm:text-4xl">{displayTitle}</h1>
+      <p className="mt-1.5 text-sm text-muted">{tr("chooseClassContinue")}</p>
 
-{/* Books | Notes Toggle */}
-      <div className="mt-6 inline-flex rounded-full border border-border bg-card p-1" role="tablist" aria-label="View mode">
+      {/* Notes | Books */}
+      <div className="mt-5 inline-flex rounded-full border border-border bg-card p-1" role="tablist" aria-label="View mode">
         <button
           type="button"
           role="tab"
@@ -319,8 +319,10 @@ export function ClassPageContent({
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">{displayTitle}</p>
           <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
+          {/* Board name already sits above as the eyebrow and in the navbar, so the
+              helper line stays generic instead of repeating it back to back. */}
           <p className="mt-1.5 max-w-xl text-sm text-muted">
-            {tr("chooseSubjectContinue").replace("{board}", displayTitle)}
+            {tr("chooseSubjectContinue").replace("{board} ", "")}
           </p>
         </div>
         <BookmarkButton title={`${classTitle} · ${displayTitle}`} path={`/${board}/${classSlug}`} />

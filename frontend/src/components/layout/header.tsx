@@ -14,6 +14,7 @@ import {
   LayoutGrid,
   LogOut,
   Menu,
+  MoreHorizontal,
   NotebookPen,
   Search,
   Sparkles,
@@ -63,6 +64,9 @@ const BOARDS_ITEM: DropdownDef = {
     ]},
   ],
 };
+
+/** Menus that move into the "More" dropdown below the 2xl breakpoint. */
+const COLLAPSIBLE_NAV_IDS = new Set(["pairing-schemes", "test-generator", "tuition"]);
 
 const OTHER_NAV_ITEMS: DropdownDef[] = [
   { id: "notes", label: "Notes", icon: NotebookPen, groups: [
@@ -323,7 +327,7 @@ function NavDropdown({
         aria-expanded={isOpen}
         aria-haspopup="true"
         onClick={() => (isOpen ? onClose() : handleEnter())}
-        className={`pressable focus-ring flex items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 py-2 text-[13px] font-semibold transition lg:text-sm ${
+        className={`pressable focus-ring flex items-center gap-1.5 whitespace-nowrap rounded-xl px-2 py-2 text-[13px] font-semibold transition lg:text-sm ${
           isOpen ? "bg-accent/10 text-accent" : "text-foreground/80 hover:bg-accent/5 hover:text-accent"
         }`}
       >
@@ -413,6 +417,32 @@ export function Header() {
     [activeBoard],
   );
 
+  /**
+   * The bar must never need horizontal scrolling at common laptop widths, so the
+   * lower-priority menus collapse into a single "More" dropdown below 2xl and only
+   * sit inline when there is genuinely room for them.
+   */
+  const primaryNavItems = useMemo(
+    () => navItems.filter((item) => !COLLAPSIBLE_NAV_IDS.has(item.id ?? "")),
+    [navItems],
+  );
+  const collapsibleNavItems = useMemo(
+    () => navItems.filter((item) => COLLAPSIBLE_NAV_IDS.has(item.id ?? "")),
+    [navItems],
+  );
+  const moreNavItem: DropdownDef = useMemo(
+    () => ({
+      id: "more",
+      label: "More",
+      icon: MoreHorizontal,
+      groups: collapsibleNavItems.map((item) => ({
+        heading: item.label,
+        items: item.groups.flatMap((g) => g.items),
+      })),
+    }),
+    [collapsibleNavItems],
+  );
+
 /**
    * Full current URL, so a dropdown entry that differs from the current page only
    * by `?view=books` is still recognised as the active destination.
@@ -479,9 +509,9 @@ export function Header() {
               </span>
             </Link>
 
-            {/* Desktop nav — scrolls internally instead of widening the page */}
-            <div className="scrollbar-none hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:flex">
-              {navItems.map((item) => (
+            {/* Desktop nav — secondary menus collapse into "More" on narrow desktops */}
+            <div className="scrollbar-none hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
+              {primaryNavItems.map((item) => (
                 <NavDropdown
                   key={item.id}
                   item={item}
@@ -492,6 +522,32 @@ export function Header() {
                   onFocused={clearClose}
                 />
               ))}
+              {collapsibleNavItems.length > 0 && (
+                <>
+                  <div className="hidden items-center gap-0.5 2xl:flex">
+                    {collapsibleNavItems.map((item) => (
+                      <NavDropdown
+                        key={item.id}
+                        item={item}
+                        isOpen={openMenuId === item.id}
+                        activeHref={activeHrefFor(item)}
+                        onOpen={() => { clearClose(); setOpenMenuId(item.id); }}
+                        onClose={() => scheduleClose()}
+                        onFocused={clearClose}
+                      />
+                    ))}
+                  </div>
+                  <div className="2xl:hidden">
+                    <NavDropdown
+                      item={moreNavItem}
+                      isOpen={openMenuId === "more"}
+                      onOpen={() => { clearClose(); setOpenMenuId("more"); }}
+                      onClose={() => scheduleClose()}
+                      onFocused={clearClose}
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">

@@ -1778,9 +1778,12 @@ function buildLevelClass(levelSlug: string): Board["classes"][number] {
 }
 
 /**
- * Curriculum order for subjects. Literal seed order is not stable across boards
- * and used to make class pages list subjects in an arbitrary sequence, so every
- * class is normalized once at module load.
+ * Curriculum order for subjects, uniform across every class: Mathematics,
+ * Physics, Chemistry, Biology, General Science, English, Urdu, Islamiyat,
+ * Pakistan Studies, Computer Science — then anything else alphabetically.
+ * Literal seed order is not stable across boards and used to make class pages
+ * list subjects in an arbitrary sequence, so every class is normalized once at
+ * module load and every board payload is sorted on the way out.
  */
 const SUBJECT_ORDER = [
     "mathematics",
@@ -1788,8 +1791,6 @@ const SUBJECT_ORDER = [
     "physics",
     "chemistry",
     "biology",
-    "computer science",
-    "computer studies",
     "general science",
     "general sciences",
     "english",
@@ -1799,13 +1800,16 @@ const SUBJECT_ORDER = [
     "islam studies",
     "pakistan studies",
     "pakistani studies",
+    "pakistan studies islamiyat",
+    "tarjuma tul quran",
+    "tarjama tul quran",
+    "computer science",
+    "computer studies",
     "geography",
     "history",
     "civics",
     "economics",
     "arabic",
-    "tarjuma tul quran",
-    "tarjama tul quran",
     "drawing",
     "art",
     "music",

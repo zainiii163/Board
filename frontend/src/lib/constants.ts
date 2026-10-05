@@ -86,11 +86,13 @@ export function boardTextbookCategory(boardSlug: string): string {
 }
 
 /**
- * Curriculum order for subject cards. The API returns subjects in whatever order
- * the database/seed happened to insert them, which made class pages render
- * subjects in an arbitrary sequence (Physics before Mathematics, Islamiyat last,
- * etc). Every listing sorts through `sortSubjects` so the order is stable and
- * matches the way subjects are taught.
+ * Curriculum order for subject cards, uniform across every class:
+ * Mathematics, Physics, Chemistry, Biology, General Science, English, Urdu,
+ * Islamiyat, Pakistan Studies, Computer Science — then anything else
+ * alphabetically. The API returns subjects in whatever order the database/seed
+ * happened to insert them, which made class pages render an arbitrary sequence
+ * (Physics before Mathematics, Islamiyat last, Computer Science next to
+ * Physics), so every listing sorts through `sortSubjects`.
  */
 const SUBJECT_ORDER = [
   "mathematics",
@@ -98,8 +100,8 @@ const SUBJECT_ORDER = [
   "physics",
   "chemistry",
   "biology",
-  "computer science",
-  "computer studies",
+  // In primary/middle grades this is the whole science syllabus, so it keeps the
+  // same slot Physics/Chemistry/Biology would occupy.
   "general science",
   "general sciences",
   "english",
@@ -112,6 +114,8 @@ const SUBJECT_ORDER = [
   "pakistan studies islamiyat",
   "tarjuma tul quran",
   "tarjama tul quran",
+  "computer science",
+  "computer studies",
   "geography",
   "history",
   "civics",
