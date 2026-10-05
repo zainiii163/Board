@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { ClassPageContent } from "@/components/content/hierarchy-pages";
 import { apiFetch, apiFetchOrNull } from "@/lib/api-client";
-import { boardDisplayTitle } from "@/lib/constants";
+import { boardDisplayTitle, sortSubjects } from "@/lib/constants";
 import type { PastPaperItem } from "@/components/content/past-papers-list";
 
 export const dynamic = "force-dynamic";
@@ -39,8 +39,6 @@ export default async function ClassPage({
   const klass = data?.class;
   if (!data || !klass) notFound();
 
-  const classNum = parseInt(classSlug, 10) || 0;
-
   const pastPapers = await apiFetch<PastPaperItem[]>(
     `/api/past-papers?board=${board}&class=${classSlug}`,
   ).catch(() => []);
@@ -49,9 +47,9 @@ export default async function ClassPage({
     <ClassPageContent
       board={board}
       classSlug={classSlug}
-      boardTitle={boardDisplayTitle(data.board?.title ?? "Board", board, classNum)}
+      boardTitle={data.board?.title ?? "Board"}
       classTitle={klass.title}
-      subjects={klass.subjects}
+      subjects={sortSubjects(klass.subjects)}
       initialView={view === "books" ? "books" : view === "past-papers" ? "past-papers" : "notes"}
       pastPapers={pastPapers}
     />

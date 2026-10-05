@@ -7,6 +7,8 @@ import {
     getChapterBySlug,
     getExerciseBySlug,
     getQuestionData,
+    sortBoardHierarchy,
+    sortSubjects,
 } from "../../demo-data.js";
 import * as boardsService from "./boards.service.js";
 import * as chapterZipService from "./chapter-zip.service.js";
@@ -37,10 +39,13 @@ export const getBySlug = async (req: Request, res: Response) => {
                 where: eq(schema.boards.slug, slug),
                 with: {
                     classes: {
+                        orderBy: (klass, { asc }) => [asc(klass.id)],
                         with: {
                             subjects: {
+                                orderBy: (subject, { asc }) => [asc(subject.id)],
                                 with: {
                                     chapters: {
+                                        orderBy: (chapter, { asc }) => [asc(chapter.id)],
                                         with: { exercises: true },
                                     },
                                 },
@@ -52,13 +57,15 @@ export const getBySlug = async (req: Request, res: Response) => {
             if (board) {
                 const filtered = {
                     ...board,
-                    classes: board.classes.map((klass) => ({
-                        ...klass,
-                        subjects: klass.subjects.map((subject) => ({
-                            ...subject,
-                            chapters: subject.chapters.filter((ch) => ch.status === "published"),
+                    classes: sortBoardHierarchy(
+                        board.classes.map((klass) => ({
+                            ...klass,
+                            subjects: klass.subjects.map((subject) => ({
+                                ...subject,
+                                chapters: subject.chapters.filter((ch) => ch.status === "published"),
+                            })),
                         })),
-                    })),
+                    ),
                 };
                 return res.json(filtered);
             }
@@ -73,7 +80,7 @@ export const getBySlug = async (req: Request, res: Response) => {
         return res.status(404).json({ message: "Board not found" });
     }
 
-    return res.json(board);
+    return res.json({ ...board, classes: sortBoardHierarchy(board.classes ?? []) });
 };
 
 export const create = async (req: AuthedRequest, res: Response, next: NextFunction) => {
@@ -114,10 +121,18 @@ export const getBoardClass = async (req: Request, res: Response) => {
 
             const klass = await db.query.classes.findFirst({
                 where: and(eq(schema.classes.slug, classSlug), eq(schema.classes.boardId, board.id)),
-                with: { board: true, subjects: true },
+                with: {
+                    board: true,
+                    // Relational queries have no implicit ordering — without this the
+                    // class page rendered subjects in arbitrary DB order.
+                    subjects: { orderBy: (subject, { asc }) => [asc(subject.id)] },
+                },
             });
             if (klass) {
-                return res.json({ board: klass.board, class: klass });
+                return res.json({
+                    board: klass.board,
+                    class: { ...klass, subjects: sortSubjects(klass.subjects) },
+                });
             }
             return res.status(404).json({ message: "Class not found" });
         } catch (e) {
@@ -132,7 +147,7 @@ export const getBoardClass = async (req: Request, res: Response) => {
 
     return res.json({
         board: getBoardBySlug(slug),
-        class: klass,
+        class: { ...klass, subjects: sortSubjects(klass.subjects ?? []) },
     });
 };
 
@@ -157,7 +172,7 @@ export const getBoardClassSubject = async (req: Request, res: Response) => {
                 where: and(eq(schema.subjects.slug, subjectSlug), eq(schema.subjects.classId, klass.id)),
                 with: {
                     class: { with: { board: true } },
-                    chapters: { with: { exercises: true } },
+                    chapters: { orderBy: (chapter, { asc }) => [asc(chapter.id)], with: { exercises: true } },
                 },
             });
             if (subject) {
@@ -212,7 +227,7 @@ export const getBoardClassSubjectChapter = async (req: Request, res: Response) =
 
             const chapter = await db.query.chapters.findFirst({
                 where: and(eq(schema.chapters.slug, chapterSlug), eq(schema.chapters.subjectId, subject.id)),
-                with: { exercises: true },
+                with: { exercises: { orderBy: (exercise, { asc }) => [asc(exercise.id)] } },
             });
             if (chapter && chapter.status === "published") {
                 return res.json({

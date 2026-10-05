@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 import { LocalizedBreadcrumbs } from "@/components/layout/localized-breadcrumbs";
-import { BookOpen, FileText, GraduationCap, NotebookPen, School } from "lucide-react";
+import { BookOpen, GraduationCap, NotebookPen, School } from "lucide-react";
 import { ChapterQuiz } from "@/components/content/chapter-quiz";
 import { BookmarkButton } from "@/components/content/bookmark-button";
 import { SaveOfflineButton } from "@/components/content/save-offline-button";
@@ -23,7 +23,19 @@ import { AdBanner } from "@/components/portal/ad-banner";
 import { CoverArt } from "@/components/portal/cover-art";
 import { useLocale } from "@/lib/locale-context";
 import { pickLocalized, pickLocalizedList } from "@/lib/i18n";
-import { ACADEMIC_YEAR, boardDisplayTitle, boardShortName, boardTextbookCategory } from "@/lib/constants";
+import {
+  ACADEMIC_YEAR,
+  APSACS_CLASSES,
+  NAV_CLASSES,
+  boardDisplayTitle,
+  boardShortName,
+  boardTextbookCategory,
+  classLabel,
+  classLabelFromSlug,
+  parseClassNumber,
+  sortClasses,
+  sortSubjects,
+} from "@/lib/constants";
 import { getBookCover } from "@/lib/book-covers";
 
 type BoardSubject = { slug: string; title: string };
@@ -36,22 +48,19 @@ type BoardPageContentProps = {
   pastPapers?: PastPaperItem[];
 };
 
-function classNumber(slug: string): number {
-  const n = parseInt(slug, 10);
-  return Number.isNaN(n) ? 0 : n;
-}
-
 export function BoardPageContent({ board, title, classes, pastPapers = [] }: BoardPageContentProps) {
   const { tr } = useLocale();
   const displayTitle = boardDisplayTitle(title, board);
   const [view, setView] = useState<"notes" | "books">("notes");
 
   const seen = new Set<string>();
-  const uniqueClasses = classes.filter((c) => {
-    if (seen.has(c.slug)) return false;
-    seen.add(c.slug);
-    return true;
-  });
+  const uniqueClasses = sortClasses(
+    classes.filter((c) => {
+      if (seen.has(c.slug)) return false;
+      seen.add(c.slug);
+      return true;
+    }),
+  );
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
@@ -60,14 +69,14 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
         <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{displayTitle}</h1>
       </div>
 
-      {/* Books | Notes Toggle */}
+{/* Books | Notes Toggle */}
       <div className="mt-6 inline-flex rounded-full border border-border bg-card p-1" role="tablist" aria-label="View mode">
         <button
           type="button"
           role="tab"
           aria-selected={view === "notes"}
           onClick={() => setView("notes")}
-          className={`rounded-full px-5 py-2 text-sm font-bold transition ${view === "notes" ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`}
+          className={`inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold transition ${view === "notes" ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`}
         >
           <NotebookPen className="h-4 w-4" aria-hidden="true" /> {tr("notes")}
         </button>
@@ -76,7 +85,7 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
           role="tab"
           aria-selected={view === "books"}
           onClick={() => setView("books")}
-          className={`rounded-full px-5 py-2 text-sm font-bold transition ${view === "books" ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`}
+          className={`inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold transition ${view === "books" ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`}
         >
           <BookOpen className="h-4 w-4" aria-hidden="true" /> {tr("books")}
         </button>
@@ -88,13 +97,16 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
         <>
           {/* ─── Class Sections ─── */}
           {uniqueClasses.map((klass) => {
-            const num = classNumber(klass.slug);
+            const num = parseClassNumber(klass.slug);
             const short = boardShortName(board, num);
-            const subjects = klass.subjects ?? [];
+            const subjects = sortSubjects(klass.subjects ?? []);
+            // In primary/middle grades science is taught as General Science, so the
+            // separate Physics/Chemistry/Biology cards are only hidden when that
+            // combined subject actually exists for the class.
+            const hasGeneralScience = subjects.some((s) => /general science/i.test(s.title));
             const displaySubjects = subjects.filter((subject) => {
-              const title = subject.title.toLowerCase();
-              // Classes 5-6: Remove individual Physics, Chemistry, Biology (should be under General Science)
-              if (num >= 5 && num <= 6) {
+              if (num >= 5 && num <= 8 && hasGeneralScience) {
+                const title = subject.title.toLowerCase();
                 if (title.includes("physics") || title.includes("chemistry") || title.includes("biology")) {
                   return false;
                 }
@@ -105,8 +117,12 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
               <div key={klass.slug} id={`class-${klass.slug}`} className="mt-10 scroll-mt-24">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
-                    <h2 className="text-xl font-black text-foreground sm:text-2xl">
-                      Class {klass.slug} <span className="text-accent">({short})</span>
+<h2 className="text-xl font-black text-foreground sm:text-2xl">
+                      {(() => {
+                        const label = classLabel(num);
+                        return label || `Class ${classLabelFromSlug(klass.slug)}`;
+                      })()}{" "}
+                      <span className="text-accent">({short})</span>
                     </h2>
                     <p className="mt-1 text-sm text-muted">{view === "notes" ? "Chapter-wise notes, SLO-based solutions, and exercises." : "Official textbooks — read online or download PDF."}</p>
                   </div>
@@ -136,17 +152,17 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
                             {cover ? (
                               <Image
                                 src={cover}
-                                alt={`${klass.slug} ${subject.title}`}
+alt={`${classLabelFromSlug(klass.slug)} ${subject.title}`}
                                 width={160}
                                 height={208}
                                 className="aspect-[3/4] w-full object-cover"
                               />
                             ) : (
-                              <CoverArt title={`${klass.slug} ${subject.title}`} className="aspect-[3/4] w-full" />
+                              <CoverArt title={`${classLabelFromSlug(klass.slug)} ${subject.title}`} className="aspect-[3/4] w-full" />
                             )}
                           </div>
                           <p className="mt-2 text-center text-xs font-semibold text-foreground group-hover:text-accent">
-                            {subject.title}
+{subject.title}
                           </p>
                         </Link>
                       );
@@ -238,34 +254,53 @@ export function ClassPageContent({
   pastPapers = [],
 }: ClassPageContentProps) {
   const { tr } = useLocale();
-  const [view, setView] = useState<"notes" | "books" | "past-papers">(initialView);
-  const classNum = classNumber(classSlug);
+  const [view, setView] = useState<"notes" | "books">(initialView === "books" ? "books" : "notes");
+  const classNum = parseClassNumber(classSlug);
   const short = boardShortName(board, classNum);
   const displayTitle = boardDisplayTitle(boardTitle, board, classNum);
   const booksCategory = boardTextbookCategory(board);
 
-  // Filter subjects based on grade-wise curriculum mapping
-  const filteredSubjects = subjects.filter((subject) => {
-    const title = subject.title.toLowerCase();
-    // Classes 5-6: Remove individual Physics, Chemistry, Biology (should be under General Science)
-    if (classNum >= 5 && classNum <= 6) {
+/**
+   * The server re-renders this component for every `/board/class` navigation, but
+   * React keeps the state of a component mounted across the same route segment.
+   * Without this reset the Notes/Books tab stayed on the previous class's choice,
+   * which is what made switching classes feel broken. Adjusting during render
+   * (the documented "reset state on prop change" pattern) avoids the stale frame.
+   */
+  const routeKey = `${board}/${classSlug}`;
+  const [lastRouteKey, setLastRouteKey] = useState(routeKey);
+  if (routeKey !== lastRouteKey) {
+    setLastRouteKey(routeKey);
+    setView(initialView === "books" ? "books" : "notes");
+  }
+
+  // Uniform subject order, plus grade-wise curriculum mapping: in primary and
+  // middle grades the separate science subjects are dropped when the class
+  // actually carries a combined General Science subject.
+  const hasGeneralScience = subjects.some((s) => /general science/i.test(s.title));
+  const filteredSubjects = sortSubjects(subjects).filter((subject) => {
+    if (classNum >= 5 && classNum <= 8 && hasGeneralScience) {
+      const title = subject.title.toLowerCase();
       if (title.includes("physics") || title.includes("chemistry") || title.includes("biology")) {
         return false;
       }
     }
-    // Classes 9-10: Keep Islamiyat, Tarjuma-tul-Quran, Pakistan Studies separate
-    // Classes 11-12: Restrict advanced electives
-    if (classNum >= 11 && classNum <= 12) {
-      // Allow all subjects for Class 11-12 (advanced electives are appropriate here)
-      return true;
-    }
     return true;
   });
 
-  const tabClass = (active: boolean) =>
-    `rounded-full px-5 py-2 text-sm font-bold transition ${active ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`;
+  // `?view=past-papers` is a deep link: land on the dedicated past papers section
+  // instead of dropping the visitor at the top of the subject list.
+  useEffect(() => {
+    if (initialView !== "past-papers") return;
+    document.getElementById("past-papers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [initialView]);
 
-  function selectView(next: "notes" | "books" | "past-papers") {
+  const tabClass = (active: boolean) =>
+    `inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold transition ${
+      active ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"
+    }`;
+
+  function selectView(next: "notes" | "books") {
     setView(next);
     const url = new URL(window.location.href);
     if (next === "notes") url.searchParams.delete("view");
@@ -273,20 +308,54 @@ export function ClassPageContent({
     window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
+  const classSlugs = (board === "apsacs" ? APSACS_CLASSES : NAV_CLASSES).map((n) =>
+    board === "apsacs" ? `class-${n}` : String(n),
+  );
+
   return (
     <section className="mx-auto max-w-5xl px-4 py-4 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
-          </div>
-          <BookmarkButton title={`${classTitle} · ${displayTitle}`} path={`/${board}/${classSlug}`} />
+      {/* Compact header — no stacked board/banner chips, subjects sit right below */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">{displayTitle}</p>
+          <h1 className="mt-1 text-3xl font-black text-foreground sm:text-4xl">{classTitle}</h1>
+          <p className="mt-1.5 max-w-xl text-sm text-muted">
+            {tr("chooseSubjectContinue").replace("{board}", displayTitle)}
+          </p>
         </div>
+        <BookmarkButton title={`${classTitle} · ${displayTitle}`} path={`/${board}/${classSlug}`} />
       </div>
 
-      {/* Notes / Books toggle */}
-      <div className="mt-6 inline-flex rounded-full border border-border bg-card p-1" role="tablist" aria-label="View mode">
+      {/* Sticky class switcher — jump between classes without going back a page */}
+      <nav
+        className="scrollbar-none sticky top-16 z-20 -mx-4 mt-5 flex gap-2 overflow-x-auto border-b border-border/50 bg-background/85 px-4 py-2 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+        aria-label="Switch class"
+      >
+        {classSlugs.map((slug) => {
+          const active = slug === classSlug;
+          return (
+            <Link
+              key={slug}
+              href={`/${board}/${slug}${view === "books" ? "?view=books" : ""}`}
+              scroll={false}
+              aria-current={active ? "page" : undefined}
+              className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+                active
+                  ? "border-accent bg-accent text-white"
+                  : "border-border bg-card text-foreground hover:border-accent hover:text-accent"
+              }`}
+            >
+              {(() => {
+                const label = classLabel(parseClassNumber(slug));
+                return label || `Class ${slug.replace(/^class-/i, "")}`;
+              })()}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Notes / Books toggle — past papers live in their own section further down */}
+      <div className="mt-5 inline-flex rounded-full border border-border bg-card p-1" role="tablist" aria-label="View mode">
         <button
           type="button"
           role="tab"
@@ -304,15 +373,6 @@ export function ClassPageContent({
           className={tabClass(view === "books")}
         >
           <BookOpen className="h-4 w-4" aria-hidden="true" /> {tr("books")}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={view === "past-papers"}
-          onClick={() => selectView("past-papers")}
-          className={tabClass(view === "past-papers")}
-        >
-          <FileText className="h-4 w-4" aria-hidden="true" /> Past Papers
         </button>
       </div>
 
@@ -359,23 +419,6 @@ export function ClassPageContent({
             )}
           </div>
         </>
-      ) : view === "past-papers" ? (
-        <>
-          <p className="mt-4 text-sm text-muted">
-            Board exam papers — filter by type, open from Google Drive.
-          </p>
-          <div className="mt-4">
-            <PastPapersList papers={pastPapers} hideHeading />
-          </div>
-          <div className="mt-6">
-            <Link
-              href="/past-papers"
-              className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-3 py-1.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
-            >
-              View all past papers →
-            </Link>
-          </div>
-        </>
       ) : (
         <>
           <p className="mt-4 text-sm text-muted">Official {short} textbooks — read online or download PDF.</p>
@@ -385,7 +428,7 @@ export function ClassPageContent({
             ) : (
               filteredSubjects.map((subject) => {
                 const cover = getBookCover(board, classNum, subject.title);
-                const label = `${classSlug} ${subject.title}`;
+                const label = `${classLabelFromSlug(classSlug)} ${subject.title}`;
                 return (
                   <Link
                     key={`bk-${subject.slug}`}
@@ -422,6 +465,30 @@ export function ClassPageContent({
         </>
       )}
 
+      {/* Past papers — its own section, never mixed into the notes/books tabs */}
+      <div id="past-papers" className="mt-12 scroll-mt-32">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Exam Prep</p>
+            <h2 className="mt-1 text-xl font-black text-foreground sm:text-2xl">
+              Past Papers — {classTitle}
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              Model papers, 1st &amp; 2nd annual, and PBAs — filter by type and open from Google Drive.
+            </p>
+          </div>
+          <Link
+            href="/past-papers"
+            className="inline-flex items-center gap-2 rounded-full border-2 border-accent px-3 py-1.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
+          >
+            View all past papers →
+          </Link>
+        </div>
+        <div className="mt-4">
+          <PastPapersList papers={pastPapers} hideHeading />
+        </div>
+      </div>
+
       {/* SEO Content Block */}
       <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">{displayTitle} {classTitle} Study Resources</h3>
@@ -442,7 +509,7 @@ export function ClassPageContent({
         </p>
       </div>
 
-      {/* Ad — bottom only */}
+      {/* Ad — bottom only, never above the subject cards */}
       <div className="mt-8">
         <AdBanner size="leaderboard" className="mx-auto" />
       </div>
@@ -485,7 +552,7 @@ export function SubjectPageContent({
   authors,
 }: SubjectPageContentProps) {
   const { tr, locale } = useLocale();
-  const classNum = classNumber(classSlug);
+  const classNum = parseClassNumber(classSlug);
   const short = boardShortName(board, classNum);
   const displayTitle = boardDisplayTitle(boardTitle, board, classNum);
   const isFbiseMcq = MCQ_ELIGIBLE_CLASSES.has(classNum);
@@ -785,7 +852,7 @@ export function ChapterPageContent(props: ChapterPageContentProps) {
   const subjectKey = `${props.board}/${props.classSlug}/${props.subject}`;
   const summary = pickLocalized(locale, props.summary, props.summaryUr);
   const formulas = pickLocalizedList(locale, props.formulas, props.formulasUr);
-  const classNum = classNumber(props.classSlug);
+  const classNum = parseClassNumber(props.classSlug);
   const displayTitle = boardDisplayTitle(props.boardTitle, props.board, classNum);
 
   return (
@@ -938,7 +1005,7 @@ type ExercisePageContentProps = {
 
 export function ExercisePageContent(props: ExercisePageContentProps) {
   const { tr } = useLocale();
-  const classNum = classNumber(props.classSlug);
+  const classNum = parseClassNumber(props.classSlug);
   const displayTitle = boardDisplayTitle(props.boardTitle, props.board, classNum);
 
   const exerciseList = props.exercises ?? [];

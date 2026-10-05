@@ -6,6 +6,9 @@ import { useDb } from "../../db/mode.js";
 import * as schema from "../../db/schema.js";
 import { ApiError } from "../../utils/api-error.js";
 
+/** Board used to disambiguate the board-less `/api/subjects/:slug` endpoint. */
+const DEFAULT_BOARD = "fbise";
+
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -27,7 +30,10 @@ async function mapSubjectRow(row: {
       where: eq(schema.classes.id, row.classId),
       with: { board: true },
     }));
-  const chapters = await db.query.chapters.findMany({ where: eq(schema.chapters.subjectId, row.id) });
+  const chapters = await db.query.chapters.findMany({
+    where: eq(schema.chapters.subjectId, row.id),
+    orderBy: (chapter, { asc }) => [asc(chapter.id)],
+  });
   return {
     id: row.id,
     boardSlug: klass!.board.slug,
@@ -52,15 +58,20 @@ export async function listSubjects(classId?: number, boardSlug?: string, classSl
       if (!classRow) return [];
       rows = await db.query.subjects.findMany({
         where: eq(schema.subjects.classId, classRow.id),
+        orderBy: (subject, { asc }) => [asc(subject.id)],
         with: { class: { with: { board: true } } },
       });
     } else if (classId) {
       rows = await db.query.subjects.findMany({
         where: eq(schema.subjects.classId, classId),
+        orderBy: (subject, { asc }) => [asc(subject.id)],
         with: { class: { with: { board: true } } },
       });
     } else {
-      rows = await db.query.subjects.findMany({ with: { class: { with: { board: true } } } });
+      rows = await db.query.subjects.findMany({
+        orderBy: (subject, { asc }) => [asc(subject.id)],
+        with: { class: { with: { board: true } } },
+      });
     }
     return Promise.all(rows.map(mapSubjectRow));
   }
@@ -73,7 +84,7 @@ export async function getSubjectBySlug(slug: string) {
       where: eq(schema.subjects.slug, slug),
       with: {
         class: { with: { board: true } },
-        chapters: true,
+        chapters: { orderBy: (chapter, { asc }) => [asc(chapter.id)] },
       },
     });
     if (!subject) throw ApiError.notFound("Subject not found.");
@@ -91,8 +102,15 @@ export async function getSubjectBySlug(slug: string) {
       })),
     };
   }
-  const records = cmsStore.listSubjectsAdmin().filter((s) => s.slug === slug);
-  const record = records.find((s) => s.classSlug === "9") ?? records[0];
+  // Subject slugs are only unique per (board, class), so this board-less endpoint
+  // has to pick one deterministically. Candidates must still match the requested
+  // slug — ignoring it and returning the first class-9 subject made every subject
+  // page render a different subject's chapters.
+  const candidates = cmsStore.listSubjectsAdmin().filter((s) => s.slug === slug);
+  const record =
+    candidates.find((s) => s.boardSlug === DEFAULT_BOARD && s.classSlug === "9") ??
+    candidates.find((s) => s.classSlug === "9") ??
+    candidates[0];
   if (!record) throw ApiError.notFound("Subject not found.");
   const chapters = cmsStore
     .listChaptersAdmin()

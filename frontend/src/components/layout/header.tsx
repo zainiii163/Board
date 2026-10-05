@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   BookOpen,
@@ -25,14 +25,26 @@ import {
 import { useLocale } from "@/lib/locale-context";
 import { useAuth } from "@/lib/auth-context";
 import { ThemeToggle } from "@/lib/theme-context";
-import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardShortName } from "@/lib/constants";
+import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardLabel, boardShortName, classLabel } from "@/lib/constants";
 import { POPOVER_SPRING } from "@/components/motion/hover-card";
 
 type DropdownItem = { label: string; href: string };
 type DropdownGroup = { heading?: string; items: DropdownItem[] };
-type DropdownDef = { label: string; groups: DropdownGroup[]; icon?: typeof BookOpen; soon?: boolean };
+type DropdownDef = {
+  /**
+   * Stable identity for the menu. Open/close state and React keys use this instead
+   * of the label, so a menu keeps its state (and never collides with a sibling)
+   * when its visible title changes — e.g. "Federal Board" turning into "NBF".
+   */
+  id: string;
+  label: string;
+  groups: DropdownGroup[];
+  icon?: typeof BookOpen;
+  soon?: boolean;
+};
 
 const BOARDS_ITEM: DropdownDef = {
+  id: "boards",
   label: "Boards",
   icon: GraduationCap,
   groups: [
@@ -53,7 +65,7 @@ const BOARDS_ITEM: DropdownDef = {
 };
 
 const OTHER_NAV_ITEMS: DropdownDef[] = [
-  { label: "Notes", icon: NotebookPen, groups: [
+  { id: "notes", label: "Notes", icon: NotebookPen, groups: [
     { heading: "Pakistani Boards", items: [
       { label: "Federal Board", href: "/fbise" },
       { label: "Punjab Board", href: "/punjab" },
@@ -68,22 +80,22 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "A Level", href: "/a-level" },
     ]},
   ]},
-  { label: "Books", icon: BookOpen, groups: [
+  { id: "books", label: "Books", icon: BookOpen, groups: [
     { heading: "Pakistani Boards", items: [
-      { label: "Federal Board", href: "/fbise" },
-      { label: "Punjab Board", href: "/punjab" },
-      { label: "KPK Board", href: "/kpk" },
-      { label: "Sindh Board", href: "/sindh" },
-      { label: "APSACS", href: "/apsacs" },
+      { label: "Federal Board", href: "/fbise?view=books" },
+      { label: "Punjab Board", href: "/punjab?view=books" },
+      { label: "KPK Board", href: "/kpk?view=books" },
+      { label: "Sindh Board", href: "/sindh?view=books" },
+      { label: "APSACS", href: "/apsacs?view=books" },
     ]},
     { heading: "International", items: [
-      { label: "Oxford Board", href: "/oxford" },
-      { label: "Cambridge Board", href: "/cambridge" },
-      { label: "O Level", href: "/o-level" },
-      { label: "A Level", href: "/a-level" },
+      { label: "Oxford Board", href: "/oxford?view=books" },
+      { label: "Cambridge Board", href: "/cambridge?view=books" },
+      { label: "O Level", href: "/o-level?view=books" },
+      { label: "A Level", href: "/a-level?view=books" },
     ]},
   ]},
-  { label: "Pairing Schemes", icon: LayoutGrid, groups: [
+  { id: "pairing-schemes", label: "Pairing Schemes", icon: LayoutGrid, groups: [
     { items: [
       { label: "9th", href: "/categories/9th-class-pairing-schemes" },
       { label: "10th", href: "/categories/10th-class-pairing-schemes" },
@@ -91,7 +103,7 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "2nd Year", href: "/categories/2nd-year-pairing-schemes" },
     ]},
   ]},
-  { label: "Past Papers", icon: FileText, groups: [
+  { id: "past-papers", label: "Past Papers", icon: FileText, groups: [
     { items: [
       { label: "All Past Papers", href: "/past-papers" },
     ]},
@@ -112,7 +124,7 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "IB", href: "/categories/ib-notes" },
     ]},
   ]},
-  { label: "Test Generator", icon: Sparkles, groups: [
+  { id: "test-generator", label: "Test Generator", icon: Sparkles, groups: [
     { items: [
       { label: "9th Class Tests", href: "/categories/9th-class-tests" },
       { label: "10th Class Tests", href: "/categories/10th-class-tests" },
@@ -122,7 +134,7 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "MCQ Practice", href: "/online-quizzes" },
     ]},
   ]},
-  { label: "Tuition", icon: User, groups: [
+  { id: "tuition", label: "Tuition", icon: User, groups: [
     { items: [
       { label: "Malik Shahid (Maths)", href: "/tuition" },
       { label: "Online Academy Classes", href: "/categories/online-academy-classes" },
@@ -135,7 +147,6 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
 
 const KNOWN_BOARD_SLUGS = new Set<string>([
   ...NAV_BOARDS.map((b) => b.slug),
-  "apsacs",
   "kpk",
   "sindh",
   "o-level",
@@ -147,13 +158,18 @@ function classHref(boardSlug: string, num: number): string {
   return `/${boardSlug}/${num}`;
 }
 
+function boardNavId(boardSlug: string): string {
+  return `board:${boardSlug}`;
+}
+
 function buildBoardNav(boardSlug: string): DropdownDef {
   if (boardSlug === "apsacs") {
     return {
+      id: boardNavId(boardSlug),
       label: boardShortName("apsacs"),
       icon: GraduationCap,
       groups: [
-        { heading: "Classes", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref("apsacs", n) })) },
+        { heading: "Classes — Notes", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref("apsacs", n) })) },
         { items: [
           { label: "All APSACS", href: "/apsacs" },
           { label: "MCQ Practice", href: "/online-quizzes" },
@@ -168,6 +184,7 @@ function buildBoardNav(boardSlug: string): DropdownDef {
       ? [{ label: "Year 10", href: "/o-level#year-10" }, { label: "Year 11", href: "/o-level#year-11" }]
       : [{ label: "Year 12 · AS", href: "/a-level#year-12" }, { label: "Year 13 · A Level", href: "/a-level#year-13" }];
     return {
+      id: boardNavId(boardSlug),
       label,
       icon: Compass,
       groups: [
@@ -180,14 +197,17 @@ function buildBoardNav(boardSlug: string): DropdownDef {
       ],
     };
   }
-  const label = boardShortName(boardSlug);
+  const label = boardLabel(boardSlug);
   return {
+    id: boardNavId(boardSlug),
     label,
     icon: BookOpen,
     groups: [
-      { heading: "Classes", items: NAV_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref(boardSlug, n) })) },
+      { heading: "Notes — Chapter-wise", items: NAV_CLASSES.map((n) => ({ label: classLabel(n) || `Class ${n}`, href: classHref(boardSlug, n) })) },
+      { heading: "Books — Official Textbooks", items: NAV_CLASSES.map((n) => ({ label: classLabel(n) || `Class ${n}`, href: `${classHref(boardSlug, n)}?view=books` })) },
       { items: [
         { label: `All ${label}`, href: `/${boardSlug}` },
+        { label: "Past Papers", href: "/past-papers" },
         { label: "MCQ Practice", href: "/online-quizzes" },
         { label: "Test Generator", href: "/test-generator" },
       ]},
@@ -210,29 +230,43 @@ function NavDropdown({
   onOpen,
   onClose,
   onFocused,
+  activeHref,
 }: {
   item: DropdownDef;
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
   onFocused: () => void;
+  activeHref?: string;
 }) {
-  const slug = item.label.toLowerCase().replace(/[^a-z]/g, "-");
+  const slug = item.id;
   const reduceMotion = useReducedMotion();
   const Icon = item.icon;
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // The panel records which menu it was measured for. A menu can swap its
+  // contents while closed (the board menu is rebuilt when the active board
+  // changes), so a measurement for a different `slug` is simply discarded —
+  // no effect, no stale coordinates at the old trigger's position.
+  const [placement, setPlacement] = useState<{ slug: string; top: number; left: number } | null>(null);
 
   const measure = useCallback(() => {
     const el = triggerRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
     const panelWidth = Math.min(320, window.innerWidth - 32);
-    setPos({
-      top: Math.min(r.bottom + 8, window.innerHeight - 80),
+    // Hang the panel below the whole navbar, not just the trigger, so it can
+    // never overlap the bar it belongs to.
+    const headerEl = el.closest("header");
+    const anchorBottom = headerEl ? Math.max(headerEl.getBoundingClientRect().bottom, r.bottom) : r.bottom;
+    setPlacement({
+      slug: item.id,
+      top: Math.min(anchorBottom + 8, window.innerHeight - 80),
       left: Math.max(16, Math.min(r.left, window.innerWidth - panelWidth - 16)),
     });
-  }, []);
+  }, [item.id]);
+
+  const pos = placement?.slug === slug ? placement : null;
 
   // Keep the panel glued to its trigger while scrolling or resizing.
   useEffect(() => {
@@ -245,6 +279,27 @@ function NavDropdown({
       window.removeEventListener("resize", measure);
     };
   }, [isOpen, measure]);
+
+  // Dismiss on Escape or an outside click/tap — hover alone never closes a panel
+  // that was opened by click on touch devices.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (triggerRef.current?.contains(target) || panelRef.current?.contains(target)) return;
+      onClose();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown, true);
+    };
+  }, [isOpen, onClose]);
 
   if (item.soon) {
     return (
@@ -267,6 +322,7 @@ function NavDropdown({
         type="button"
         aria-expanded={isOpen}
         aria-haspopup="true"
+        onClick={() => (isOpen ? onClose() : handleEnter())}
         className={`pressable focus-ring flex items-center gap-1.5 whitespace-nowrap rounded-xl px-2.5 py-2 text-[13px] font-semibold transition lg:text-sm ${
           isOpen ? "bg-accent/10 text-accent" : "text-foreground/80 hover:bg-accent/5 hover:text-accent"
         }`}
@@ -287,6 +343,8 @@ function NavDropdown({
           // panel stays stuck at opacity 0.
           <AnimatePresence>
             <motion.div
+              key={slug}
+              ref={panelRef}
               /* Opacity is intentionally absent from `initial`: the panel must be
                  visible even if the spring never runs. */
               initial={reduceMotion ? false : { y: -6, scale: 0.97 }}
@@ -305,16 +363,23 @@ function NavDropdown({
                   {g.heading && (
                     <div className="mb-1 mt-2 px-3 text-[11px] font-bold uppercase tracking-wider text-accent">{g.heading}</div>
                   )}
-                  {g.items.map((itm) => (
-                    <Link
-                      key={itm.href}
-                      href={itm.href}
-                      onClick={onClose}
-                      className="block whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium text-foreground transition-colors duration-200 hover:bg-accent/10 hover:text-accent"
-                    >
-                      {itm.label}
-                    </Link>
-                  ))}
+                  {g.items.map((itm) => {
+                    const active = activeHref === itm.href;
+                    return (
+                      <Link
+                        key={itm.href}
+                        href={itm.href}
+                        onClick={onClose}
+                        aria-current={active ? "page" : undefined}
+                        className={`flex items-center justify-between gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-accent/10 hover:text-accent ${
+                          active ? "bg-accent/10 text-accent" : "text-foreground"
+                        }`}
+                      >
+                        {itm.label}
+                        {active && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" aria-hidden="true" />}
+                      </Link>
+                    );
+                  })}
                   {gi < item.groups.length - 1 && <div className="my-2 border-t border-border/60" />}
                 </div>
               ))}
@@ -330,10 +395,11 @@ function NavDropdown({
 
 export function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [dropdownSlug, setDropdownSlug] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const { user, loading, isStaff, signOut } = useAuth();
   const { tr, locale } = useLocale();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reduceMotion = useReducedMotion();
 
@@ -347,14 +413,53 @@ export function Header() {
     [activeBoard],
   );
 
+/**
+   * Full current URL, so a dropdown entry that differs from the current page only
+   * by `?view=books` is still recognised as the active destination.
+   */
+  const currentUrl = `${pathname ?? "/"}${searchParams?.toString() ? `?${searchParams.toString()}` : ""}`;
+
+  const boardsHref = activeBoard ? `/${activeBoard}` : undefined;
+
+  /** Destination that should render as "current" inside a given menu. */
+  const activeHrefFor = useCallback(
+    (item: DropdownDef): string | undefined => {
+      if (item.id === BOARDS_ITEM.id) return boardsHref;
+      if (activeBoard && item.id === boardNavId(activeBoard)) {
+        const segments = (pathname ?? "").split("/").filter(Boolean);
+        if (segments[0] !== activeBoard) return boardsHref;
+        const classNum = parseInt(segments[1] ?? "", 10);
+        if (Number.isNaN(classNum)) return boardsHref;
+        const wantsBooks = searchParams?.get("view") === "books";
+        return `${classHref(activeBoard, classNum)}${wantsBooks ? "?view=books" : ""}`;
+      }
+      return currentUrl;
+    },
+    [activeBoard, boardsHref, pathname, searchParams, currentUrl],
+  );
   const clearClose = useCallback(() => {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
   }, []);
 
   const scheduleClose = useCallback((ms = 200) => {
     clearClose();
-    closeTimer.current = setTimeout(() => setDropdownSlug(null), ms);
+    closeTimer.current = setTimeout(() => setOpenMenuId(null), ms);
   }, [clearClose]);
+
+  // Any navigation (board switch, class switch, view toggle) must not leave a
+  // menu open showing the previous page's list. Resetting during render (rather
+  // than in an effect) avoids a frame where the stale menu is still on screen.
+  const routeKey = `${pathname ?? "/"}${searchParams?.toString() ? `?${searchParams.toString()}` : ""}`;
+  const [lastRouteKey, setLastRouteKey] = useState(routeKey);
+  if (routeKey !== lastRouteKey) {
+    setLastRouteKey(routeKey);
+    setOpenMenuId(null);
+    setDrawerOpen(false);
+  }
+
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
 
   return (
     <>
@@ -378,10 +483,11 @@ export function Header() {
             <div className="scrollbar-none hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto lg:flex">
               {navItems.map((item) => (
                 <NavDropdown
-                  key={item.label}
+                  key={item.id}
                   item={item}
-                  isOpen={dropdownSlug === item.label.toLowerCase().replace(/[^a-z]/g, "-")}
-                  onOpen={() => { clearClose(); setDropdownSlug(item.label.toLowerCase().replace(/[^a-z]/g, "-")); }}
+                  isOpen={openMenuId === item.id}
+                  activeHref={activeHrefFor(item)}
+                  onOpen={() => { clearClose(); setOpenMenuId(item.id); }}
                   onClose={() => scheduleClose()}
                   onFocused={clearClose}
                 />
@@ -504,23 +610,32 @@ export function Header() {
                 <nav className="space-y-5" aria-label="Mobile navigation">
                   {navItems.map((item) => {
                     const Icon = item.icon ?? LayoutGrid;
+                    const activeHref = activeHrefFor(item);
                     return (
-                      <div key={item.label}>
+                      <div key={item.id}>
                         <p className="mb-2 flex items-center gap-2 px-1 text-[11px] font-bold uppercase tracking-wider text-accent">
                           <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                           {item.label}
                         </p>
                         <div className="grid grid-cols-2 gap-1.5">
-                          {item.groups.flatMap((g) => g.items).map((itm) => (
-                            <Link
-                              key={itm.href}
-                              href={itm.href}
-                              onClick={() => setDrawerOpen(false)}
-                              className="rounded-xl border border-border/70 bg-card/50 px-3 py-2.5 text-sm font-medium text-foreground transition hover:border-accent/50 hover:bg-accent/10 hover:text-accent"
-                            >
-                              {itm.label}
-                            </Link>
-                          ))}
+                          {item.groups.flatMap((g) => g.items).map((itm) => {
+                            const active = activeHref === itm.href;
+                            return (
+                              <Link
+                                key={`${item.id}:${itm.href}`}
+                                href={itm.href}
+                                onClick={() => setDrawerOpen(false)}
+                                aria-current={active ? "page" : undefined}
+                                className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
+                                  active
+                                    ? "border-accent bg-accent/10 text-accent"
+                                    : "border-border/70 bg-card/50 text-foreground hover:border-accent/50 hover:bg-accent/10 hover:text-accent"
+                                }`}
+                              >
+                                {itm.label}
+                              </Link>
+                            );
+                          })}
                         </div>
                       </div>
                     );

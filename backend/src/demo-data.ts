@@ -1777,10 +1777,107 @@ function buildLevelClass(levelSlug: string): Board["classes"][number] {
     };
 }
 
+/**
+ * Curriculum order for subjects. Literal seed order is not stable across boards
+ * and used to make class pages list subjects in an arbitrary sequence, so every
+ * class is normalized once at module load.
+ */
+const SUBJECT_ORDER = [
+    "mathematics",
+    "maths",
+    "physics",
+    "chemistry",
+    "biology",
+    "computer science",
+    "computer studies",
+    "general science",
+    "general sciences",
+    "english",
+    "urdu",
+    "islamiyat",
+    "islamiat",
+    "islam studies",
+    "pakistan studies",
+    "pakistani studies",
+    "geography",
+    "history",
+    "civics",
+    "economics",
+    "arabic",
+    "tarjuma tul quran",
+    "tarjama tul quran",
+    "drawing",
+    "art",
+    "music",
+];
+
+/** Lower-cased, punctuation-free key used for subject lookups and ordering. */
+export function subjectKey(title: string): string {
+    return title
+        .toLowerCase()
+        .replace(/\(.*?\)/g, " ")
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim();
+}
+
+/**
+ * Sort a subject list into curriculum order. Subjects outside the known list keep
+ * their relative position at the end, ordered alphabetically, so newly added
+ * subjects are never lost or interleaved.
+ */
+export function sortSubjects<T extends { title: string }>(subjects: readonly T[]): T[] {
+    return subjects
+        .map((subject, index) => ({ subject, index }))
+        .sort((a, b) => {
+            const rankA = SUBJECT_ORDER.indexOf(subjectKey(a.subject.title) as (typeof SUBJECT_ORDER)[number]);
+            const rankB = SUBJECT_ORDER.indexOf(subjectKey(b.subject.title) as (typeof SUBJECT_ORDER)[number]);
+            const safeA = rankA === -1 ? SUBJECT_ORDER.length : rankA;
+            const safeB = rankB === -1 ? SUBJECT_ORDER.length : rankB;
+            if (safeA !== safeB) return safeA - safeB;
+            const byTitle = subjectKey(a.subject.title).localeCompare(subjectKey(b.subject.title));
+            return byTitle !== 0 ? byTitle : a.index - b.index;
+        })
+        .map((entry) => entry.subject);
+}
+
+/** Numeric class order (5 → 12, APSACS `class-3` → 3), unparseable slugs last. */
+export function classNumberFromSlug(slug: string): number {
+    const parsed = parseInt(slug.replace(/^class-/i, ""), 10);
+    return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
+}
+
+/** Sort class entries numerically so 9 comes before 10 and APSACS 3 before 8. */
+export function sortClasses<T extends { slug: string }>(classes: readonly T[]): T[] {
+    return classes
+        .map((klass, index) => ({ klass, index }))
+        .sort((a, b) => {
+            const diff = classNumberFromSlug(a.klass.slug) - classNumberFromSlug(b.klass.slug);
+            return diff !== 0 ? diff : a.index - b.index;
+        })
+        .map((entry) => entry.klass);
+}
+
+/**
+ * Classes and their subjects in one pass, leaving every other field untouched.
+ * Applied to board payloads so relational reads never depend on insertion order.
+ */
+export function sortBoardHierarchy<C extends { slug: string; subjects?: S[] }, S extends { title: string }>(
+    classes: readonly C[],
+): C[] {
+    return sortClasses(classes).map((klass) =>
+        klass.subjects ? { ...klass, subjects: sortSubjects(klass.subjects) } : klass,
+    );
+}
+
 for (const board of Object.values(BOARD_DATA)) {
     const classNine = board.classes.filter((klass) => klass.slug === "9");
     const levelClasses = LEVEL_CLASS_SLUGS.map((levelSlug) => buildLevelClass(levelSlug));
     board.classes = [...levelClasses.slice(0, 4), ...classNine, ...levelClasses.slice(4)];
+    // Numeric class order (5..12, not lexicographic) and curriculum subject order.
+    board.classes = sortClasses(board.classes);
+    for (const klass of board.classes) {
+        klass.subjects = sortSubjects(klass.subjects);
+    }
 }
 
 let mutableBoardData: Record<string, Board> | null = null;

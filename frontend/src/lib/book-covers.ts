@@ -1,4 +1,5 @@
 import { getApiBaseUrl } from "@/lib/api-client";
+import { subjectKey } from "@/lib/constants";
 
 // Real book cover mapping: board slug + class + subject → static cover file.
 // Mirrors backend BOOK_COVERS (keyed by board slug to match frontend routes).
@@ -18,7 +19,6 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       Arabic: "/book-covers/fbise-6-Arabic-Book--6th-class.jpg",
     },
     7: {
-      Mathematics: "/book-covers/fbise-7-GENERAL-SCIENCE-7-NBF.webp",
       English: "/book-covers/fbise-7-ENGLISH-7-NBF.webp",
       "Computer Science": "/book-covers/fbise-7-Computer-Science-7.jpg",
       Urdu: "/book-covers/fbise-7-URDU-7-NBF.webp",
@@ -38,20 +38,19 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       History: "/book-covers/fbise-8-nbf-history-8.jpg",
     },
     9: {
+      Mathematics: "/book-covers/fbise-9-9th-Class-Mathematics-NBF.jpg",
       Physics: "/book-covers/fbise-9-Class-9-Physics-NBF.jpg",
       Chemistry: "/book-covers/fbise-9-Chemistry-9-With-Experimentation-Skills-NBF.webp",
-      Mathematics: "/book-covers/fbise-9-9th-Class-Mathematics-NBF.jpg",
       Biology: "/book-covers/fbise-9-9th-Class-Biology-NBF.jpg",
       English: "/book-covers/fbise-9-English-9-NBF.webp",
-      "Computer Science": "/book-covers/fbise-9-Computer-Science-9-NBF.webp",
       Urdu: "/book-covers/fbise-9-NBF-URDU-9.webp",
       "Pakistan Studies": "/book-covers/fbise-9-Class-9-Pakistan-Studies--Urdu-.jpg",
       Islamiat: "/book-covers/fbise-9-Islamiat-Lazmi-Class-9-NBF.webp",
     },
     10: {
+      Mathematics: "/book-covers/fbise-10---------------------.jpg",
       Physics: "/book-covers/fbise-10-10th-Class-Physics--NBF.jpg",
       Chemistry: "/book-covers/fbise-10-Chemistry-10-NBF.webp",
-      Mathematics: "/book-covers/fbise-10---------------------.jpg",
       Biology: "/book-covers/fbise-10-Biology-10-NBF.webp",
       English: "/book-covers/fbise-10-class-10-english-book-pdf-federal-board.webp",
       "Computer Science": "/book-covers/fbise-10-NBF-COMPUTER-SCIENCE-10.jpg",
@@ -60,9 +59,9 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       Islamiat: "/book-covers/fbise-10-Islamiat-10-NBF.webp",
     },
     11: {
+      Mathematics: "/book-covers/fbise-11-Math-11-NBF.webp",
       Physics: "/book-covers/fbise-11-Physics-Class-11-NBF.webp",
       Chemistry: "/book-covers/fbise-11-Textbook-of-Chemistry-Grade-11-Federal-board.webp",
-      Mathematics: "/book-covers/fbise-11-Math-11-NBF.webp",
       Biology: "/book-covers/fbise-11-Biology-11-NATIONAL-BOOK-FOUNDATION--Federal-Board.webp",
       English: "/book-covers/fbise-11-English-11-NBF-FG.webp",
       "Computer Science": "/book-covers/fbise-11-Computer-Science-11-NBF.webp",
@@ -70,9 +69,9 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       Islamiat: "/book-covers/fbise-11-Islamiat-11-NBF.webp",
     },
     12: {
+      Mathematics: "/book-covers/fbise-12-Mathematics-Book-For-Class-12.webp",
       Physics: "/book-covers/fbise-12-Physics-National-Book-Foundation-12--Federal-board.webp",
       Chemistry: "/book-covers/fbise-12-TextBook-Chemistry-Grade-12th-Federal-board.webp",
-      Mathematics: "/book-covers/fbise-12-Mathematics-Book-For-Class-12.webp",
       Biology: "/book-covers/fbise-12-Biology-Grade-12-Edition-2025.webp",
       English: "/book-covers/fbise-12-English-For-Grade-12-NBF-FG-Saleemi-Book-Depot-in-42354394857775.webp",
       "Computer Science": "/book-covers/fbise-12-Computer-Science-For-Grade-12-NBF-FG-Saleemi-Book-Depot-in-42627272999215.webp",
@@ -82,9 +81,9 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
   },
   punjab: {
     9: {
+      Mathematics: "/book-covers/punjab-9-Class-9-Mathematics.webp",
       Physics: "/book-covers/punjab-9-PTB-Physics-Class-9th-2025.webp",
       Chemistry: "/book-covers/punjab-9-PTB-Chemistry-Class-9th-2025.webp",
-      Mathematics: "/book-covers/punjab-9-Class-9-Mathematics.webp",
       Biology: "/book-covers/punjab-9-Class-9-Biology-PCTB.webp",
       English: "/book-covers/punjab-9-PCTB-English-9th-Class-2025-800x.webp",
       "Computer Science": "/book-covers/punjab-9-PTB-Computer-Science-Entrepreneurship-Class-9th-2025.webp",
@@ -107,6 +106,47 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
     8: { Islamiat: "/book-covers/apsacs-APSACS--Islamiat-Textbook-Class-8.webp" },
   },
 };
+
+/**
+ * Subject title variants that must resolve to the same canonical key. Boards and
+ * seeds spell some subjects differently ("Islamiyat" vs "Islamiat", "Computer"
+ * vs "Computer Science"), which previously left those cards without a cover or
+ * pointed them at another subject's artwork.
+ */
+const SUBJECT_ALIASES: Record<string, string> = {
+  math: "mathematics",
+  maths: "mathematics",
+  "general maths": "mathematics",
+  computer: "computer science",
+  computers: "computer science",
+  computing: "computer science",
+  "computer studies": "computer science",
+  islamiyat: "islamiat",
+  "islamic studies": "islamiat",
+  "pak studies": "pakistan studies",
+  "pak. studies": "pakistan studies",
+  tarjama: "tarjuma tul quran",
+  "tarjama tul quran": "tarjuma tul quran",
+};
+
+/**
+ * Pre-computed `key -> path` index per board/class so lookups are a single map hit
+ * and every spelling of a subject title resolves to the same artwork.
+ */
+const BOOK_COVERS_INDEX: Record<string, Record<number, Record<string, string>>> = {};
+for (const [board, classes] of Object.entries(BOOK_COVERS)) {
+  for (const [classNum, subjects] of Object.entries(classes)) {
+    const byClass = (BOOK_COVERS_INDEX[board] ??= {});
+    const bySubject = (byClass[Number(classNum)] ??= {});
+    for (const [title, path] of Object.entries(subjects)) bySubject[subjectKey(title)] = path;
+  }
+}
+
+/** Canonical lookup key for a subject title (lowercase, alias-resolved). */
+function coverKey(title: string): string {
+  const key = subjectKey(title);
+  return SUBJECT_ALIASES[key] ?? key;
+}
 
 // Generate SVG placeholder for missing book covers
 function generatePlaceholder(subjectTitle: string, classNum: number): string {
@@ -141,9 +181,12 @@ function generatePlaceholder(subjectTitle: string, classNum: number): string {
   return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
 
-// Returns a full absolute URL to a real book cover, or SVG placeholder when no cover exists.
-export function getBookCover(boardSlug: string, classNum: number, subjectTitle: string): string | null {
-  const path = BOOK_COVERS[boardSlug]?.[classNum]?.[subjectTitle];
+/**
+ * Full absolute URL to a real book cover, or an SVG placeholder when the board has
+ * no artwork for that subject yet.
+ */
+export function getBookCover(boardSlug: string, classNum: number, subjectTitle: string): string {
+  const path = BOOK_COVERS_INDEX[boardSlug]?.[classNum]?.[coverKey(subjectTitle)];
   if (path) return `${getApiBaseUrl()}${path}`;
   return generatePlaceholder(subjectTitle, classNum);
 }

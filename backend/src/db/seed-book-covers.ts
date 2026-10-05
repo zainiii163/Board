@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, eq } from "drizzle-orm";
 import { db } from "./index.js";
 import * as schema from "./schema.js";
 
@@ -18,7 +18,6 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       Arabic: "/book-covers/fbise-6-Arabic-Book--6th-class.jpg",
     },
     7: {
-      Mathematics: "/book-covers/fbise-7-GENERAL-SCIENCE-7-NBF.webp",
       English: "/book-covers/fbise-7-ENGLISH-7-NBF.webp",
       "Computer Science": "/book-covers/fbise-7-Computer-Science-7.jpg",
       Urdu: "/book-covers/fbise-7-URDU-7-NBF.webp",
@@ -43,7 +42,6 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       Mathematics: "/book-covers/fbise-9-9th-Class-Mathematics-NBF.jpg",
       Biology: "/book-covers/fbise-9-9th-Class-Biology-NBF.jpg",
       English: "/book-covers/fbise-9-English-9-NBF.webp",
-      "Computer Science": "/book-covers/fbise-9-HamdardChemistryGuide9.webp",
       Urdu: "/book-covers/fbise-9-NBF-URDU-9.webp",
       "Pakistan Studies": "/book-covers/fbise-9-Class-9-Pakistan-Studies--Urdu-.jpg",
       Islamiat: "/book-covers/fbise-9-Islamiat-Lazmi-Class-9-NBF.webp",
@@ -154,6 +152,26 @@ function samplePdfFor(subject: string, index: number): string {
   return hint?.file ?? SAMPLE_BOOK_PDFS[index % SAMPLE_BOOK_PDFS.length];
 }
 
+/**
+ * Cover files that were historically attached to the wrong subject (a Chemistry
+ * guide used as the Computer Science cover, a General Science cover used as
+ * Mathematics). The asset list above no longer contains them, so already-seeded
+ * rows are cleared on boot and the pages fall back to generated cover art.
+ */
+const RETIRED_COVER_URLS = [
+  "/book-covers/fbise-9-HamdardChemistryGuide9.webp",
+  "/book-covers/fbise-7-GENERAL-SCIENCE-7-NBF.webp",
+];
+
+async function clearRetiredCovers() {
+  for (const coverUrl of RETIRED_COVER_URLS) {
+    await db
+      .update(schema.books)
+      .set({ coverUrl: null })
+      .where(eq(schema.books.coverUrl, coverUrl));
+  }
+}
+
 export async function seedBookCovers() {
   // Ensure cover_url column exists on books table
   try {
@@ -161,6 +179,8 @@ export async function seedBookCovers() {
   } catch {
     // Column may already exist
   }
+
+  await clearRetiredCovers();
 
   const existing = await db.select({ id: schema.books.id }).from(schema.books).limit(1);
   if (existing.length > 0) {

@@ -16,12 +16,25 @@ export const YOUTUBE_CHANNEL_URL = "https://youtube.com/@mathwithmalikshahid?si=
 export const NAV_BOARDS = [
   { slug: "fbise", label: "Federal Board" },
   { slug: "punjab", label: "Punjab Board" },
+  { slug: "kpk", label: "KPK Board" },
+  { slug: "sindh", label: "Sindh Board" },
   { slug: "oxford", label: "Oxford Board" },
   { slug: "cambridge", label: "Cambridge Board" },
   { slug: "apsacs", label: "APSACS" },
   { slug: "o-level", label: "O Level" },
   { slug: "a-level", label: "A Level" },
 ] as const;
+
+/** Human-readable board name for any board slug (falls back to a title-cased slug). */
+export function boardLabel(boardSlug: string): string {
+  const known = NAV_BOARDS.find((b) => b.slug === boardSlug);
+  if (known) return known.label;
+  return boardSlug
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
 
 export const NAV_CLASSES = [5, 6, 7, 8, 9, 10, 11, 12] as const;
 export const APSACS_CLASSES = [1, 2, 3, 4, 5, 6, 7, 8] as const;
@@ -38,7 +51,7 @@ export function boardShortName(boardSlug: string, classNum?: number): string {
     if (classNum === undefined) return "Federal Board";
     return classNum >= 9 ? "FBISE" : "NBF";
   }
-  return NAV_BOARDS.find((b) => b.slug === boardSlug)?.label ?? boardSlug;
+  return boardLabel(boardSlug);
 }
 
 // Display title shown in breadcrumbs/chips/SEO: FBISE branding only for classes 9–12.
@@ -70,4 +83,109 @@ export const BOARD_TEXTBOOK_CATEGORY: Record<string, string> = {
 
 export function boardTextbookCategory(boardSlug: string): string {
   return BOARD_TEXTBOOK_CATEGORY[boardSlug] ?? "federal-text-books";
+}
+
+/**
+ * Curriculum order for subject cards. The API returns subjects in whatever order
+ * the database/seed happened to insert them, which made class pages render
+ * subjects in an arbitrary sequence (Physics before Mathematics, Islamiyat last,
+ * etc). Every listing sorts through `sortSubjects` so the order is stable and
+ * matches the way subjects are taught.
+ */
+const SUBJECT_ORDER = [
+  "mathematics",
+  "maths",
+  "physics",
+  "chemistry",
+  "biology",
+  "computer science",
+  "computer studies",
+  "general science",
+  "general sciences",
+  "english",
+  "urdu",
+  "islamiyat",
+  "islamiat",
+  "islam studies",
+  "pakistan studies",
+  "pakistani studies",
+  "pakistan studies islamiyat",
+  "tarjuma tul quran",
+  "tarjama tul quran",
+  "geography",
+  "history",
+  "civics",
+  "economics",
+  "arabic",
+  "drawing",
+  "art",
+  "music",
+  "physical education",
+] as const;
+
+/** Lower-cased, punctuation-free key used for subject lookups and ordering. */
+export function subjectKey(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/\(.*?\)/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function subjectRank(title: string): number {
+  const index = SUBJECT_ORDER.indexOf(subjectKey(title) as (typeof SUBJECT_ORDER)[number]);
+  return index === -1 ? SUBJECT_ORDER.length : index;
+}
+
+/**
+ * Sort a subject list into curriculum order. Subjects outside the known list keep
+ * their relative position at the end, ordered alphabetically, so newly added
+ * subjects are never lost or interleaved.
+ */
+export function sortSubjects<T extends { title: string }>(subjects: readonly T[]): T[] {
+  return subjects
+    .map((subject, index) => ({ subject, index }))
+    .sort((a, b) => {
+      const rank = subjectRank(a.subject.title) - subjectRank(b.subject.title);
+      if (rank !== 0) return rank;
+      const byTitle = subjectKey(a.subject.title).localeCompare(subjectKey(b.subject.title));
+      return byTitle !== 0 ? byTitle : a.index - b.index;
+    })
+    .map((entry) => entry.subject);
+}
+
+/** Numeric class order (5 → 12, APSACS `class-3` → 3), with unparseable slugs last. */
+export function classNumberFromSlug(slug: string): number {
+  const parsed = parseInt(slug.replace(/^class-/i, ""), 10);
+  return Number.isNaN(parsed) ? Number.POSITIVE_INFINITY : parsed;
+}
+
+/** Sort class entries numerically so 9 comes before 10 and APSACS 3 before 8. */
+export function sortClasses<T extends { slug: string }>(classes: readonly T[]): T[] {
+  return classes
+    .map((klass, index) => ({ klass, index }))
+    .sort((a, b) => {
+      const diff = classNumberFromSlug(a.klass.slug) - classNumberFromSlug(b.klass.slug);
+      return diff !== 0 ? diff : a.index - b.index;
+    })
+    .map((entry) => entry.klass);
+}
+
+/** Parsed class number from a slug; 0 when the slug carries no number. */
+export function parseClassNumber(slug: string): number {
+  const parsed = parseInt(slug.replace(/^class-/i, ""), 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
+/** Human-facing class title — intermediate classes are labelled as years. */
+export function classLabel(num: number): string {
+  if (num === 11) return "1st Year";
+  if (num === 12) return "2nd Year";
+  if (num > 0) return `Class ${num}`;
+  return "";
+}
+
+/** Bare class number for a slug, for compact chips ("9", "3"). */
+export function classLabelFromSlug(slug: string): string {
+  return String(parseClassNumber(slug) || slug.replace(/^class-/i, ""));
 }

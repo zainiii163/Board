@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { Header } from "@/components/layout/header";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
 import { Footer } from "@/components/layout/footer";
@@ -18,7 +20,11 @@ export default function PublicLayout({
     <div className="flex min-h-screen flex-col bg-background font-sans text-foreground">
       <ServiceWorkerRegister />
       <SearchShortcut />
-      <Header />
+      {/* Header reads the query string to mark the active board/class destination,
+          so it needs a Suspense boundary to stay statically renderable. */}
+      <Suspense fallback={null}>
+        <Header />
+      </Suspense>
       <OfflineBanner />
       <main className="flex-1 pb-20 lg:pb-0">{children}</main>
       <PlatformIntro />
