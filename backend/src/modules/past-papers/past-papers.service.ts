@@ -3,13 +3,26 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { useDb } from "../../db/mode.js";
 import * as schema from "../../db/schema.js";
-import { resourcesStore, type PastPaperRecord, type PastPaperType } from "../../store/resources-store.js";
+import {
+  resourcesStore,
+  sortPastPapers,
+  type PastPaperRecord,
+  type PastPaperType,
+} from "../../store/resources-store.js";
 import { ApiError } from "../../utils/api-error.js";
 
 const PAPER_TYPES: PastPaperType[] = ["model", "first-annual", "second-annual", "pba"];
 
 function normalizePaperType(value: unknown): PastPaperType {
   return PAPER_TYPES.includes(value as PastPaperType) ? (value as PastPaperType) : "first-annual";
+}
+
+function normalizeSyllabus(value: unknown): "new" | "old" {
+  return value === "old" ? "old" : "new";
+}
+
+function normalizeSolved(value: unknown): boolean {
+  return value === true || value === "true" || value === "solved" || value === 1;
 }
 
 function mapPastPaperRow(row: typeof schema.pastPapers.$inferSelect): PastPaperRecord {
@@ -24,6 +37,8 @@ function mapPastPaperRow(row: typeof schema.pastPapers.$inferSelect): PastPaperR
     year: row.year,
     sessionType: row.sessionType,
     paperType: row.paperType ?? "first-annual",
+    isSolved: row.isSolved ?? false,
+    syllabus: row.syllabus ?? "new",
     pdfUrl: row.pdfUrl,
     driveUrl: row.driveUrl ?? null,
   };
@@ -34,6 +49,8 @@ export async function listPastPapers(
   year?: string,
   paperType?: string,
   classSlug?: string,
+  syllabus?: string,
+  solved?: string,
 ): Promise<PastPaperRecord[]> {
   if (useDb()) {
     const rows = await db.select().from(schema.pastPapers);
@@ -42,9 +59,12 @@ export async function listPastPapers(
     if (year) mapped = mapped.filter((p) => p.year === year);
     if (paperType) mapped = mapped.filter((p) => p.paperType === paperType);
     if (classSlug) mapped = mapped.filter((p) => p.classSlug === classSlug);
-    return mapped;
+    if (syllabus === "new" || syllabus === "old") mapped = mapped.filter((p) => p.syllabus === syllabus);
+    if (solved === "solved") mapped = mapped.filter((p) => p.isSolved);
+    if (solved === "unsolved") mapped = mapped.filter((p) => !p.isSolved);
+    return sortPastPapers(mapped);
   }
-  return resourcesStore.listPastPapers(boardSlug, year, paperType, classSlug);
+  return resourcesStore.listPastPapers(boardSlug, year, paperType, classSlug, syllabus, solved);
 }
 
 export async function getPastPaper(id: number): Promise<PastPaperRecord> {
@@ -77,13 +97,20 @@ export async function createPastPaper(input: Omit<PastPaperRecord, "id">): Promi
         year: input.year,
         sessionType: input.sessionType ?? "annual",
         paperType: normalizePaperType(input.paperType),
+        isSolved: normalizeSolved(input.isSolved),
+        syllabus: normalizeSyllabus(input.syllabus),
         pdfUrl: input.pdfUrl,
         driveUrl: input.driveUrl ?? null,
       })
       .returning();
     return mapPastPaperRow(row);
   }
-  return resourcesStore.createPastPaper({ ...input, paperType: normalizePaperType(input.paperType) });
+  return resourcesStore.createPastPaper({
+    ...input,
+    paperType: normalizePaperType(input.paperType),
+    isSolved: normalizeSolved(input.isSolved),
+    syllabus: normalizeSyllabus(input.syllabus),
+  });
 }
 
 export async function updatePastPaper(
@@ -93,6 +120,8 @@ export async function updatePastPaper(
   if (useDb()) {
     const patch: Partial<Omit<PastPaperRecord, "id">> = { ...input };
     if ("paperType" in patch) patch.paperType = normalizePaperType(patch.paperType);
+    if ("syllabus" in patch) patch.syllabus = normalizeSyllabus(patch.syllabus);
+    if ("isSolved" in patch) patch.isSolved = normalizeSolved(patch.isSolved);
     if ("driveUrl" in patch) patch.driveUrl = patch.driveUrl ?? null;
     const [row] = await db
       .update(schema.pastPapers)
@@ -104,6 +133,8 @@ export async function updatePastPaper(
   }
   const patch: Partial<Omit<PastPaperRecord, "id">> = { ...input };
   if ("paperType" in patch) patch.paperType = normalizePaperType(patch.paperType);
+  if ("syllabus" in patch) patch.syllabus = normalizeSyllabus(patch.syllabus);
+  if ("isSolved" in patch) patch.isSolved = normalizeSolved(patch.isSolved);
   if ("driveUrl" in patch) patch.driveUrl = patch.driveUrl ?? null;
   const updated = resourcesStore.updatePastPaper(id, patch);
   if (!updated) throw ApiError.notFound("Past paper not found.");

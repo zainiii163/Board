@@ -16,6 +16,8 @@ type PastPaper = {
   year: string;
   sessionType: "annual" | "supply";
   paperType: PastPaperType;
+  isSolved: boolean;
+  syllabus: "new" | "old";
   pdfUrl: string | null;
   driveUrl: string | null;
 };
@@ -29,6 +31,8 @@ const emptyForm = {
   subjectTitle: "Mathematics",
   year: new Date().getFullYear().toString(),
   paperType: "first-annual" as PastPaperType,
+  isSolved: false,
+  syllabus: "new" as "new" | "old",
   pdfUrl: "",
   driveUrl: "",
 };
@@ -79,6 +83,8 @@ export default function ManagePastPapersPage() {
       subjectTitle: paper.subjectTitle,
       year: paper.year,
       paperType: paper.paperType ?? "first-annual",
+      isSolved: paper.isSolved ?? false,
+      syllabus: paper.syllabus ?? "new",
       pdfUrl: paper.pdfUrl ?? "",
       driveUrl: paper.driveUrl ?? "",
     });
@@ -113,6 +119,14 @@ export default function ManagePastPapersPage() {
               <option key={value} value={value}>{PAPER_TYPE_LABELS[value]}</option>
             ))}
           </select>
+          <select value={form.syllabus} onChange={(e) => setForm({ ...form, syllabus: e.target.value as "new" | "old" })} className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground">
+            <option value="new">New Syllabus</option>
+            <option value="old">Old Syllabus</option>
+          </select>
+          <select value={form.isSolved ? "solved" : "unsolved"} onChange={(e) => setForm({ ...form, isSolved: e.target.value === "solved" })} className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground">
+            <option value="unsolved">Unsolved</option>
+            <option value="solved">Solved</option>
+          </select>
           <input value={form.pdfUrl} onChange={(e) => setForm({ ...form, pdfUrl: e.target.value })} placeholder="PDF URL (from Uploads)" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground md:col-span-2" />
           <input value={form.driveUrl} onChange={(e) => setForm({ ...form, driveUrl: e.target.value })} placeholder="Google Drive link (optional)" className="rounded-xl border border-border bg-card px-3 py-2 text-sm text-foreground md:col-span-2" />
         </div>
@@ -137,7 +151,8 @@ export default function ManagePastPapersPage() {
                   {paper.subjectTitle} — {paper.year} ({PAPER_TYPE_LABELS[paper.paperType] ?? paper.sessionType})
                 </p>
                 <p className="mt-1 text-sm text-muted">
-                  {paper.boardTitle} • {paper.classTitle}
+                  {paper.boardTitle} • {paper.classTitle} •{" "}
+                  {paper.syllabus === "old" ? "Old Syllabus" : "New Syllabus"} • {paper.isSolved ? "Solved" : "Unsolved"}
                 </p>
               </div>
               <div className="flex gap-2">

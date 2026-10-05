@@ -1,6 +1,9 @@
 import { apiFetch } from "@/lib/api-client";
 import { PastPapersList, type PastPaperItem } from "@/components/content/past-papers-list";
 
+// Papers change whenever staff add one in the admin, so never serve this from cache.
+export const dynamic = "force-dynamic";
+
 async function getPastPapers() {
   try {
     return await apiFetch<PastPaperItem[]>("/api/past-papers");

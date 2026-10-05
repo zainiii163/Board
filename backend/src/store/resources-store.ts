@@ -18,6 +18,29 @@ export type BookRecord = {
 
 export type PastPaperType = "model" | "first-annual" | "second-annual" | "pba";
 
+/** Display order inside a year: 2nd Annual → Model Paper → 1st Annual, PBA last. */
+const PAPER_TYPE_RANK: Record<PastPaperType, number> = {
+  "second-annual": 0,
+  model: 1,
+  "first-annual": 2,
+  pba: 3,
+};
+
+/** Newest year first, then the paper-type order above, then subject name. */
+export function sortPastPapers<
+  T extends { id: number; year: string; paperType: PastPaperType; subjectTitle: string },
+>(rows: T[]): T[] {
+  return [...rows].sort((a, b) => {
+    const yearDiff = (parseInt(b.year, 10) || 0) - (parseInt(a.year, 10) || 0);
+    if (yearDiff !== 0) return yearDiff;
+    const rank = PAPER_TYPE_RANK[a.paperType] - PAPER_TYPE_RANK[b.paperType];
+    if (rank !== 0) return rank;
+    const bySubject = a.subjectTitle.localeCompare(b.subjectTitle);
+    if (bySubject !== 0) return bySubject;
+    return a.id - b.id;
+  });
+}
+
 export type PastPaperRecord = {
   id: number;
   boardSlug: string;
@@ -29,6 +52,8 @@ export type PastPaperRecord = {
   year: string;
   sessionType: "annual" | "supply";
   paperType: PastPaperType;
+  isSolved: boolean;
+  syllabus: "new" | "old";
   pdfUrl: string | null;
   driveUrl: string | null;
 };
@@ -103,6 +128,8 @@ const pastPapers: PastPaperRecord[] = PAST_PAPERS.map((paper) => {
     year: paper.year,
     sessionType: paper.paperType === "second-annual" ? ("supply" as const) : ("annual" as const),
     paperType: paper.paperType ?? "first-annual",
+    isSolved: false,
+    syllabus: "new",
     pdfUrl: null,
     driveUrl: null,
   };
@@ -139,13 +166,23 @@ export const resourcesStore = {
     return true;
   },
 
-  listPastPapers: (boardSlug?: string, year?: string, paperType?: string, classSlug?: string) => {
+  listPastPapers: (
+    boardSlug?: string,
+    year?: string,
+    paperType?: string,
+    classSlug?: string,
+    syllabus?: string,
+    solved?: string,
+  ) => {
     let rows = [...pastPapers];
     if (boardSlug) rows = rows.filter((p) => p.boardSlug === boardSlug);
     if (year) rows = rows.filter((p) => p.year === year);
     if (paperType) rows = rows.filter((p) => p.paperType === paperType);
     if (classSlug) rows = rows.filter((p) => p.classSlug === classSlug);
-    return rows;
+    if (syllabus === "new" || syllabus === "old") rows = rows.filter((p) => p.syllabus === syllabus);
+    if (solved === "solved") rows = rows.filter((p) => p.isSolved);
+    if (solved === "unsolved") rows = rows.filter((p) => !p.isSolved);
+    return sortPastPapers(rows);
   },
 
   getPastPaper: (id: number) => pastPapers.find((p) => p.id === id) ?? null,

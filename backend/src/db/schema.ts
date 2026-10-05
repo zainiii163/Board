@@ -212,6 +212,8 @@ export const pastPapers = pgTable("past_papers", {
     .$type<"model" | "first-annual" | "second-annual" | "pba">()
     .notNull()
     .default("first-annual"),
+  isSolved: boolean("is_solved").notNull().default(false),
+  syllabus: text("syllabus").$type<"new" | "old">().notNull().default("new"),
   pdfUrl: text("pdf_url"),
   driveUrl: text("drive_url"),
 });

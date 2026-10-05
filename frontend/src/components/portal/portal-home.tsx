@@ -90,11 +90,6 @@ export function PortalHome({ categories, latest, trending, categoryNameById, boa
         </section>
       </Reveal>
 
-      {/* Ad — mid content */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <AdBanner size="inline" />
-      </div>
-
       {/* ─── Latest Resources ─── */}
       <Reveal>
         <section className="border-y border-border bg-card/40">
@@ -133,13 +128,9 @@ export function PortalHome({ categories, latest, trending, categoryNameById, boa
         </section>
       </Reveal>
 
-      {/* Ad — between sections */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <AdBanner size="banner" className="mx-auto" />
-      </div>
-
       {/* ─── Trending ─── */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
+      <Reveal>
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="mb-8">
           <div className="mb-2 flex items-center gap-2">
             <span className="inline-block h-6 w-1 rounded-full bg-orange-500" />
@@ -157,9 +148,11 @@ export function PortalHome({ categories, latest, trending, categoryNameById, boa
           <p className="text-sm text-muted">{tr("noResourcesYet")}</p>
         )}
       </section>
+      </Reveal>
 
       {/* ─── Why BoardNotes Section ─── */}
-      <section className="bg-gradient-to-b from-background via-accent/[0.03] to-background border-y border-border">
+      <Reveal>
+        <section className="bg-gradient-to-b from-background via-accent/[0.03] to-background border-y border-border">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
             <div className="mb-2 flex items-center justify-center gap-2">
@@ -192,11 +185,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById, boa
           </div>
         </div>
       </section>
-
-      {/* Ad — before CTA */}
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <AdBanner size="mobile-banner" className="mx-auto" />
-      </div>
+      </Reveal>
 
       {/* ─── SEO Content Block ─── */}
       <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -213,6 +202,12 @@ export function PortalHome({ categories, latest, trending, categoryNameById, boa
           </p>
         </div>
       </section>
+
+      {/* ─── Ads — below all primary educational content ─── */}
+      <div className="mx-auto max-w-6xl space-y-4 px-4 pb-6 sm:px-6 lg:px-8">
+        <AdBanner size="inline" />
+        <AdBanner size="banner" className="mx-auto" />
+      </div>
 
       {/* ─── Upload CTA ─── */}
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8">
