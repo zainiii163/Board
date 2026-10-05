@@ -28,9 +28,22 @@ export type PastPaperItem = {
   paperType: PastPaperType;
   pdfUrl: string | null;
   driveUrl: string | null;
+  isSolved?: boolean;
+  syllabus?: "new" | "old";
 };
 
-const FILTERS: ("all" | PastPaperType)[] = ["all", "model", "first-annual", "second-annual", "pba"];
+const FILTERS: ("all" | PastPaperType)[] = ["all", "second-annual", "model", "first-annual", "pba"];
+
+// Chronological order: 2nd Annual → Model → 1st Annual (for same year)
+function getSortOrder(paperType: PastPaperType): number {
+  switch (paperType) {
+    case "second-annual": return 1;
+    case "model": return 2;
+    case "first-annual": return 3;
+    case "pba": return 4;
+    default: return 5;
+  }
+}
 
 function normalizeBoardLabel(boardTitle: string, classTitle: string): string {
   if (!/federal|fbise/i.test(boardTitle)) return boardTitle;
@@ -62,16 +75,27 @@ export function PastPapersList({
   );
   const [boardFilter, setBoardFilter] = useState(initialBoard && papers.some((p) => p.boardSlug === initialBoard) ? initialBoard : "all");
   const [yearFilter, setYearFilter] = useState(initialYear && papers.some((p) => p.year === initialYear) ? initialYear : "all");
+  const [solvedFilter, setSolvedFilter] = useState<"all" | "solved" | "unsolved">("all");
+  const [syllabusFilter, setSyllabusFilter] = useState<"all" | "new" | "old">("new");
 
   const boards = Array.from(new Map(papers.map((p) => [p.boardSlug, p.boardTitle])));
   const years = Array.from(new Set(papers.map((p) => p.year))).sort().reverse();
 
-  const visible = papers.filter(
-    (p) =>
-      (filter === "all" || p.paperType === filter) &&
-      (boardFilter === "all" || p.boardSlug === boardFilter) &&
-      (yearFilter === "all" || p.year === yearFilter),
-  );
+  const visible = papers
+    .filter(
+      (p) =>
+        (filter === "all" || p.paperType === filter) &&
+        (boardFilter === "all" || p.boardSlug === boardFilter) &&
+        (yearFilter === "all" || p.year === yearFilter) &&
+        (solvedFilter === "all" || (solvedFilter === "solved" ? p.isSolved : !p.isSolved)) &&
+        (syllabusFilter === "all" || p.syllabus === syllabusFilter || (syllabusFilter === "new" && !p.syllabus)),
+    )
+    .sort((a, b) => {
+      // Sort by year descending, then by chronological order within year
+      const yearDiff = parseInt(b.year) - parseInt(a.year);
+      if (yearDiff !== 0) return yearDiff;
+      return getSortOrder(a.paperType) - getSortOrder(b.paperType);
+    });
   const selectClass =
     "rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold text-foreground/80 transition hover:border-accent/50";
 
@@ -119,6 +143,45 @@ export function PastPapersList({
             ))}
           </select>
         )}
+        <div className="flex gap-2 rounded-full border border-border bg-card p-1">
+          <button
+            type="button"
+            onClick={() => setSolvedFilter("all")}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${solvedFilter === "all" ? "bg-accent text-white" : "text-foreground/80 hover:text-accent"}`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => setSolvedFilter("solved")}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${solvedFilter === "solved" ? "bg-accent text-white" : "text-foreground/80 hover:text-accent"}`}
+          >
+            Solved
+          </button>
+          <button
+            type="button"
+            onClick={() => setSolvedFilter("unsolved")}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${solvedFilter === "unsolved" ? "bg-accent text-white" : "text-foreground/80 hover:text-accent"}`}
+          >
+            Unsolved
+          </button>
+        </div>
+        <div className="flex gap-2 rounded-full border border-border bg-card p-1">
+          <button
+            type="button"
+            onClick={() => setSyllabusFilter("new")}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${syllabusFilter === "new" ? "bg-accent text-white" : "text-foreground/80 hover:text-accent"}`}
+          >
+            New Syllabus
+          </button>
+          <button
+            type="button"
+            onClick={() => setSyllabusFilter("old")}
+            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${syllabusFilter === "old" ? "bg-accent text-white" : "text-foreground/80 hover:text-accent"}`}
+          >
+            Old Syllabus
+          </button>
+        </div>
       </div>
       <div className="mt-4 space-y-3">
         {visible.length === 0 && (

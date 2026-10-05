@@ -45,6 +45,7 @@ function classNumber(slug: string): number {
 export function BoardPageContent({ board, title, classes, pastPapers = [] }: BoardPageContentProps) {
   const { tr } = useLocale();
   const displayTitle = boardDisplayTitle(title, board);
+  const [view, setView] = useState<"notes" | "books">("notes");
 
   const seen = new Set<string>();
   const uniqueClasses = classes.filter((c) => {
@@ -66,15 +67,47 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
       {/* Sticky Class Ribbon */}
       <ClassRibbon board={board} classes={uniqueClasses} />
 
+      {/* Books | Notes Toggle */}
+      <div className="mt-6 inline-flex rounded-full border border-border bg-card p-1" role="tablist" aria-label="View mode">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "notes"}
+          onClick={() => setView("notes")}
+          className={`rounded-full px-5 py-2 text-sm font-bold transition ${view === "notes" ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`}
+        >
+          <NotebookPen className="h-4 w-4" aria-hidden="true" /> {tr("notes")}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={view === "books"}
+          onClick={() => setView("books")}
+          className={`rounded-full px-5 py-2 text-sm font-bold transition ${view === "books" ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`}
+        >
+          <BookOpen className="h-4 w-4" aria-hidden="true" /> {tr("books")}
+        </button>
+      </div>
+
       {uniqueClasses.length === 0 ? (
         <p className="mt-8 text-sm text-muted">{tr("noClassesYet")}</p>
       ) : (
         <>
-          {/* ─── Class Sections with Books/Notes Toggle ─── */}
+          {/* ─── Class Sections ─── */}
           {uniqueClasses.map((klass) => {
             const num = classNumber(klass.slug);
             const short = boardShortName(board, num);
             const subjects = klass.subjects ?? [];
+            const displaySubjects = subjects.filter((subject) => {
+              const title = subject.title.toLowerCase();
+              // Classes 5-8: Remove individual Physics, Chemistry, Biology, Computer Science
+              if (num >= 5 && num <= 8) {
+                if (title.includes("physics") || title.includes("chemistry") || title.includes("biology") || title.includes("computer")) {
+                  return false;
+                }
+              }
+              return true;
+            });
             return (
               <div key={klass.slug} id={`class-${klass.slug}`} className="mt-10 scroll-mt-24">
                 <div className="flex flex-wrap items-end justify-between gap-3">
@@ -82,42 +115,37 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
                     <h2 className="text-xl font-black text-foreground sm:text-2xl">
                       Class {klass.slug} <span className="text-accent">({short})</span>
                     </h2>
-                    <p className="mt-1 text-sm text-muted">Chapter-wise notes, SLO-based solutions, and exercises.</p>
+                    <p className="mt-1 text-sm text-muted">{view === "notes" ? "Chapter-wise notes, SLO-based solutions, and exercises." : "Official textbooks — read online or download PDF."}</p>
                   </div>
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/${board}/${klass.slug}`}
-                      className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
-                    >
-                      Notes →
-                    </Link>
-                    <Link
-                      href={`/${board}/${klass.slug}?view=books`}
-                      className="shrink-0 rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
-                    >
-                      Books →
-                    </Link>
-                  </div>
+                  <Link
+                    href={`/${board}/${klass.slug}${view === "books" ? "?view=books" : ""}`}
+                    className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
+                  >
+                    View All →
+                  </Link>
                 </div>
-                {subjects.length === 0 ? (
+                {displaySubjects.length === 0 ? (
                   <p className="mt-4 text-sm text-muted">{tr("noSubjectsYet")}</p>
                 ) : (
-                  <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                    {subjects.map((subject) => {
+                  <div className="mt-4 flex gap-3 overflow-x-auto pb-2 scrollbar-thin snap-x-mandatory">
+                    {displaySubjects.slice(0, 6).map((subject) => {
                       const cover = getBookCover(board, num, subject.title);
+                      const href = view === "books"
+                        ? `/${board}/books/${klass.slug}/${subject.slug}`
+                        : `/${board}/${klass.slug}/${subject.slug}`;
                       return (
                         <Link
                           key={`${klass.slug}-${subject.slug}`}
-                          href={`/${board}/${klass.slug}/${subject.slug}`}
-                          className="group"
+                          href={href}
+                          className="group shrink-0"
                         >
                           <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
                             {cover ? (
                               <Image
                                 src={cover}
                                 alt={`${klass.slug} ${subject.title}`}
-                                width={200}
-                                height={260}
+                                width={160}
+                                height={208}
                                 className="aspect-[3/4] w-full object-cover"
                               />
                             ) : (
@@ -125,11 +153,21 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
                             )}
                           </div>
                           <p className="mt-2 text-center text-xs font-semibold text-foreground group-hover:text-accent">
-                            {klass.slug} {subject.title}
+                            {subject.title}
                           </p>
                         </Link>
                       );
                     })}
+                    {displaySubjects.length > 6 && (
+                      <Link
+                        href={`/${board}/${klass.slug}${view === "books" ? "?view=books" : ""}`}
+                        className="group flex shrink-0 items-center justify-center rounded-xl border border-dashed border-border bg-card/50 px-6 transition hover:border-accent hover:bg-accent/10"
+                      >
+                        <span className="text-sm font-semibold text-muted group-hover:text-accent">
+                          +{displaySubjects.length - 6} more
+                        </span>
+                      </Link>
+                    )}
                   </div>
                 )}
               </div>
@@ -216,9 +254,9 @@ export function ClassPageContent({
   // Filter subjects based on grade-wise curriculum mapping
   const filteredSubjects = subjects.filter((subject) => {
     const title = subject.title.toLowerCase();
-    // Classes 5-8: Remove individual Physics, Chemistry, Biology - should be under General Science
+    // Classes 5-8: Remove individual Physics, Chemistry, Biology, Computer Science - should be under General Science
     if (classNum >= 5 && classNum <= 8) {
-      if (title.includes("physics") || title.includes("chemistry") || title.includes("biology")) {
+      if (title.includes("physics") || title.includes("chemistry") || title.includes("biology") || title.includes("computer")) {
         return false;
       }
     }

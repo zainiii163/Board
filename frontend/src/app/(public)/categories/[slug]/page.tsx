@@ -68,7 +68,6 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                   <h1 className="mt-0.5 font-serif text-3xl font-black text-foreground sm:text-4xl">{category.name}</h1>
                 </div>
               </div>
-              <p className="mt-3 text-sm text-muted">{data.total} PDFs to download</p>
             </div>
           </div>
         </div>
