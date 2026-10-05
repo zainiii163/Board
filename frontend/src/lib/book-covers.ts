@@ -43,7 +43,7 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       Mathematics: "/book-covers/fbise-9-9th-Class-Mathematics-NBF.jpg",
       Biology: "/book-covers/fbise-9-9th-Class-Biology-NBF.jpg",
       English: "/book-covers/fbise-9-English-9-NBF.webp",
-      "Computer Science": "/book-covers/fbise-9-HamdardChemistryGuide9.webp",
+      "Computer Science": "/book-covers/fbise-9-Computer-Science-9-NBF.webp",
       Urdu: "/book-covers/fbise-9-NBF-URDU-9.webp",
       "Pakistan Studies": "/book-covers/fbise-9-Class-9-Pakistan-Studies--Urdu-.jpg",
       Islamiat: "/book-covers/fbise-9-Islamiat-Lazmi-Class-9-NBF.webp",
@@ -108,9 +108,42 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
   },
 };
 
-// Returns a full absolute URL to a real book cover, or null when no cover exists.
+// Generate SVG placeholder for missing book covers
+function generatePlaceholder(subjectTitle: string, classNum: number): string {
+  const initials = subjectTitle
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  const colors = [
+    "#0f766e", // teal-700
+    "#059669", // emerald-600
+    "#0891b2", // cyan-600
+    "#7c3aed", // violet-600
+    "#db2777", // pink-600
+    "#ea580c", // orange-600
+  ];
+  const colorIndex = classNum % colors.length;
+  const bgColor = colors[colorIndex];
+
+  const svg = `
+    <svg width="200" height="260" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="260" fill="${bgColor}"/>
+      <rect x="10" y="10" width="180" height="240" fill="none" stroke="white" stroke-width="2" rx="4"/>
+      <text x="100" y="110" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle">${initials}</text>
+      <text x="100" y="150" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white" text-anchor="middle">Class ${classNum}</text>
+      <text x="100" y="170" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">${subjectTitle.substring(0, 20)}${subjectTitle.length > 20 ? "..." : ""}</text>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+}
+
+// Returns a full absolute URL to a real book cover, or SVG placeholder when no cover exists.
 export function getBookCover(boardSlug: string, classNum: number, subjectTitle: string): string | null {
   const path = BOOK_COVERS[boardSlug]?.[classNum]?.[subjectTitle];
-  if (!path) return null;
-  return `${getApiBaseUrl()}${path}`;
+  if (path) return `${getApiBaseUrl()}${path}`;
+  return generatePlaceholder(subjectTitle, classNum);
 }

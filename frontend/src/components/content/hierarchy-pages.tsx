@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import { LocalizedBreadcrumbs } from "@/components/layout/localized-breadcrumbs";
 import { BookOpen, FileText, GraduationCap, NotebookPen, School } from "lucide-react";
+import { ClassRibbon } from "@/components/layout/class-ribbon";
 import { ChapterQuiz } from "@/components/content/chapter-quiz";
 import { BookmarkButton } from "@/components/content/bookmark-button";
 import { SaveOfflineButton } from "@/components/content/save-offline-button";
@@ -52,8 +53,6 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
     return true;
   });
 
-  const notesClasses = uniqueClasses;
-
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <LocalizedBreadcrumbs items={[{ label: "Home", href: "/" }, { label: displayTitle }]} />
@@ -64,55 +63,41 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
         <p className="mt-2 max-w-2xl text-sm text-muted">{tr("chooseClassContinue")}</p>
       </div>
 
-      {/* Anchor tabs — Notes then Books for each class */}
-      <nav
-        className="sticky top-16 z-20 mt-6 -mx-4 flex flex-wrap gap-2 border-b border-border bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
-        aria-label="Class sections"
-      >
-        {notesClasses.map((klass) => (
-          <a
-            key={`tab-notes-${klass.slug}`}
-            href={`#class-${klass.slug}-notes`}
-            className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
-          >
-            {klass.slug} Notes
-          </a>
-        ))}
-        {notesClasses.map((klass) => (
-          <a
-            key={`tab-books-${klass.slug}`}
-            href={`#class-${klass.slug}-books`}
-            className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
-          >
-            {klass.slug} Books
-          </a>
-        ))}
-      </nav>
+      {/* Sticky Class Ribbon */}
+      <ClassRibbon board={board} classes={uniqueClasses} />
 
       {uniqueClasses.length === 0 ? (
         <p className="mt-8 text-sm text-muted">{tr("noClassesYet")}</p>
       ) : (
         <>
-          {/* ─── Notes sections ─── */}
-          {notesClasses.map((klass) => {
+          {/* ─── Class Sections with Books/Notes Toggle ─── */}
+          {uniqueClasses.map((klass) => {
             const num = classNumber(klass.slug);
             const short = boardShortName(board, num);
             const subjects = klass.subjects ?? [];
             return (
-              <div key={`notes-${klass.slug}`} id={`class-${klass.slug}-notes`} className="mt-10 scroll-mt-24">
+              <div key={klass.slug} id={`class-${klass.slug}`} className="mt-10 scroll-mt-24">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-black text-foreground sm:text-2xl">
-                      Class {klass.slug} Notes <span className="text-accent">({short})</span>
+                      Class {klass.slug} <span className="text-accent">({short})</span>
                     </h2>
                     <p className="mt-1 text-sm text-muted">Chapter-wise notes, SLO-based solutions, and exercises.</p>
                   </div>
-                  <Link
-                    href={`/${board}/${klass.slug}`}
-                    className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
-                  >
-                    Click More →
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/${board}/${klass.slug}`}
+                      className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
+                    >
+                      Notes →
+                    </Link>
+                    <Link
+                      href={`/${board}/${klass.slug}?view=books`}
+                      className="shrink-0 rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground transition hover:border-accent hover:text-accent"
+                    >
+                      Books →
+                    </Link>
+                  </div>
                 </div>
                 {subjects.length === 0 ? (
                   <p className="mt-4 text-sm text-muted">{tr("noSubjectsYet")}</p>
@@ -122,7 +107,7 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
                       const cover = getBookCover(board, num, subject.title);
                       return (
                         <Link
-                          key={`note-${klass.slug}-${subject.slug}`}
+                          key={`${klass.slug}-${subject.slug}`}
                           href={`/${board}/${klass.slug}/${subject.slug}`}
                           className="group"
                         >
@@ -131,64 +116,6 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
                               <Image
                                 src={cover}
                                 alt={`${klass.slug} ${subject.title}`}
-                                width={200}
-                                height={260}
-                                className="aspect-[3/4] w-full object-cover"
-                              />
-                            ) : (
-                              <CoverArt title={`${klass.slug} ${subject.title}`} className="aspect-[3/4] w-full" />
-                            )}
-                          </div>
-                          <p className="mt-2 text-center text-xs font-semibold text-foreground group-hover:text-accent">
-                            {klass.slug} {subject.title}
-                          </p>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* ─── Books sections ─── */}
-          {notesClasses.map((klass) => {
-            const num = classNumber(klass.slug);
-            const short = boardShortName(board, num);
-            const subjects = klass.subjects ?? [];
-            return (
-              <div key={`books-${klass.slug}`} id={`class-${klass.slug}-books`} className="mt-10 scroll-mt-24">
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <h2 className="text-xl font-black text-foreground sm:text-2xl">
-                      Class {klass.slug} Books <span className="text-accent">({short})</span>
-                    </h2>
-                    <p className="mt-1 text-sm text-muted">Official textbooks in PDF — read online or download.</p>
-                  </div>
-                  <Link
-                    href={`/${board}/${klass.slug}?view=books`}
-                    className="shrink-0 rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-bold text-accent transition hover:bg-accent hover:text-white"
-                  >
-                    Click More →
-                  </Link>
-                </div>
-                {subjects.length === 0 ? (
-                  <p className="mt-4 text-sm text-muted">No books listed yet.</p>
-                ) : (
-                  <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-                    {subjects.map((subject) => {
-                      const cover = getBookCover(board, num, subject.title);
-                      return (
-                        <Link
-                          key={`book-${klass.slug}-${subject.slug}`}
-                          href={`/${board}/books/${klass.slug}/${subject.slug}`}
-                          className="group"
-                        >
-                          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
-                            {cover ? (
-                              <Image
-                                src={cover}
-                                alt={`${klass.slug} ${subject.title} book`}
                                 width={200}
                                 height={260}
                                 className="aspect-[3/4] w-full object-cover"
@@ -286,6 +213,19 @@ export function ClassPageContent({
   const displayTitle = boardDisplayTitle(boardTitle, board, classNum);
   const booksCategory = boardTextbookCategory(board);
 
+  // Filter subjects based on grade-wise curriculum mapping
+  const filteredSubjects = subjects.filter((subject) => {
+    const title = subject.title.toLowerCase();
+    // Classes 5-8: Remove individual Physics, Chemistry, Biology - should be under General Science
+    if (classNum >= 5 && classNum <= 8) {
+      if (title.includes("physics") || title.includes("chemistry") || title.includes("biology")) {
+        return false;
+      }
+    }
+    // Classes 9-12: Allow all science subjects
+    return true;
+  });
+
   const tabClass = (active: boolean) =>
     `rounded-full px-5 py-2 text-sm font-bold transition ${active ? "bg-accent text-white shadow-sm" : "text-muted hover:text-foreground"}`;
 
@@ -361,10 +301,10 @@ export function ClassPageContent({
         <>
           <p className="mt-4 text-sm text-muted">Chapter-wise notes, SLO-based solutions, and solved exercises.</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {subjects.length === 0 ? (
+            {filteredSubjects.length === 0 ? (
               <p className="text-sm text-muted md:col-span-2 xl:col-span-3">{tr("noSubjectsYet")}</p>
             ) : (
-              subjects.map((subject) => {
+              filteredSubjects.map((subject) => {
                 const cover = getBookCover(board, classNum, subject.title);
                 return (
                   <Link
@@ -421,10 +361,10 @@ export function ClassPageContent({
         <>
           <p className="mt-4 text-sm text-muted">Official {short} textbooks — read online or download PDF.</p>
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {subjects.length === 0 ? (
+            {filteredSubjects.length === 0 ? (
               <p className="text-sm text-muted col-span-full">No books listed yet.</p>
             ) : (
-              subjects.map((subject) => {
+              filteredSubjects.map((subject) => {
                 const cover = getBookCover(board, classNum, subject.title);
                 const label = `${classSlug} ${subject.title}`;
                 return (
