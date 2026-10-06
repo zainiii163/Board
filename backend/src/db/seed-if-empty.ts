@@ -8,6 +8,7 @@ import { seedRegionalBoardContent } from "./seed-board-backfill.js";
 import { seedLogarithmsEnrichment } from "./seed-logarithms-enrichment.js";
 import { seedBookCovers } from "./seed-book-covers.js";
 import { seedSubjectsAndMCQs } from "./seed-subjects-mcqs.js";
+import { seedPunjabVariantBoards, seedPunjabVariantPastPapers } from "./seed-punjab-variants.js";
 
 async function ensurePastPaperColumns() {
   await db.execute(sql`
@@ -43,6 +44,12 @@ export async function seedIfEmpty() {
     await seedDemoClassroom();
     await seedDemoChapterVideo();
     await seedRegionalBoardContent();
+    // Idempotent, so these run on every boot: they register the Punjab variant
+    // boards on a database that was seeded before they existed. Must come before
+    // seedSubjectsAndMCQs, which fills in subjects/chapters for whatever boards
+    // are present.
+    await seedPunjabVariantBoards();
+    await seedPunjabVariantPastPapers();
     await seedLogarithmsEnrichment();
     await seedBookCovers();
     await seedSubjectsAndMCQs();
@@ -53,6 +60,8 @@ export async function seedIfEmpty() {
   await seedPlatformContent();
   await seedDemoClassroom();
   await seedDemoChapterVideo();
+  await seedPunjabVariantBoards();
+  await seedPunjabVariantPastPapers();
   await seedBookCovers();
   await seedSubjectsAndMCQs();
   console.log("[db] Seed complete. Admin CMS changes will persist to PostgreSQL.");

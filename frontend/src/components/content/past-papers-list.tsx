@@ -6,6 +6,7 @@ import { CheckCircle2, CircleDot, Filter, GraduationCap } from "lucide-react";
 
 import { PageHeading } from "@/components/layout/page-heading";
 import { pdfUrl } from "@/lib/api-client";
+import { NAV_BOARDS } from "@/lib/constants";
 import { DownloadGate } from "@/components/content/download-gate";
 import { DriveLinkButton } from "@/components/content/drive-link-button";
 
@@ -100,10 +101,20 @@ export function PastPapersList({
 }) {
   const reduceMotion = useReducedMotion();
 
-  const boards = useMemo(
-    () => [...new Map(papers.map((p) => [p.boardSlug, p.boardTitle])).entries()],
-    [papers],
-  );
+  /**
+   * Board options come from the canonical board list, not just the boards that
+   * happen to have papers loaded — otherwise a board with no papers yet is
+   * impossible to select, and a board that silently drops out of the list looks
+   * like the site lost it.
+   */
+  const boards = useMemo(() => {
+    const titles = new Map(papers.map((p) => [p.boardSlug, p.boardTitle]));
+    for (const board of NAV_BOARDS) {
+      if (board.slug === "o-level" || board.slug === "a-level") continue;
+      if (!titles.has(board.slug)) titles.set(board.slug, board.label);
+    }
+    return [...titles.entries()];
+  }, [papers]);
   const years = useMemo(() => [...new Set(papers.map((p) => p.year))].sort().reverse(), [papers]);
   const subjects = useMemo(
     () =>

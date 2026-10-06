@@ -225,7 +225,7 @@ export default function ManageResourcesPage() {
               const catInfo = catMap[resource.categoryId];
               return (
                 <tr key={resource.id}
-                  className={`border-b border-border/60 align-middle transition-colors hover:bg-accent/5 ${idx % 2 === 0 ? "bg-background/30" : "bg-card/30"}`}>
+                  className={`border-b border-border/60 align-middle transition-colors hover:bg-accent/5 ${idx % 2 === 0 ? "bg-background/30" : "bg-card"}`}>
                   <td className="py-3 pr-3 w-10">
                     <input
                       type="checkbox"

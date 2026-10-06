@@ -258,7 +258,7 @@ export default async function OnlineQuizzesPage({
       ))}
 
       {/* Board links */}
-      <div className="mt-10 rounded-2xl border border-border bg-card/50 p-5">
+      <div className="mt-10 rounded-2xl border border-border bg-card p-5">
         <h2 className="text-lg font-bold text-foreground">Practice by board</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {NAV_BOARDS.map((b) => (

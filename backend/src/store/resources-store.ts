@@ -61,6 +61,12 @@ export type PastPaperRecord = {
 const boardMeta: Record<string, { slug: string; title: string }> = {
   FBISE: { slug: "fbise", title: "Federal Board (FBISE)" },
   Punjab: { slug: "punjab", title: "Punjab Board" },
+  // Punjab Board examination authorities — same scheme of studies, own papers.
+  Lahore: { slug: "lahore", title: "Lahore Board" },
+  "Lahore Board": { slug: "lahore", title: "Lahore Board" },
+  "D.G. Khan": { slug: "d-g-khan", title: "D.G. Khan Board" },
+  "D.G. Khan Board": { slug: "d-g-khan", title: "D.G. Khan Board" },
+  DGKhan: { slug: "d-g-khan", title: "D.G. Khan Board" },
   KPK: { slug: "kpk", title: "KPK Board" },
   Sindh: { slug: "sindh", title: "Sindh Board" },
 };

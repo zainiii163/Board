@@ -95,7 +95,7 @@ export function SearchPageContent({
       <form
         action="/search"
         method="get"
-        className="mt-6 rounded-2xl border border-white/20 bg-card/70 p-5 shadow-lg backdrop-blur-md sm:p-6 dark:border-white/5 dark:bg-card/50"
+        className="mt-6 rounded-2xl border border-white/20 bg-card p-5 shadow-lg backdrop-blur-md sm:p-6 dark:border-white/5 dark:bg-card"
       >
         <div className="flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">

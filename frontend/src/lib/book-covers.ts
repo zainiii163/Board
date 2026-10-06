@@ -142,6 +142,16 @@ for (const [board, classes] of Object.entries(BOOK_COVERS)) {
   }
 }
 
+/**
+ * Lahore Board and D.G. Khan Board are Punjab Board authorities and use the same
+ * textbooks, so they fall back to the Punjab artwork instead of showing blank
+ * generated placeholders.
+ */
+const COVER_BOARD_ALIASES: Record<string, string> = {
+  lahore: "punjab",
+  "d-g-khan": "punjab",
+};
+
 /** Canonical lookup key for a subject title (lowercase, alias-resolved). */
 function coverKey(title: string): string {
   const key = subjectKey(title);
@@ -186,7 +196,10 @@ function generatePlaceholder(subjectTitle: string, classNum: number): string {
  * no artwork for that subject yet.
  */
 export function getBookCover(boardSlug: string, classNum: number, subjectTitle: string): string {
-  const path = BOOK_COVERS_INDEX[boardSlug]?.[classNum]?.[coverKey(subjectTitle)];
+  const alias = COVER_BOARD_ALIASES[boardSlug];
+  const path =
+    BOOK_COVERS_INDEX[boardSlug]?.[classNum]?.[coverKey(subjectTitle)] ??
+    (alias ? BOOK_COVERS_INDEX[alias]?.[classNum]?.[coverKey(subjectTitle)] : undefined);
   if (path) return `${getApiBaseUrl()}${path}`;
   return generatePlaceholder(subjectTitle, classNum);
 }

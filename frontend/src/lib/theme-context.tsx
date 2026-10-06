@@ -70,7 +70,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       onClick={toggleTheme}
       aria-label={isDark ? tr("light") : tr("dark")}
       title={isDark ? tr("light") : tr("dark")}
-      className={`pressable focus-ring relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-border bg-card/70 text-foreground shadow-sm backdrop-blur-md transition-colors hover:border-accent/50 hover:bg-accent/10 hover:text-accent ${className}`}
+      className={`pressable focus-ring relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-sm backdrop-blur-md transition-colors hover:border-accent/50 hover:bg-accent/10 hover:text-accent ${className}`}
     >
       <AnimatePresence initial={false} mode="wait">
         <motion.span

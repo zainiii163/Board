@@ -202,7 +202,7 @@ export default function OLevelPage() {
       </div>
 
       {/* Topical past papers */}
-      <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+      <div className="mt-10 rounded-2xl border border-border bg-card p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-black text-foreground">O Level topical past papers</h2>
@@ -288,7 +288,7 @@ export default function OLevelPage() {
       </div>
 
       {/* SEO Content Block */}
-      <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+      <div className="mt-10 rounded-2xl border border-border bg-card p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">O Level Books and Notes — Complete Study Material</h3>
         <p className="mb-3 text-sm leading-6 text-muted">
           BoardNotes compiles free O Level and IGCSE study material for Cambridge students worldwide: chapter-wise

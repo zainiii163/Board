@@ -9,7 +9,7 @@ export default function BoardLoading() {
       </div>
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-40 animate-pulse rounded-2xl border border-border bg-card/50" />
+          <div key={i} className="h-40 animate-pulse rounded-2xl border border-border bg-card" />
         ))}
       </div>
     </section>

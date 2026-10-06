@@ -101,7 +101,7 @@ export function APSACSClassPageContent({
       </div>
 
       {/* SEO Content Block */}
-      <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
+      <div className="mt-12 rounded-2xl border border-border bg-card p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">APSACS {classTitle} Study Resources</h3>
         <p className="mb-3 text-sm leading-6 text-muted">
           Access comprehensive study materials for APSACS {classTitle}, including textbooks, notes, and practice exercises. 

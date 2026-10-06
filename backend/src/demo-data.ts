@@ -993,6 +993,29 @@ export const BOARD_DATA: Record<string, Board> = {
     },
 };
 
+/**
+ * Lahore Board and D.G. Khan Board are Punjab Board examination authorities: same
+ * scheme of studies, same textbooks, but they issue their own papers. They reuse
+ * the Punjab tree verbatim (with their own slug/title) rather than duplicating
+ * several hundred lines of chapter content, which also keeps the two boards from
+ * drifting apart when Punjab content is edited.
+ */
+const PUNJAB_VARIANT_BOARDS = [
+    { slug: "lahore", title: "Lahore Board" },
+    { slug: "d-g-khan", title: "D.G. Khan Board" },
+] as const;
+
+for (const variant of PUNJAB_VARIANT_BOARDS) {
+    if (BOARD_DATA[variant.slug]) continue;
+    const punjab = BOARD_DATA.punjab;
+    if (!punjab) continue;
+    BOARD_DATA[variant.slug] = structuredClone({
+        ...punjab,
+        slug: variant.slug,
+        title: variant.title,
+    }) as Board;
+}
+
 const LEVEL_CLASS_SLUGS = ["5", "6", "7", "8", "10", "11", "12"] as const;
 
 type LevelMathChapter = {
@@ -2074,4 +2097,10 @@ export const PAST_PAPERS = [
     { year: "2026", subject: "Mathematics", board: "FBISE", paperType: "model" as const },
     { year: "2025", subject: "Physics", board: "Punjab", paperType: "first-annual" as const },
     { year: "2024", subject: "Chemistry", board: "KPK", paperType: "second-annual" as const },
+    { year: "2026", subject: "Mathematics", board: "Lahore Board", paperType: "model" as const },
+    { year: "2026", subject: "Physics", board: "Lahore Board", paperType: "first-annual" as const },
+    { year: "2025", subject: "English", board: "Lahore Board", paperType: "first-annual" as const },
+    { year: "2026", subject: "Mathematics", board: "D.G. Khan Board", paperType: "model" as const },
+    { year: "2026", subject: "Physics", board: "D.G. Khan Board", paperType: "first-annual" as const },
+    { year: "2025", subject: "Biology", board: "D.G. Khan Board", paperType: "first-annual" as const },
 ];

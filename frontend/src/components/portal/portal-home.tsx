@@ -92,7 +92,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById, boa
 
       {/* ─── Latest Resources ─── */}
       <Reveal>
-        <section className="border-y border-border bg-card/40">
+        <section className="border-y border-border bg-card">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
             <div className="mb-8 flex items-end justify-between gap-4">
               <div>
@@ -189,7 +189,7 @@ export function PortalHome({ categories, latest, trending, categoryNameById, boa
 
       {/* ─── SEO Content Block ─── */}
       <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
           <h2 className="mb-3 font-serif text-xl font-bold text-foreground sm:text-2xl">Complete Learning Support for Pakistani Students</h2>
           <p className="mb-4 text-sm leading-relaxed text-muted">
             BoardNotes provides free, high-quality study resources for students across Pakistan and international boards. From Class 5 to 2nd Year, access textbooks, notes, solved exercises, past papers, pairing schemes, and guess papers — all organized by board, class, and subject.

@@ -130,7 +130,7 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
                 type="button"
                 disabled={filter.page <= 1}
                 onClick={() => setFilter((f) => ({ ...f, page: f.page - 1 }))}
-                className="pressable inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/60 px-3.5 py-2 text-sm font-semibold text-foreground transition hover:border-accent/50 hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+                className="pressable inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground transition hover:border-accent/50 hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                 Prev
@@ -165,7 +165,7 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
                 type="button"
                 disabled={filter.page >= totalPages}
                 onClick={() => setFilter((f) => ({ ...f, page: f.page + 1 }))}
-                className="pressable inline-flex items-center gap-1.5 rounded-xl border border-border bg-card/60 px-3.5 py-2 text-sm font-semibold text-foreground transition hover:border-accent/50 hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+                className="pressable inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-sm font-semibold text-foreground transition hover:border-accent/50 hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Next
                 <ChevronRight className="h-4 w-4" aria-hidden="true" />

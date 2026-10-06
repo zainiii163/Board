@@ -12,7 +12,7 @@ export function AdBanner({ size = "inline", className = "", label }: { size?: Ad
   const s = SIZES[size];
 
   return (
-    <div className={`relative overflow-hidden rounded-xl border border-dashed border-border bg-card/50 ${className}`}
+    <div className={`relative overflow-hidden rounded-xl border border-dashed border-border bg-card ${className}`}
       style={{ maxWidth: s.width, minHeight: s.height }}>
       <div className="flex h-full min-h-[inherit] flex-col items-center justify-center gap-1 p-3 text-center">
         <span className="text-[10px] font-bold uppercase tracking-wider text-muted/60">{label ?? "Advertisement"}</span>
@@ -42,7 +42,7 @@ export function AdSenseBanner({ className }: { className?: string }) {
           data-full-width-responsive="true">
         </ins>
       */}
-      <div className="relative flex h-[90px] w-full max-w-[728px] items-center justify-center overflow-hidden rounded-xl border border-dashed border-border bg-card/30">
+      <div className="relative flex h-[90px] w-full max-w-[728px] items-center justify-center overflow-hidden rounded-xl border border-dashed border-border bg-card">
         <span className="text-[10px] font-bold uppercase tracking-wider text-muted/40">Advertisement</span>
       </div>
     </div>

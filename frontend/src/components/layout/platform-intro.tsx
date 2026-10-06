@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 
@@ -52,7 +52,7 @@ export function PlatformIntro() {
         {/* Stats row */}
         <div className="mb-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {STATS.map((s) => (
-            <div key={s.label} className="rounded-xl border border-border bg-card/60 px-4 py-3 text-center backdrop-blur-sm transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
+            <div key={s.label} className="rounded-xl border border-border bg-card px-4 py-3 text-center backdrop-blur-sm transition-all duration-300 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/5">
               <p className="text-2xl font-black text-accent sm:text-3xl">{s.value}</p>
               <p className="mt-0.5 text-xs font-semibold uppercase tracking-wider text-muted">{s.label}</p>
             </div>

@@ -189,7 +189,7 @@ alt={`${classLabelFromSlug(klass.slug)} ${subject.title}`}
                     {displaySubjects.length > 6 && (
                       <Link
                         href={`/${board}/${klass.slug}${view === "books" ? "?view=books" : ""}`}
-                        className="group flex shrink-0 items-center justify-center rounded-xl border border-dashed border-border bg-card/50 px-6 transition hover:border-accent hover:bg-accent/10"
+                        className="group flex shrink-0 items-center justify-center rounded-xl border border-dashed border-border bg-card px-6 transition hover:border-accent hover:bg-accent/10"
                       >
                         <span className="text-sm font-semibold text-muted group-hover:text-accent">
                           +{displaySubjects.length - 6} more
@@ -225,7 +225,7 @@ alt={`${classLabelFromSlug(klass.slug)} ${subject.title}`}
       </div>
 
       {/* SEO Content Block */}
-      <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
+      <div className="mt-12 rounded-2xl border border-border bg-card p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">
           {displayTitle} Books and Notes — Complete Study Material
         </h3>
@@ -511,7 +511,7 @@ export function ClassPageContent({
       </div>
 
       {/* SEO Content Block */}
-      <div className="mt-12 rounded-2xl border border-border bg-card/50 p-6">
+      <div className="mt-12 rounded-2xl border border-border bg-card p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">{displayTitle} {classTitle} Study Resources</h3>
         <p className="mb-3 text-sm leading-6 text-muted">
           Access comprehensive study materials for {displayTitle} {classTitle}, including textbooks, notes, past papers, and solved exercises.
@@ -727,7 +727,7 @@ export function SubjectPageContent({
 
       {/* Chapter-wise MCQs — 9/11/12 board pattern is ~50% MCQs */}
       {isFbiseMcq && (
-        <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+        <div className="mt-10 rounded-2xl border border-border bg-card p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-lg font-black text-foreground sm:text-xl">
@@ -762,7 +762,7 @@ export function SubjectPageContent({
       )}
 
       {/* What's Included */}
-      <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+      <div className="mt-10 rounded-2xl border border-border bg-card p-6">
         <h2 className="text-lg font-bold text-foreground">What Is Included in the Notes?</h2>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
@@ -792,7 +792,7 @@ export function SubjectPageContent({
       </div>
 
       {/* Course & book description */}
-      <div className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
+      <div className="mt-10 rounded-2xl border border-border bg-card p-6">
         <h2 className="text-lg font-black text-foreground sm:text-xl">
           About the {classTitle} {subjectTitle} Course &amp; Book ({short})
         </h2>
@@ -817,7 +817,7 @@ export function SubjectPageContent({
       </div>
 
       {/* Authors */}
-      <div className="mt-8 rounded-2xl border border-border bg-card/50 p-5">
+      <div className="mt-8 rounded-2xl border border-border bg-card p-5">
         <p className="text-sm text-muted">
           {authors.length === 0 ? (
             tr("notesByContributors").replace("{author}", tr("authorLabel"))

@@ -55,7 +55,7 @@ export default async function TuitionPage() {
       </section>
 
       {/* Stats */}
-      <section className="border-b border-border bg-card/50">
+      <section className="border-b border-border bg-card">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {[

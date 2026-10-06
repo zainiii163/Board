@@ -160,7 +160,7 @@ export default async function BookDetailPage({ params }: PageProps) {
                 )}
               </div>
             ) : (
-              <div className="mt-6 rounded-xl border border-dashed border-border bg-card/60 px-4 py-3 text-sm text-muted">
+              <div className="mt-6 rounded-xl border border-dashed border-border bg-card px-4 py-3 text-sm text-muted">
                 PDF coming soon — meanwhile, chapter-wise notes are ready.
               </div>
             )}
@@ -200,7 +200,7 @@ export default async function BookDetailPage({ params }: PageProps) {
 
       {/* SEO block */}
       <div className="mx-auto max-w-6xl px-4 pb-8 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-border bg-card/50 p-6">
+        <div className="rounded-2xl border border-border bg-card p-6">
           <h3 className="mb-3 text-lg font-bold text-foreground">
             {subjectTitle} Book {classSlug} — {boardTitle}
           </h3>

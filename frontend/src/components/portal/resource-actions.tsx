@@ -70,7 +70,7 @@ export function ResourceActions({ slug, fileUrl, downloads }: Props) {
         <button
           type="button"
           onClick={handleCopy}
-          className="pressable inline-flex items-center gap-2 rounded-xl border border-border bg-card/60 px-5 py-3 text-sm font-semibold text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
+          className="pressable inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
         >
           {copied ? <Check className="h-4 w-4 text-emerald-500" aria-hidden="true" /> : <Link2 className="h-4 w-4" aria-hidden="true" />}
           {copied ? tr("copied") : tr("copyLink")}
@@ -79,7 +79,7 @@ export function ResourceActions({ slug, fileUrl, downloads }: Props) {
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="pressable inline-flex items-center gap-2 rounded-xl border border-border bg-card/60 px-5 py-3 text-sm font-semibold text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
+          className="pressable inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
         >
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
           {tr("whatsApp")}

@@ -16,6 +16,9 @@ export const YOUTUBE_CHANNEL_URL = "https://youtube.com/@mathwithmalikshahid?si=
 export const NAV_BOARDS = [
   { slug: "fbise", label: "Federal Board" },
   { slug: "punjab", label: "Punjab Board" },
+  // Punjab Board examination authorities — same scheme/textbooks, own papers.
+  { slug: "lahore", label: "Lahore Board" },
+  { slug: "d-g-khan", label: "D.G. Khan Board" },
   { slug: "kpk", label: "KPK Board" },
   { slug: "sindh", label: "Sindh Board" },
   { slug: "oxford", label: "Oxford Board" },
@@ -24,6 +27,9 @@ export const NAV_BOARDS = [
   { slug: "o-level", label: "O Level" },
   { slug: "a-level", label: "A Level" },
 ] as const;
+
+/** Boards that share the Punjab Board scheme of studies and textbooks. */
+export const PUNJAB_VARIANT_SLUGS = ["lahore", "d-g-khan"] as const;
 
 /** Human-readable board name for any board slug (falls back to a title-cased slug). */
 export function boardLabel(boardSlug: string): string {
@@ -72,6 +78,9 @@ export function boardDisplayTitle(boardTitle: string, boardSlug: string, classNu
 export const BOARD_TEXTBOOK_CATEGORY: Record<string, string> = {
   fbise: "federal-text-books",
   punjab: "punjab-text-books",
+  // Lahore Board and D.G. Khan Board sit under the Punjab textbook category.
+  lahore: "punjab-text-books",
+  "d-g-khan": "punjab-text-books",
   kpk: "kpk-text-books",
   sindh: "sindh-text-books",
   oxford: "oxford-text-books",

@@ -50,6 +50,8 @@ const BOARDS_ITEM: DropdownDef = {
     { heading: "Pakistani Boards", items: [
       { label: "Federal Board", href: "/fbise" },
       { label: "Punjab Board", href: "/punjab" },
+      { label: "Lahore Board", href: "/lahore" },
+      { label: "D.G. Khan Board", href: "/d-g-khan" },
       { label: "KPK Board", href: "/kpk" },
       { label: "Sindh Board", href: "/sindh" },
       { label: "APSACS", href: "/apsacs" },
@@ -524,7 +526,7 @@ export function Header() {
               <Link
                 href="/search"
                 aria-label={tr("search")}
-                className="pressable focus-ring hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-card/60 text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:bg-accent/10 hover:text-accent sm:inline-flex"
+                className="pressable focus-ring hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:bg-accent/10 hover:text-accent sm:inline-flex"
               >
                 <Search className="h-4 w-4" aria-hidden="true" />
               </Link>
@@ -550,7 +552,7 @@ export function Header() {
                   )}
                   <Link
                     href="/account"
-                    className="pressable inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card/60 text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
+                    className="pressable inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:text-accent"
                     aria-label={user.name}
                   >
                     <span className="text-xs font-black">{user.name.slice(0, 1).toUpperCase()}</span>
@@ -570,7 +572,7 @@ export function Header() {
                 type="button"
                 onClick={() => setDrawerOpen(true)}
                 aria-label={tr("openMenu")}
-                className="pressable focus-ring inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card/60 text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent lg:hidden"
+                className="pressable focus-ring inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground backdrop-blur-md transition hover:border-accent/50 hover:text-accent lg:hidden"
               >
                 <Menu className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -654,7 +656,7 @@ export function Header() {
                                 className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition ${
                                   active
                                     ? "border-accent bg-accent/10 text-accent"
-                                    : "border-border/70 bg-card/50 text-foreground hover:border-accent/50 hover:bg-accent/10 hover:text-accent"
+                                    : "border-border/70 bg-card text-foreground hover:border-accent/50 hover:bg-accent/10 hover:text-accent"
                                 }`}
                               >
                                 {itm.label}
@@ -674,7 +676,7 @@ export function Header() {
                     <Link
                       href="/account"
                       onClick={() => setDrawerOpen(false)}
-                      className="flex items-center gap-2 rounded-xl border border-border bg-card/60 px-4 py-3 text-sm font-semibold text-foreground"
+                      className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground"
                     >
                       <User className="h-4 w-4" aria-hidden="true" />
                       {user.name}
