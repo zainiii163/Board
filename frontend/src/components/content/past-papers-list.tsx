@@ -6,7 +6,7 @@ import { CheckCircle2, CircleDot, Filter, GraduationCap } from "lucide-react";
 
 import { PageHeading } from "@/components/layout/page-heading";
 import { pdfUrl } from "@/lib/api-client";
-import { NAV_BOARDS } from "@/lib/constants";
+import { NAV_BOARDS, sortSubjects } from "@/lib/constants";
 import { DownloadGate } from "@/components/content/download-gate";
 import { DriveLinkButton } from "@/components/content/drive-link-button";
 
@@ -118,9 +118,7 @@ export function PastPapersList({
   const years = useMemo(() => [...new Set(papers.map((p) => p.year))].sort().reverse(), [papers]);
   const subjects = useMemo(
     () =>
-      [...new Set(papers.map((p) => p.subjectTitle))]
-        .sort((a, b) => a.localeCompare(b))
-        .filter(Boolean),
+      sortSubjects([...new Set(papers.map((p) => p.subjectTitle))].map((title) => ({ title }))).map((s) => s.title),
     [papers],
   );
 
