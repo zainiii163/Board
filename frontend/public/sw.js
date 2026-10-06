@@ -1,6 +1,7 @@
-const STATIC_CACHE = "boardnotes-static-v1";
-const API_CACHE = "boardnotes-api-v1";
-const PAGE_CACHE = "boardnotes-pages-v1";
+const STATIC_CACHE = "boardnotes-static-v2";
+const API_CACHE = "boardnotes-api-v2";
+const PAGE_CACHE = "boardnotes-pages-v2";
+const CACHE_PREFIX = "boardnotes-";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -10,7 +11,20 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  // Drop every stale boardnotes-* cache so old page HTML (with any persistent
+  // banner/board state) can never be served from an outdated deploy.
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith(CACHE_PREFIX) && ![STATIC_CACHE, API_CACHE, PAGE_CACHE].includes(key))
+            .map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
+  );
 });
 
 self.addEventListener("message", (event) => {
