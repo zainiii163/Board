@@ -246,7 +246,7 @@ function NavDropdown({
     const anchorBottom = headerEl ? Math.max(headerEl.getBoundingClientRect().bottom, r.bottom) : r.bottom;
     setPlacement({
       slug: item.id,
-      top: Math.min(anchorBottom + 8, window.innerHeight - 80),
+      top: Math.min(anchorBottom + 2, window.innerHeight - 80),
       left: Math.max(16, Math.min(r.left, window.innerWidth - panelWidth - 16)),
     });
   }, [item.id]);
@@ -436,7 +436,7 @@ export function Header() {
     if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
   }, []);
 
-  const scheduleClose = useCallback((ms = 200) => {
+  const scheduleClose = useCallback((ms = 500) => {
     clearClose();
     closeTimer.current = setTimeout(() => setOpenMenuId(null), ms);
   }, [clearClose]);
