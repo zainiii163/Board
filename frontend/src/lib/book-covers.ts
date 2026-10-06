@@ -150,6 +150,14 @@ for (const [board, classes] of Object.entries(BOOK_COVERS)) {
 const COVER_BOARD_ALIASES: Record<string, string> = {
   lahore: "punjab",
   "d-g-khan": "punjab",
+  // Boards with no artwork of their own fall back to the FBISE/NBF covers so
+  // cards still render a real textbook image instead of a flat placeholder.
+  kpk: "fbise",
+  sindh: "fbise",
+  cambridge: "fbise",
+  "o-level": "oxford",
+  "a-level": "oxford",
+  apsacs: "fbise",
 };
 
 /** Canonical lookup key for a subject title (lowercase, alias-resolved). */
@@ -197,9 +205,20 @@ function generatePlaceholder(subjectTitle: string, classNum: number): string {
  */
 export function getBookCover(boardSlug: string, classNum: number, subjectTitle: string): string {
   const alias = COVER_BOARD_ALIASES[boardSlug];
-  const path =
+  let path =
     BOOK_COVERS_INDEX[boardSlug]?.[classNum]?.[coverKey(subjectTitle)] ??
     (alias ? BOOK_COVERS_INDEX[alias]?.[classNum]?.[coverKey(subjectTitle)] : undefined);
+
+  // Last resort before the placeholder: the same class/subject artwork from any
+  // board that does have it — a real textbook cover beats a flat letter tile.
+  if (!path) {
+    const needle = coverKey(subjectTitle);
+    for (const classes of Object.values(BOOK_COVERS_INDEX)) {
+      path = classes[classNum]?.[needle];
+      if (path) break;
+    }
+  }
+
   if (path) return `${getApiBaseUrl()}${path}`;
   return generatePlaceholder(subjectTitle, classNum);
 }
