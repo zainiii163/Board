@@ -452,18 +452,21 @@ export function Header() {
    * A menu now opens instantly only when nothing else is open, otherwise the
    * switch waits for the pointer to dwell (and is cancelled if it leaves).
    */
+  const openMenuIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    openMenuIdRef.current = openMenuId;
+  }, [openMenuId]);
+
   const hoverOpen = useCallback((id: string) => {
     clearClose();
     clearPendingOpen();
-    setOpenMenuId((current) => {
-      if (current === id) return current;
-      if (current !== null) {
-        openTimer.current = setTimeout(() => setOpenMenuId(id), 160);
-      } else {
-        setOpenMenuId(id);
-      }
-      return current;
-    });
+    const current = openMenuIdRef.current;
+    if (current === id) return;
+    if (current !== null) {
+      openTimer.current = setTimeout(() => setOpenMenuId(id), 160);
+    } else {
+      setOpenMenuId(id);
+    }
   }, [clearClose, clearPendingOpen]);
 
   const closeMenu = useCallback(() => {
