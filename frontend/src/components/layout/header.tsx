@@ -16,14 +16,12 @@ import {
   Menu,
   Search,
   Sparkles,
-  Upload,
   User,
   X,
 } from "lucide-react";
 
 import { useLocale } from "@/lib/locale-context";
 import { useAuth } from "@/lib/auth-context";
-import { ThemeToggle } from "@/lib/theme-context";
 import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardLabel, classLabel } from "@/lib/constants";
 import { POPOVER_SPRING } from "@/components/motion/hover-card";
 
@@ -522,26 +520,6 @@ export function Header() {
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
-              {/* Search */}
-              <Link
-                href="/search"
-                aria-label={tr("search")}
-                className="pressable focus-ring hidden h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:bg-accent/10 hover:text-accent sm:inline-flex"
-              >
-                <Search className="h-4 w-4" aria-hidden="true" />
-              </Link>
-
-              <ThemeToggle />
-
-              {/* Upload CTA — label only when there is room */}
-              <Link
-                href="/upload"
-                className="pressable focus-ring inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-accent to-accent-2 px-3 py-2 text-sm font-bold text-white shadow-md shadow-accent/25 transition hover:shadow-lg hover:shadow-accent/40 sm:px-4"
-              >
-                <Upload className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span className="hidden xl:inline">{tr("uploadTitle")}</span>
-              </Link>
-
               {/* Auth */}
               {!loading && user ? (
                 <div className="hidden items-center gap-1.5 lg:flex">

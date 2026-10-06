@@ -10,6 +10,7 @@ import { PwaInstallPrompt } from "@/components/layout/pwa-install-prompt";
 import { OfflineBanner } from "@/components/layout/offline-banner";
 import { ServiceWorkerRegister } from "@/components/layout/service-worker-register";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
+import { FloatingActions } from "@/components/layout/floating-actions";
 
 export default function PublicLayout({
   children,
@@ -32,6 +33,7 @@ export default function PublicLayout({
       <Footer />
       <PwaInstallPrompt />
       <WhatsAppButton />
+      <FloatingActions />
       <MobileTabBar />
     </div>
   );
