@@ -16,6 +16,7 @@ import {
   Menu,
   Search,
   Sparkles,
+  Upload,
   User,
   X,
 } from "lucide-react";
@@ -520,6 +521,25 @@ export function Header() {
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
+              {/* Search */}
+              <Link
+                href="/search"
+                aria-label={tr("search")}
+                className="pressable focus-ring inline-flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-foreground/80 backdrop-blur-md transition hover:border-accent/50 hover:bg-accent/10 hover:text-accent"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </Link>
+
+              {/* Upload CTA — compact round icon button so it never eats nav room */}
+              <Link
+                href="/upload"
+                aria-label={tr("uploadTitle")}
+                title={tr("uploadTitle")}
+                className="pressable focus-ring inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-accent to-accent-2 text-white shadow-md shadow-accent/25 transition hover:shadow-lg hover:shadow-accent/40"
+              >
+                <Upload className="h-4 w-4 shrink-0" aria-hidden="true" />
+              </Link>
+
               {/* Auth */}
               {!loading && user ? (
                 <div className="hidden items-center gap-1.5 lg:flex">
