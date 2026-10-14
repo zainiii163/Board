@@ -7,7 +7,24 @@ This repository is split into separate workspaces for the frontend app, backend 
 - `frontend/` - Next.js 16 app
 - `backend/` - Express + TypeScript API
 - `shared/` - shared domain/types package
-- `docs/` - project requirements and product documents
+- `docs/` - project requirements and technical documentation
+
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [`docs/SRS.md`](./docs/SRS.md) | Client-facing Software Requirements Specification v3.1 |
+| [`docs/README.md`](./docs/README.md) | Documentation index |
+| [`docs/TECHNICAL-OVERVIEW.md`](./docs/TECHNICAL-OVERVIEW.md) | System architecture and technology stack |
+| [`docs/BACKEND.md`](./docs/BACKEND.md) | Express API deep dive |
+| [`docs/FRONTEND.md`](./docs/FRONTEND.md) | Next.js 16 app deep dive |
+| [`docs/API-REFERENCE.md`](./docs/API-REFERENCE.md) | Every HTTP endpoint |
+| [`docs/DATA-MODEL.md`](./docs/DATA-MODEL.md) | PostgreSQL schema, migrations, data layer |
+| [`docs/AUTH-AND-ROLES.md`](./docs/AUTH-AND-ROLES.md) | JWT auth and the permission matrix |
+| [`docs/ENVIRONMENT.md`](./docs/ENVIRONMENT.md) | Every environment variable |
+| [`docs/DEVELOPMENT.md`](./docs/DEVELOPMENT.md) | Setup, scripts, deployment runbook |
+| [`docs/TESTING.md`](./docs/TESTING.md) | Test suite and coverage gaps |
+| [`docs/ISSUES-AND-RISKS.md`](./docs/ISSUES-AND-RISKS.md) | Verified defects and remediation order |
 
 ## Local PostgreSQL setup
 
