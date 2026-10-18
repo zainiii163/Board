@@ -8,7 +8,10 @@ function apiBase() {
 }
 
 export function getApiBaseUrl() {
-  return apiBase();
+  // Asset URLs are proxied by Next rewrites. Keeping them relative on both the
+  // server and client prevents an SSR/client hydration mismatch and makes them
+  // work through development tunnels.
+  return "";
 }
 
 function getToken(): string | null {
@@ -97,7 +100,7 @@ export async function apiUploadFile<T>(path: string, file: File): Promise<T> {
   const token = getToken();
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${apiBase()}${path}`, {
     method: "POST",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
     body: form,
@@ -107,5 +110,5 @@ export async function apiUploadFile<T>(path: string, file: File): Promise<T> {
 
 export function pdfUrl(path: string) {
   if (path.startsWith("http")) return path;
-  return `${apiBase()}${path}`;
+  return `${getApiBaseUrl()}${path}`;
 }

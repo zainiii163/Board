@@ -21,7 +21,7 @@ export function Footer() {
 
   useEffect(() => {
     apiFetch<{ tree: NavCategory[] }>("/api/portal/nav")
-      .then((data) => setNavCats(data.tree))
+      .then((data) => setNavCats(Array.isArray(data.tree) ? data.tree : []))
       .catch(() => setNavCats([]));
     apiFetch<PortalStats>("/api/portal/stats")
       .then(setStats)
@@ -56,6 +56,7 @@ export function Footer() {
     { href: "/copyright", label: tr("copyright") },
     { href: WHATSAPP_CHAT_URL, label: tr("joinWhatsApp"), external: true },
   ];
+  const visibleCategories = Array.isArray(navCats) ? navCats.slice(0, 8) : [];
 
   return (
     <footer className="border-t border-border bg-[#0B0B18] text-slate-300 print:hidden">
@@ -110,7 +111,7 @@ export function Footer() {
         <div>
           <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-slate-200">Categories</h3>
           <ul className="space-y-2.5 text-sm">
-            {navCats.slice(0, 8).map((cat) => (
+            {visibleCategories.map((cat) => (
               <li key={cat.slug}>
                 <Link href={`/categories/${cat.slug}`} className="inline-block transition-all duration-300 hover:text-white hover:translate-x-1.5 text-slate-400">
                   {cat.icon} {cat.name}
