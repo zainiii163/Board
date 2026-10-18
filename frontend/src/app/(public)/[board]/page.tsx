@@ -16,6 +16,7 @@ type BoardData = {
   title: string;
   classes: BoardClass[];
 };
+type BookSummary = { classSlug: string; subjectSlug: string | null; subjectTitle: string | null };
 
 export async function generateMetadata({ params }: { params: Promise<{ board: string }> }): Promise<Metadata> {
   const { board } = await params;
@@ -40,7 +41,10 @@ export default async function BoardPage({ params }: { params: Promise<{ board: s
     subjects: sortSubjects((klass.subjects ?? []).map((s) => ({ slug: s.slug, title: s.title }))),
   }));
 
-  const pastPapers = await apiFetch<PastPaperItem[]>(`/api/past-papers?board=${board}`).catch(() => []);
+  const [pastPapers, books] = await Promise.all([
+    apiFetch<PastPaperItem[]>(`/api/past-papers?board=${board}`).catch(() => []),
+    apiFetchOrNull<BookSummary[]>(`/api/books?board=${board}`),
+  ]);
 
-  return <BoardPageContent board={board} title={data.title} classes={classes} pastPapers={pastPapers} />;
+  return <BoardPageContent board={board} title={data.title} classes={classes} pastPapers={pastPapers} books={books ?? []} />;
 }

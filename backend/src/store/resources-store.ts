@@ -1,4 +1,4 @@
-import { BOOKS, PAST_PAPERS } from "../demo-data.js";
+import { BOARD_DATA, PAST_PAPERS } from "../demo-data.js";
 
 export type BookRecord = {
   id: number;
@@ -85,11 +85,6 @@ function slugify(value: string) {
     .replace(/^-|-$/g, "");
 }
 
-function parseClassName(className: string) {
-  const match = className.match(/\d+/);
-  return match?.[0] ?? slugify(className);
-}
-
 let bookIdCounter = 1;
 let pastPaperIdCounter = 1;
 
@@ -97,28 +92,87 @@ const MEMORY_BOOK_PDFS = [
   "/demo-pdfs/textbook-math-9.pdf",
   "/demo-pdfs/textbook-physics-9.pdf",
   "/demo-pdfs/textbook-chemistry-9.pdf",
+  "/demo-pdfs/9th-biology-notes.pdf",
+  "/demo-pdfs/9th-english-notes.pdf",
+  "/demo-pdfs/9th-urdu-notes.pdf",
+  "/demo-pdfs/10th-biology-notes.pdf",
+  "/demo-pdfs/10th-chemistry-notes.pdf",
+  "/demo-pdfs/10th-english-notes.pdf",
+  "/demo-pdfs/10th-maths-notes.pdf",
+  "/demo-pdfs/10th-physics-notes.pdf",
+  "/demo-pdfs/11th-chemistry-notes.pdf",
+  "/demo-pdfs/11th-maths-notes.pdf",
+  "/demo-pdfs/11th-physics-notes.pdf",
+  "/demo-pdfs/12th-physics-notes.pdf",
 ];
 
-const books: BookRecord[] = BOOKS.map((book, index) => {
-  const board = boardMeta[book.board] ?? { slug: slugify(book.board), title: book.board };
-  const classSlug = parseClassName(book.className);
-  const isMath = book.title.toLowerCase().includes("math");
-  return {
-    id: bookIdCounter++,
-    boardSlug: board.slug,
-    boardTitle: board.title,
-    classSlug,
-    classTitle: book.className,
-    subjectSlug: isMath ? "mathematics" : null,
-    subjectTitle: isMath ? "Mathematics" : null,
-    title: book.title,
-    priceLabel: book.price,
-    coverUrl: null,
-    pdfUrl: MEMORY_BOOK_PDFS[index % MEMORY_BOOK_PDFS.length],
-    driveUrl: null,
-    notesPath: isMath ? `/${board.slug}/${classSlug}/mathematics` : null,
-  };
-});
+function demoPdfForSubject(subjectTitle: string, index: number): string {
+  const subject = subjectTitle.toLowerCase();
+  if (subject.includes("math")) return "/demo-pdfs/textbook-math-9.pdf";
+  if (subject.includes("physics")) return "/demo-pdfs/textbook-physics-9.pdf";
+  if (subject.includes("chemistry")) return "/demo-pdfs/textbook-chemistry-9.pdf";
+  if (subject.includes("biolog")) return "/demo-pdfs/9th-biology-notes.pdf";
+  if (subject.includes("english")) return "/demo-pdfs/9th-english-notes.pdf";
+  if (subject.includes("urdu")) return "/demo-pdfs/9th-urdu-notes.pdf";
+  return MEMORY_BOOK_PDFS[index % MEMORY_BOOK_PDFS.length];
+}
+
+const PRIMARY_SUBJECTS = [
+  ["mathematics", "Mathematics"],
+  ["english", "English"],
+  ["urdu", "Urdu"],
+  ["general-science", "General Science"],
+  ["pakistan-studies", "Pakistan Studies"],
+  ["islamiat", "Islamiat"],
+  ["computer-science", "Computer Science"],
+] as const;
+
+const SECONDARY_SUBJECTS = [
+  ["mathematics", "Mathematics"],
+  ["physics", "Physics"],
+  ["chemistry", "Chemistry"],
+  ["biology", "Biology"],
+  ["english", "English"],
+  ["urdu", "Urdu"],
+  ["computer-science", "Computer Science"],
+  ["pakistan-studies", "Pakistan Studies"],
+  ["islamiat", "Islamiat"],
+] as const;
+
+function catalogSubjects(classSlug: string, existing: { slug: string; title: string }[]) {
+  const defaults = Number(classSlug.replace(/^class-/, "")) <= 8 ? PRIMARY_SUBJECTS : SECONDARY_SUBJECTS;
+  const bySlug = new Map(existing.map((subject) => [subject.slug, subject]));
+  for (const [slug, title] of defaults) bySlug.set(slug, bySlug.get(slug) ?? { slug, title });
+  return [...bySlug.values()];
+}
+
+/**
+ * The application runs without PostgreSQL during local development. Build that
+ * fallback catalog directly from the board hierarchy so a book can never leak
+ * into another board/class/subject, and every subject card has a readable PDF.
+ */
+const books: BookRecord[] = Object.values(BOARD_DATA).flatMap((board) =>
+  board.classes.flatMap((klass) =>
+    catalogSubjects(klass.slug, klass.subjects).map((subject, index) => {
+      const catalogIndex = bookIdCounter - 1;
+      return {
+        id: bookIdCounter++,
+        boardSlug: board.slug,
+        boardTitle: board.title,
+        classSlug: klass.slug,
+        classTitle: klass.title,
+        subjectSlug: subject.slug,
+        subjectTitle: subject.title,
+        title: `${klass.title} ${subject.title} Textbook — ${board.title}`,
+        priceLabel: "Free PDF",
+        coverUrl: null,
+        pdfUrl: demoPdfForSubject(subject.title, catalogIndex + index),
+        driveUrl: null,
+        notesPath: `/${board.slug}/${klass.slug}/${subject.slug}`,
+      };
+    }),
+  ),
+);
 
 const pastPapers: PastPaperRecord[] = PAST_PAPERS.map((paper) => {
   const board = boardMeta[paper.board] ?? { slug: slugify(paper.board), title: paper.board };

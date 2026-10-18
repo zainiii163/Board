@@ -1,7 +1,14 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const SERVER_API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
+// A browser opened through a dev tunnel cannot reach the developer machine's
+// `localhost:4000`. Browser requests therefore use same-origin Next rewrites,
+// while server components still call the backend directly.
+function apiBase() {
+  return typeof window === "undefined" ? SERVER_API_BASE : "/backend-api/api";
+}
 
 export function getApiBaseUrl() {
-  return BASE;
+  return apiBase();
 }
 
 function getToken(): string | null {
@@ -29,7 +36,7 @@ async function parseResponse<T>(res: Response, path: string): Promise<T> {
 }
 
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${apiBase()}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -50,7 +57,7 @@ export async function apiFetchOrNull<T>(path: string): Promise<T | null> {
 
 export async function apiAuthFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const token = getToken();
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${apiBase()}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
@@ -100,5 +107,5 @@ export async function apiUploadFile<T>(path: string, file: File): Promise<T> {
 
 export function pdfUrl(path: string) {
   if (path.startsWith("http")) return path;
-  return `${BASE}${path}`;
+  return `${apiBase()}${path}`;
 }

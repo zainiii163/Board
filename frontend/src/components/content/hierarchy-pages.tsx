@@ -46,9 +46,10 @@ type BoardPageContentProps = {
   title: string;
   classes: BoardClass[];
   pastPapers?: PastPaperItem[];
+  books?: { classSlug: string; subjectSlug: string | null; subjectTitle: string | null }[];
 };
 
-export function BoardPageContent({ board, title, classes, pastPapers = [] }: BoardPageContentProps) {
+export function BoardPageContent({ board, title, classes, pastPapers = [], books = [] }: BoardPageContentProps) {
   const { tr } = useLocale();
   const displayTitle = boardDisplayTitle(title, board);
   const [view, setView] = useState<"notes" | "books">("notes");
@@ -119,11 +120,16 @@ export function BoardPageContent({ board, title, classes, pastPapers = [] }: Boa
             const num = parseClassNumber(klass.slug);
             const short = boardShortName(board, num);
             const subjects = sortSubjects(klass.subjects ?? []);
+            const catalogSubjects = books
+              .filter((book): book is { classSlug: string; subjectSlug: string; subjectTitle: string } => (
+                book.classSlug === klass.slug && Boolean(book.subjectSlug && book.subjectTitle)
+              ))
+              .map((book) => ({ slug: book.subjectSlug, title: book.subjectTitle }));
             // In primary/middle grades science is taught as General Science, so the
             // separate Physics/Chemistry/Biology cards are only hidden when that
             // combined subject actually exists for the class.
             const hasGeneralScience = subjects.some((s) => /general science/i.test(s.title));
-            const displaySubjects = subjects.filter((subject) => {
+            const displaySubjects = (view === "books" ? catalogSubjects : subjects).filter((subject) => {
               if (num >= 5 && num <= 8 && hasGeneralScience) {
                 const title = subject.title.toLowerCase();
                 if (title.includes("physics") || title.includes("chemistry") || title.includes("biology")) {
@@ -261,6 +267,7 @@ type ClassPageContentProps = {
   subjects: { slug: string; title: string }[];
   initialView?: "notes" | "books" | "past-papers";
   pastPapers?: PastPaperItem[];
+  books?: { subjectSlug: string | null; subjectTitle: string | null; pdfUrl: string | null }[];
 };
 
 export function ClassPageContent({
@@ -271,6 +278,7 @@ export function ClassPageContent({
   subjects,
   initialView = "notes",
   pastPapers = [],
+  books = [],
 }: ClassPageContentProps) {
   const { tr } = useLocale();
   const [view, setView] = useState<"notes" | "books">(initialView === "books" ? "books" : "notes");
@@ -306,6 +314,9 @@ export function ClassPageContent({
     }
     return true;
   });
+  const bookSubjects = books
+    .filter((book): book is { subjectSlug: string; subjectTitle: string; pdfUrl: string | null } => Boolean(book.subjectSlug && book.subjectTitle))
+    .map((book) => ({ slug: book.subjectSlug, title: book.subjectTitle }));
 
   // `?view=past-papers` is a deep link: land on the dedicated past papers section
   // instead of dropping the visitor at the top of the subject list.
@@ -444,10 +455,10 @@ export function ClassPageContent({
         <>
           <p className="mt-4 text-sm text-muted">Official {short} textbooks — read online or download PDF.</p>
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {filteredSubjects.length === 0 ? (
+            {bookSubjects.length === 0 ? (
               <p className="text-sm text-muted col-span-full">No books listed yet.</p>
             ) : (
-              filteredSubjects.map((subject) => {
+              bookSubjects.map((subject) => {
                 const cover = getBookCover(board, classNum, subject.title);
                 const label = `${classLabelFromSlug(classSlug)} ${subject.title}`;
                 return (

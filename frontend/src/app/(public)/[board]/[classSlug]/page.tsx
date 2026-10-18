@@ -13,6 +13,8 @@ type ClassData = {
   class: { slug: string; title: string; subjects: { slug: string; title: string }[] } | null;
 };
 
+type BookSummary = { subjectSlug: string | null; subjectTitle: string | null; pdfUrl: string | null };
+
 export async function generateMetadata({ params }: { params: Promise<{ board: string; classSlug: string }> }): Promise<Metadata> {
   const { board, classSlug } = await params;
   const data = await apiFetchOrNull<ClassData>(`/api/boards/${board}/classes/${classSlug}`);
@@ -39,9 +41,10 @@ export default async function ClassPage({
   const klass = data?.class;
   if (!data || !klass) notFound();
 
-  const pastPapers = await apiFetch<PastPaperItem[]>(
-    `/api/past-papers?board=${board}&class=${classSlug}`,
-  ).catch(() => []);
+  const [pastPapers, books] = await Promise.all([
+    apiFetch<PastPaperItem[]>(`/api/past-papers?board=${board}&class=${classSlug}`).catch(() => []),
+    apiFetchOrNull<BookSummary[]>(`/api/books?board=${board}&class=${classSlug}`),
+  ]);
 
   return (
     <ClassPageContent
@@ -52,6 +55,7 @@ export default async function ClassPage({
       subjects={sortSubjects(klass.subjects)}
       initialView={view === "books" ? "books" : view === "past-papers" ? "past-papers" : "notes"}
       pastPapers={pastPapers}
+      books={books ?? []}
     />
   );
 }

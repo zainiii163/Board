@@ -201,3 +201,33 @@ test("GET /api/classes/9 and /api/subjects/mathematics serve the SRS learning hi
         });
     });
 });
+
+test("book catalog stays scoped to its board, class, and subject and exposes PDFs", async () => {
+    const app = createApp();
+    const server = app.listen(0);
+    await new Promise<void>((resolve) => server.once("listening", resolve));
+
+    const address = server.address();
+    assert.ok(address && typeof address !== "string");
+    const baseUrl = `http://127.0.0.1:${address.port}`;
+
+    const classFiveBooks = await fetch(`${baseUrl}/api/books?board=fbise&class=5`);
+    const classFivePayload = await classFiveBooks.json();
+    assert.equal(classFiveBooks.status, 200);
+    assert.ok(classFivePayload.length > 0);
+    assert.ok(classFivePayload.every((book: { boardSlug: string; classSlug: string; pdfUrl: string | null }) => (
+        book.boardSlug === "fbise" && book.classSlug === "5" && Boolean(book.pdfUrl)
+    )));
+
+    const mathBooks = await fetch(`${baseUrl}/api/books?board=fbise&class=9&subject=mathematics`);
+    const mathPayload = await mathBooks.json();
+    assert.equal(mathBooks.status, 200);
+    assert.equal(mathPayload.length, 1);
+    assert.equal(mathPayload[0].subjectSlug, "mathematics");
+    assert.equal(mathPayload[0].classSlug, "9");
+    assert.ok(mathPayload[0].pdfUrl);
+
+    await new Promise<void>((resolve, reject) => {
+        server.close((error) => error ? reject(error) : resolve());
+    });
+});

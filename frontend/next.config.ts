@@ -5,9 +5,10 @@ import type { NextConfig } from "next";
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['127.0.0.1'],
+  allowedDevOrigins: ["127.0.0.1", "*.asse.devtunnels.ms"],
   async rewrites() {
     return [
+      { source: "/backend-api/:path*", destination: `${API}/:path*` },
       { source: "/book-covers/:path*", destination: `${API}/book-covers/:path*` },
       { source: "/uploads/:path*", destination: `${API}/uploads/:path*` },
       { source: "/demo-pdfs/:path*", destination: `${API}/demo-pdfs/:path*` },
