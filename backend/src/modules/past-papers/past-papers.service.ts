@@ -11,7 +11,7 @@ import {
 } from "../../store/resources-store.js";
 import { ApiError } from "../../utils/api-error.js";
 
-const PAPER_TYPES: PastPaperType[] = ["model", "first-annual", "second-annual", "pba"];
+const PAPER_TYPES: PastPaperType[] = ["model", "paper-pattern", "first-annual", "second-annual", "pba"];
 
 function normalizePaperType(value: unknown): PastPaperType {
   return PAPER_TYPES.includes(value as PastPaperType) ? (value as PastPaperType) : "first-annual";

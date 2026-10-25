@@ -23,7 +23,14 @@ import {
 
 import { useLocale } from "@/lib/locale-context";
 import { useAuth } from "@/lib/auth-context";
-import { NAV_BOARDS, NAV_CLASSES, APSACS_CLASSES, boardLabel, classLabel } from "@/lib/constants";
+import {
+  BOOKS_NOTES_NAV_BOARDS,
+  NAV_BOARDS,
+  NAV_CLASSES,
+  boardLabel,
+  classLabel,
+  isBooksNotesBoard,
+} from "@/lib/constants";
 import { POPOVER_SPRING } from "@/components/motion/hover-card";
 
 type DropdownItem = { label: string; href: string };
@@ -41,26 +48,19 @@ type DropdownDef = {
   soon?: boolean;
 };
 
+/** Books & Notes entry points — Federal + Punjab only (client 123.pdf). */
 const BOARDS_ITEM: DropdownDef = {
   id: "boards",
   label: "Boards",
   icon: GraduationCap,
   groups: [
-    { heading: "Pakistani Boards", items: [
-      { label: "Federal Board", href: "/fbise" },
-      { label: "Punjab Board", href: "/punjab" },
-      { label: "Lahore Board", href: "/lahore" },
-      { label: "D.G. Khan Board", href: "/d-g-khan" },
-      { label: "KPK Board", href: "/kpk" },
-      { label: "Sindh Board", href: "/sindh" },
-      { label: "APSACS", href: "/apsacs" },
-    ]},
-    { heading: "International", items: [
-      { label: "Oxford Board", href: "/oxford" },
-      { label: "Cambridge Board", href: "/cambridge" },
-      { label: "O Level", href: "/o-level" },
-      { label: "A Level", href: "/a-level" },
-    ]},
+    {
+      heading: "Books & Notes",
+      items: BOOKS_NOTES_NAV_BOARDS.map((board) => ({
+        label: board.label,
+        href: `/${board.slug}`,
+      })),
+    },
   ],
 };
 
@@ -144,37 +144,22 @@ const BOOKS_AND_NOTES_ID = "books-and-notes";
 function buildBooksAndNotesNav(activeBoard: string | null): DropdownDef {
   const base = { id: BOOKS_AND_NOTES_ID, label: "Books & Notes", icon: Layers };
 
-  // Neutral pages list every board so the menu is never empty or board-specific.
-  if (!activeBoard) {
+  // Neutral / non-allowlist boards: Federal + Punjab only (Past Papers keep other boards).
+  if (!activeBoard || !isBooksNotesBoard(activeBoard)) {
     return {
       ...base,
       groups: [
-        { heading: "Notes — Chapter-wise", items: NAV_BOARDS.map((b) => ({ label: b.label, href: `/${b.slug}` })) },
-        { heading: "Books — Official Textbooks", items: NAV_BOARDS.map((b) => ({ label: b.label, href: `/${b.slug}?view=books` })) },
-      ],
-    };
-  }
-
-  if (activeBoard === "apsacs") {
-    return {
-      ...base,
-      groups: [
-        { heading: "APSACS — Notes", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: classHref("apsacs", n) })) },
-        { heading: "APSACS — Books", items: APSACS_CLASSES.map((n) => ({ label: `Class ${n}`, href: `${classHref("apsacs", n)}?view=books` })) },
-        { items: [{ label: "All APSACS", href: "/apsacs" }] },
-      ],
-    };
-  }
-
-  if (activeBoard === "o-level" || activeBoard === "a-level") {
-    const years = activeBoard === "o-level"
-      ? [{ label: "Year 10", href: "/o-level#year-10" }, { label: "Year 11", href: "/o-level#year-11" }]
-      : [{ label: "Year 12 · AS", href: "/a-level#year-12" }, { label: "Year 13 · A Level", href: "/a-level#year-13" }];
-    return {
-      ...base,
-      groups: [
-        { heading: "Years", items: years },
-        { items: [{ label: `All ${boardLabel(activeBoard)}`, href: `/${activeBoard}` }] },
+        {
+          heading: "Notes — Chapter-wise",
+          items: BOOKS_NOTES_NAV_BOARDS.map((b) => ({ label: b.label, href: `/${b.slug}` })),
+        },
+        {
+          heading: "Books — Official Textbooks",
+          items: BOOKS_NOTES_NAV_BOARDS.map((b) => ({
+            label: b.label,
+            href: `/${b.slug}?view=books`,
+          })),
+        },
       ],
     };
   }

@@ -8,6 +8,7 @@ import { seedRegionalBoardContent } from "./seed-board-backfill.js";
 import { seedLogarithmsEnrichment } from "./seed-logarithms-enrichment.js";
 import { seedBookCovers } from "./seed-book-covers.js";
 import { seedSubjectsAndMCQs } from "./seed-subjects-mcqs.js";
+import { seedFbisePastPaperSources } from "./seed-fbise-past-paper-sources.js";
 import { seedPunjabVariantBoards, seedPunjabVariantPastPapers } from "./seed-punjab-variants.js";
 
 async function ensurePastPaperColumns() {
@@ -35,34 +36,41 @@ async function ensurePastPaperColumns() {
   await db.execute(sql`ALTER TABLE "chapters" ADD COLUMN IF NOT EXISTS "drive_url" text`);
 }
 
+async function runOptional(label: string, fn: () => Promise<void>) {
+  try {
+    await fn();
+  } catch (err) {
+    console.warn(`[db] Optional seed "${label}" skipped:`, err instanceof Error ? err.message : err);
+  }
+}
+
 export async function seedIfEmpty() {
   await ensurePastPaperColumns();
   const existing = await db.select({ id: schema.boards.id }).from(schema.boards).limit(1);
   if (existing.length > 0) {
     console.log("[db] Content already seeded — using PostgreSQL as source of truth.");
-    await seedPlatformContent();
-    await seedDemoClassroom();
-    await seedDemoChapterVideo();
-    await seedRegionalBoardContent();
-    // Idempotent, so these run on every boot: they register the Punjab variant
-    // boards on a database that was seeded before they existed. Must come before
-    // seedSubjectsAndMCQs, which fills in subjects/chapters for whatever boards
-    // are present.
-    await seedPunjabVariantBoards();
-    await seedPunjabVariantPastPapers();
-    await seedLogarithmsEnrichment();
-    await seedBookCovers();
-    await seedSubjectsAndMCQs();
+    await runOptional("platform", seedPlatformContent);
+    await runOptional("classroom", seedDemoClassroom);
+    await runOptional("chapter-video", seedDemoChapterVideo);
+    await runOptional("regional-boards", seedRegionalBoardContent);
+    // Idempotent: Punjab variants before subject sync; FBISE sources last.
+    await runOptional("punjab-variant-boards", seedPunjabVariantBoards);
+    await runOptional("punjab-variant-papers", seedPunjabVariantPastPapers);
+    await runOptional("logarithms", seedLogarithmsEnrichment);
+    await runOptional("book-covers", seedBookCovers);
+    await runOptional("subjects-mcqs", seedSubjectsAndMCQs);
+    await runOptional("fbise-past-paper-sources", seedFbisePastPaperSources);
     return;
   }
   console.log("[db] Empty database — seeding board content from demo catalog…");
   await seedBoardContent();
-  await seedPlatformContent();
-  await seedDemoClassroom();
-  await seedDemoChapterVideo();
-  await seedPunjabVariantBoards();
-  await seedPunjabVariantPastPapers();
-  await seedBookCovers();
-  await seedSubjectsAndMCQs();
+  await runOptional("platform", seedPlatformContent);
+  await runOptional("classroom", seedDemoClassroom);
+  await runOptional("chapter-video", seedDemoChapterVideo);
+  await runOptional("punjab-variant-boards", seedPunjabVariantBoards);
+  await runOptional("punjab-variant-papers", seedPunjabVariantPastPapers);
+  await runOptional("book-covers", seedBookCovers);
+  await runOptional("subjects-mcqs", seedSubjectsAndMCQs);
+  await runOptional("fbise-past-paper-sources", seedFbisePastPaperSources);
   console.log("[db] Seed complete. Admin CMS changes will persist to PostgreSQL.");
 }

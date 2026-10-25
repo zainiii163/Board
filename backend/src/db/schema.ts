@@ -209,7 +209,7 @@ export const pastPapers = pgTable("past_papers", {
   year: text("year").notNull(),
   sessionType: text("session_type").$type<"annual" | "supply">().notNull().default("annual"),
   paperType: text("paper_type")
-    .$type<"model" | "first-annual" | "second-annual" | "pba">()
+    .$type<"model" | "paper-pattern" | "first-annual" | "second-annual" | "pba">()
     .notNull()
     .default("first-annual"),
   isSolved: boolean("is_solved").notNull().default(false),

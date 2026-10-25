@@ -4,7 +4,9 @@ const SERVER_API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:400
 // `localhost:4000`. Browser requests therefore use same-origin Next rewrites,
 // while server components still call the backend directly.
 function apiBase() {
-  return typeof window === "undefined" ? SERVER_API_BASE : "/backend-api/api";
+  // Browser calls go through Next rewrites: /backend-api/* → API root.
+  // Paths already include `/api/...`, so the prefix must not add another `/api`.
+  return typeof window === "undefined" ? SERVER_API_BASE : "/backend-api";
 }
 
 export function getApiBaseUrl() {

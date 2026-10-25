@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { useLocale } from "@/lib/locale-context";
-import { ACADEMIC_YEAR, NAV_BOARDS } from "@/lib/constants";
+import { ACADEMIC_YEAR, BOOKS_NOTES_NAV_BOARDS } from "@/lib/constants";
 import { POPOVER_SPRING } from "@/components/motion/hover-card";
 
 type Kind = "board" | "class" | "chapter" | "paper" | "resource";
@@ -40,11 +40,10 @@ type SearchResponse = {
   resources?: { slug: string; title: string; subject: string; board: string | null }[];
 };
 
-const EXTRA_BOARD_SLUGS = ["apsacs", "kpk", "sindh", "o-level", "a-level"];
-
-const BOARD_INDEX = [...new Set([...NAV_BOARDS.map((b) => b.slug), ...EXTRA_BOARD_SLUGS])].map((slug) => ({
-  slug,
-  title: NAV_BOARDS.find((b) => b.slug === slug)?.label ?? slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+/** Hero search board suggestions follow Books & Notes allowlist (Federal + Punjab). */
+const BOARD_INDEX = BOOKS_NOTES_NAV_BOARDS.map((board) => ({
+  slug: board.slug,
+  title: board.label,
 }));
 
 const QUICK_FILTERS = [
@@ -79,12 +78,12 @@ function localSuggestions(query: string): Suggestion[] {
   if (digits) {
     const num = parseInt(digits[0], 10);
     if (num >= 1 && num <= 12) {
-      for (const board of BOARD_INDEX.slice(0, 6)) {
+      for (const board of BOARD_INDEX) {
         out.push({
           key: `class-${board.slug}-${num}`,
           label: `Class ${num}`,
           meta: board.title,
-          href: board.slug === "apsacs" ? `/apsacs/class-${num}` : `/${board.slug}/${num}`,
+          href: `/${board.slug}/${num}`,
           kind: "class",
         });
       }

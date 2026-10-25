@@ -13,8 +13,11 @@ export type HomeBoardSection = {
   slug: string;
   title: string;
   classNumbers: number[];
-  featuredClassSlug: string;
-  subjects: { slug: string; title: string }[];
+  classes: {
+    slug: string;
+    title: string;
+    subjects: { slug: string; title: string }[];
+  }[];
 };
 
 type Props = {
@@ -28,7 +31,6 @@ export function BoardCoverSections({ sections }: Props) {
   return (
     <section className="mx-auto max-w-6xl space-y-10 px-4 pt-14 sm:px-6 lg:px-8" aria-label="Boards">
       {sections.map((board) => {
-        const classNum = parseInt(board.featuredClassSlug, 10) || 0;
         return (
           <Reveal key={board.slug}>
             <div className="py-2">
@@ -47,38 +49,56 @@ export function BoardCoverSections({ sections }: Props) {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
-                {board.subjects.map((subject, i) => {
-                  const cover = getBookCover(board.slug, classNum, subject.title);
-                  const label = `${board.featuredClassSlug} ${subject.title}`;
+              <div className="space-y-8">
+                {board.classes.map((klass) => {
+                  const classNum = parseInt(klass.slug, 10) || 0;
                   return (
-                    <motion.div
-                      key={subject.slug}
-                      initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: "-40px" }}
-                      transition={{ duration: 0.45, delay: Math.min(i, 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <Link
-                        href={`/${board.slug}/${board.featuredClassSlug}/${subject.slug}`}
-                        className="group relative block overflow-hidden rounded-xl border border-border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lift"
-                      >
-                        {cover ? (
-                          <Image
-                            src={cover}
-                            alt={`${label} book cover`}
-                            width={200}
-                            height={300}
-                            className="aspect-[2/3] w-full object-cover transition-all duration-500 group-hover:scale-[1.04] group-hover:grayscale-[55%]"
-                          />
-                        ) : (
-                          <CoverArt title={label} className="aspect-[2/3] w-full transition-transform duration-500 group-hover:scale-[1.04]" />
-                        )}
-                        <p className="absolute inset-x-0 bottom-0 bg-gradient-to-r from-accent to-accent-2 p-1 text-center text-xs font-bold text-white">
-                          {label}
-                        </p>
-                      </Link>
-                    </motion.div>
+                    <section key={klass.slug} aria-label={klass.title} className="border-t border-border pt-5">
+                      <h3 className="mb-4 text-lg font-bold text-foreground">
+                        <Link href={`/${board.slug}/${klass.slug}`} className="transition-colors hover:text-accent">
+                          {klass.title}
+                        </Link>
+                      </h3>
+                      {klass.subjects.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                          {klass.subjects.map((subject, i) => {
+                            const cover = getBookCover(board.slug, classNum, subject.title);
+                            const label = `${klass.title} ${subject.title}`;
+                            return (
+                              <motion.div
+                                key={subject.slug}
+                                initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-40px" }}
+                                transition={{ duration: 0.45, delay: Math.min(i, 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
+                              >
+                                <Link
+                                  href={`/${board.slug}/${klass.slug}/${subject.slug}`}
+                                  className="group relative block overflow-hidden rounded-xl border border-border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lift"
+                                >
+                                  {cover ? (
+                                    <Image
+                                      src={cover}
+                                      alt={`${label} book cover`}
+                                      width={200}
+                                      height={300}
+                                      className="aspect-[2/3] w-full object-cover transition-all duration-500 group-hover:scale-[1.04] group-hover:grayscale-[55%]"
+                                    />
+                                  ) : (
+                                    <CoverArt title={label} className="aspect-[2/3] w-full transition-transform duration-500 group-hover:scale-[1.04]" />
+                                  )}
+                                  <p className="absolute inset-x-0 bottom-0 bg-gradient-to-r from-accent to-accent-2 p-1 text-center text-xs font-bold text-white">
+                                    {label}
+                                  </p>
+                                </Link>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted">Subjects coming soon.</p>
+                      )}
+                    </section>
                   );
                 })}
               </div>

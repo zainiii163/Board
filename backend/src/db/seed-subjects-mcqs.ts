@@ -1,178 +1,55 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 
 import { db } from "./index.js";
 import * as schema from "./schema.js";
+import { publishedCurriculumSubjects } from "./seed-book-covers.js";
 
-const SUBJECTS: { slug: string; title: string }[] = [
-  { slug: "physics", title: "Physics" },
-  { slug: "chemistry", title: "Chemistry" },
-  { slug: "biology", title: "Biology" },
-  { slug: "english", title: "English" },
-  { slug: "urdu", title: "Urdu" },
-  { slug: "computer-science", title: "Computer Science" },
-  { slug: "islamiat", title: "Islamiyat" },
-  { slug: "pakistan-studies", title: "Pakistan Studies" },
-  { slug: "general-science", title: "General Science" },
-];
+async function renameLegacyClassFiveSocialStudies(classId: number, boardSlug: string, classSlug: string) {
+  if (boardSlug !== "fbise" || classSlug !== "5") return;
 
-type MCQ = {
-  chapterKey: string;
-  question: string;
-  options: { label: string; text: string }[];
-  correctLabel: string;
-  reason: string;
-};
+  const legacy = await db.query.subjects.findFirst({
+    where: and(eq(schema.subjects.classId, classId), eq(schema.subjects.slug, "pakistan-studies")),
+  });
+  const replacement = await db.query.subjects.findFirst({
+    where: and(eq(schema.subjects.classId, classId), eq(schema.subjects.slug, "social-studies")),
+  });
 
-function generateMathMCQs(board: string, classNum: number, chapter: string): MCQ[] {
-  const prefix = `${board}/${classNum}/mathematics/${chapter}`;
-  return [
-    {
-      chapterKey: prefix,
-      question: `What is the result of simplifying the expression in this chapter?`,
-      options: [
-        { label: "A", text: "Option A is correct" },
-        { label: "B", text: "Option B is incorrect" },
-        { label: "C", text: "Option C is incorrect" },
-        { label: "D", text: "Option D is incorrect" },
-      ],
-      correctLabel: "A",
-      reason: "This is the correct answer based on the mathematical concepts in this chapter.",
-    },
-    {
-      chapterKey: prefix,
-      question: `Which property applies to the concept studied in this chapter?`,
-      options: [
-        { label: "A", text: "Property A" },
-        { label: "B", text: "Property B" },
-        { label: "C", text: "Property C" },
-        { label: "D", text: "Property D" },
-      ],
-      correctLabel: "B",
-      reason: "Property B is the fundamental property that applies here.",
-    },
-    {
-      chapterKey: prefix,
-      question: `Solve the problem using the method from this chapter.`,
-      options: [
-        { label: "A", text: "Solution 1" },
-        { label: "B", text: "Solution 2" },
-        { label: "C", text: "Solution 3" },
-        { label: "D", text: "Solution 4" },
-      ],
-      correctLabel: "A",
-      reason: "Using the standard method from this chapter, Solution 1 is correct.",
-    },
-  ];
+  // The old record came from the placeholder seed and has no chapter content
+  // after cleanup. Preserve a real editor-created record if both exist.
+  if (legacy && !replacement) {
+    const chapters = await db.query.chapters.findMany({ where: eq(schema.chapters.subjectId, legacy.id) });
+    if (chapters.length === 0) {
+      await db
+        .update(schema.subjects)
+        .set({ slug: "social-studies", title: "Social Studies" })
+        .where(eq(schema.subjects.id, legacy.id));
+    }
+  }
 }
 
-function generateScienceMCQs(board: string, classNum: number, subject: string, chapter: string): MCQ[] {
-  const prefix = `${board}/${classNum}/${subject}/${chapter}`;
-  return [
-    {
-      chapterKey: prefix,
-      question: `Which concept is fundamental to the topic of ${chapter.replace(/-/g, " ")}?`,
-      options: [
-        { label: "A", text: "Concept A" },
-        { label: "B", text: "Concept B" },
-        { label: "C", text: "Concept C" },
-        { label: "D", text: "Concept D" },
-      ],
-      correctLabel: "A",
-      reason: "Concept A is the most fundamental concept in this topic.",
-    },
-    {
-      chapterKey: prefix,
-      question: `What is the correct definition related to ${chapter.replace(/-/g, " ")}?`,
-      options: [
-        { label: "A", text: "Definition A" },
-        { label: "B", text: "Definition B" },
-        { label: "C", text: "Definition C" },
-        { label: "D", text: "Definition D" },
-      ],
-      correctLabel: "C",
-      reason: "Definition C accurately describes the concept.",
-    },
-    {
-      chapterKey: prefix,
-      question: `Which statement about ${chapter.replace(/-/g, " ")} is true?`,
-      options: [
-        { label: "A", text: "Statement A" },
-        { label: "B", text: "Statement B" },
-        { label: "C", text: "Statement C" },
-        { label: "D", text: "Statement D" },
-      ],
-      correctLabel: "B",
-      reason: "Statement B is the only true statement among the options.",
-    },
-  ];
-}
+async function removePlaceholderSubject(subjectId: number, boardSlug: string, classSlug: string, subjectSlug: string) {
+  const chapters = await db.query.chapters.findMany({
+    where: eq(schema.chapters.subjectId, subjectId),
+    with: { exercises: true },
+  });
 
-const CHAPTER_MAP: Record<string, string[]> = {
-  "physics": [
-    "forces-and-motion", "energy-and-power", "properties-of-matter",
-    "heat-and-temperature", "waves-and-sound", "light-and-optics",
-    "electricity-and-magnetism", "atomic-and-nuclear-physics",
-  ],
-  "chemistry": [
-    "fundamentals-of-chemistry", "atomic-structure", "chemical-bonding",
-    "states-of-matter", "chemical-reactions", "acids-and-bases",
-    "organic-chemistry", "environmental-chemistry",
-  ],
-  "biology": [
-    "introduction-to-biology", "cells-and-tissues", "nutrition",
-    "circulation", "respiration", "excretion",
-    "coordination-and-control", "reproduction", "inheritance",
-  ],
-  "english": [
-    "parts-of-speech", "tenses", "active-and-passive-voice",
-    "direct-and-indirect-speech", "comprehension", "writing-skills",
-    "literature", "grammar-and-usage",
-  ],
-  "urdu": [
-    "nasr", "nazm", "ghazal", "tareekh-e-adab", "qawaid",
-    "comprehension", "writing", "interview-and-report",
-  ],
-  "computer-science": [
-    "introduction-to-computers", "hardware-and-software", "number-systems",
-    "programming-fundamentals", "data-representation", "networking",
-    "database-concepts", "web-development",
-  ],
-  "islamiat": [
-    "quran-and-hadith", "imaniat", "ibadat",
-    "muamalat", "akhlaq-and-adab", "history-of-islam",
-  ],
-  "pakistan-studies": [
-    "ideology-of-pakistan", "history-of-pakistan", "government-of-pakistan",
-    "geography-of-pakistan", "culture-and-society", "economic-development",
-  ],
-  "general-science": [
-    "introduction-to-science", "living-things", "matter-and-its-properties",
-    "force-and-energy", "earth-and-universe", "technology-and-society",
-  ],
-};
+  // Preserve any editor-authored content. The bad seed created only chapters
+  // with this exact summary shape and no exercises.
+  const onlyPlaceholderContent = chapters.length > 0 && chapters.every((chapter) => (
+    chapter.summary.startsWith("Study material for ") && chapter.exercises.length === 0
+  ));
+  if (!onlyPlaceholderContent) return false;
 
-const CLASS_CHAPTERS: Record<number, string[]> = {
-  5: ["introduction", "basics", "fundamentals", "exercises"],
-  6: ["introduction", "basics", "fundamentals", "exercises"],
-  7: ["introduction", "basics", "fundamentals", "exercises"],
-  8: ["introduction", "basics", "fundamentals", "exercises"],
-  9: ["chapter-1", "chapter-2", "chapter-3", "chapter-4"],
-  10: ["chapter-1", "chapter-2", "chapter-3", "chapter-4"],
-  11: ["chapter-1", "chapter-2", "chapter-3", "chapter-4"],
-  12: ["chapter-1", "chapter-2", "chapter-3", "chapter-4"],
-};
-
-function getChaptersForSubject(subject: string, classNum: number): string[] {
-  const specific = CHAPTER_MAP[subject];
-  if (specific) return specific;
-  return CLASS_CHAPTERS[classNum] || ["chapter-1", "chapter-2", "chapter-3", "chapter-4"];
+  const chapterPrefix = `${boardSlug}/${classSlug}/${subjectSlug}/%`;
+  await db.delete(schema.mcqs).where(sql`${schema.mcqs.chapterKey} LIKE ${chapterPrefix}`);
+  await db.delete(schema.chapters).where(eq(schema.chapters.subjectId, subjectId));
+  return true;
 }
 
 export async function seedSubjectsAndMCQs() {
-  console.log("[db] Seeding subjects and MCQs for all boards/classes…");
+  console.log("[db] Syncing the published curriculum catalog…");
 
   const boards = await db.query.boards.findMany();
-  const boardMap = new Map(boards.map((b) => [b.slug, b]));
 
   for (const board of boards) {
     const classes = await db.query.classes.findMany({
@@ -180,82 +57,56 @@ export async function seedSubjectsAndMCQs() {
     });
 
     for (const klass of classes) {
-      const classNum = parseInt(klass.slug, 10);
+      await renameLegacyClassFiveSocialStudies(klass.id, board.slug, klass.slug);
+      const allowedSubjects = publishedCurriculumSubjects(board.slug, klass.slug);
+      const allowedSlugs = new Set(allowedSubjects.map((subject) => subject.slug));
+      const existingSubjects = await db.query.subjects.findMany({
+        where: eq(schema.subjects.classId, klass.id),
+      });
 
-      for (const subject of SUBJECTS) {
-        const existingSubject = await db.query.subjects.findFirst({
+      for (const existingSubject of existingSubjects) {
+        const placeholderRemoved = await removePlaceholderSubject(
+          existingSubject.id,
+          board.slug,
+          klass.slug,
+          existingSubject.slug,
+        );
+        if (placeholderRemoved && !allowedSlugs.has(existingSubject.slug)) {
+          await db.delete(schema.subjects).where(eq(schema.subjects.id, existingSubject.id));
+        }
+      }
+
+      for (const subject of allowedSubjects) {
+        const matchingSubjects = await db.query.subjects.findMany({
           where: and(
             eq(schema.subjects.classId, klass.id),
             eq(schema.subjects.slug, subject.slug),
           ),
         });
 
-        let subjectId = existingSubject?.id;
-        if (!subjectId) {
-          const [inserted] = await db
+        // There is no database uniqueness constraint on (class_id, slug), and
+        // the development server can start two seed passes at once. Remove only
+        // duplicate empty records; anything with chapters is preserved for an
+        // editor to review rather than silently discarded.
+        const [existingSubject, ...duplicates] = matchingSubjects;
+        for (const duplicate of duplicates) {
+          const duplicateChapters = await db.query.chapters.findMany({
+            where: eq(schema.chapters.subjectId, duplicate.id),
+          });
+          if (duplicateChapters.length === 0) {
+            await db.delete(schema.subjects).where(eq(schema.subjects.id, duplicate.id));
+          }
+        }
+
+        if (!existingSubject) {
+          await db
             .insert(schema.subjects)
             .values({ classId: klass.id, slug: subject.slug, title: subject.title })
             .returning();
-          subjectId = inserted.id;
-        }
-
-        const chapters = getChaptersForSubject(subject.slug, classNum);
-        for (const chapterSlug of chapters) {
-          const existingChapter = await db.query.chapters.findFirst({
-            where: and(
-              eq(schema.chapters.subjectId, subjectId),
-              eq(schema.chapters.slug, chapterSlug),
-            ),
-          });
-
-          let chapterId = existingChapter?.id;
-          if (!chapterId) {
-            const title = chapterSlug
-              .replace(/-/g, " ")
-              .replace(/\b\w/g, (c) => c.toUpperCase());
-            const [inserted] = await db
-              .insert(schema.chapters)
-              .values({
-                subjectId,
-                slug: chapterSlug,
-                title,
-                summary: `Study material for ${subject.title} - ${title}`,
-                formulas: [],
-                formulasUr: [],
-                definitions: [],
-                status: "published",
-              })
-              .returning();
-            chapterId = inserted.id;
-          }
-
-          const chapterKey = `${board.slug}/${klass.slug}/${subject.slug}/${chapterSlug}`;
-          const existingMcqs = await db.query.mcqs.findFirst({
-            where: eq(schema.mcqs.chapterKey, chapterKey),
-          });
-
-          if (!existingMcqs) {
-            let mcqs: MCQ[];
-            if (subject.slug === "mathematics") {
-              mcqs = generateMathMCQs(board.slug, classNum, chapterSlug);
-            } else {
-              mcqs = generateScienceMCQs(board.slug, classNum, subject.slug, chapterSlug);
-            }
-
-            for (const mcq of mcqs) {
-              await db.insert(schema.mcqs).values({
-                chapterKey: mcq.chapterKey,
-                question: mcq.question,
-                options: mcq.options,
-                correctLabel: mcq.correctLabel,
-                reason: mcq.reason,
-              });
-            }
-          }
         }
       }
     }
   }
 
-  console.log("[db] Subjects and MCQs seeded.");
+  console.log("[db] Published curriculum catalog synced.");
 }

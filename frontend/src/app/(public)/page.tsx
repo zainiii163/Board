@@ -1,21 +1,18 @@
 import { apiFetchOrNull } from "@/lib/api-client";
-import { getBookCover } from "@/lib/book-covers";
 import { PortalHome } from "@/components/portal/portal-home";
 import { type HomeBoardSection } from "@/components/portal/board-cover-sections";
 import {
   type PortalCategory,
   type PortalResource,
 } from "@/components/portal/portal-types";
+import { isBooksNotesBoard } from "@/lib/constants";
 
 type CategoriesResponse = { categories: PortalCategory[]; tree: PortalCategory[] };
 type ResourcesPage = { resources: PortalResource[]; total: number };
 
 type BoardCatalogItem = {
   slug: string;
-  title: string;
   classCount: number;
-  chapterCount: number;
-  ready: boolean;
 };
 
 type BoardDetail = {
@@ -23,11 +20,6 @@ type BoardDetail = {
   title: string;
   classes: { slug: string; title: string; subjects?: { slug: string; title: string }[] }[];
 };
-
-function countCovers(boardSlug: string, klass: BoardDetail["classes"][number]): number {
-  const classNum = parseInt(klass.slug, 10) || 0;
-  return (klass.subjects ?? []).filter((subject) => getBookCover(boardSlug, classNum, subject.title)).length;
-}
 
 export const dynamic = "force-dynamic";
 
@@ -38,27 +30,12 @@ function buildSection(board: BoardDetail): HomeBoardSection | null {
     seen.add(klass.slug);
     return true;
   });
+  if (classes.length === 0) return null;
 
-  const classNumberBySlug = new Map<string, number>();
-  for (const klass of classes) {
-    const num = parseInt(klass.slug, 10);
-    if (Number.isFinite(num) && num > 0) classNumberBySlug.set(klass.slug, num);
-  }
-
-  const classNumbers = [...classNumberBySlug.values()].sort((a, b) => b - a);
-
-  const withSubjects = classes
-    .filter((klass) => (klass.subjects?.length ?? 0) > 0)
-    .sort((a, b) => {
-      const coverA = countCovers(board.slug, a);
-      const coverB = countCovers(board.slug, b);
-      if (coverA !== coverB) return coverB - coverA;
-      const countDiff = (b.subjects?.length ?? 0) - (a.subjects?.length ?? 0);
-      if (countDiff !== 0) return countDiff;
-      return (classNumberBySlug.get(b.slug) ?? 0) - (classNumberBySlug.get(a.slug) ?? 0);
-    });
-  const featured = withSubjects[0];
-  if (!featured) return null;
+  const classNumbers = classes
+    .map((klass) => parseInt(klass.slug, 10))
+    .filter((num) => Number.isFinite(num) && num > 0)
+    .sort((a, b) => b - a);
 
   const title = board.title.replace(/\s*\([^)]*\)/g, "").trim() || board.title;
 
@@ -66,20 +43,24 @@ function buildSection(board: BoardDetail): HomeBoardSection | null {
     slug: board.slug,
     title,
     classNumbers,
-    featuredClassSlug: featured.slug,
-    subjects: (featured.subjects ?? []).slice(0, 6),
+    classes: classes.map((klass) => ({
+      slug: klass.slug,
+      title: klass.title,
+      subjects: klass.subjects ?? [],
+    })),
   };
 }
 
 async function fetchHomeBoardSections(): Promise<HomeBoardSection[]> {
   const catalog = await apiFetchOrNull<BoardCatalogItem[]>("/api/boards");
-  const ready = (catalog ?? [])
-    .filter((board) => board.ready && board.classCount > 0)
-    .slice(0, 5);
-  if (ready.length === 0) return [];
+  // Books & Notes home: Federal + Punjab only (client 123.pdf). Other boards remain in API/DB.
+  const boards = (catalog ?? []).filter(
+    (board) => board.classCount > 0 && isBooksNotesBoard(board.slug),
+  );
+  if (boards.length === 0) return [];
 
   const details = await Promise.all(
-    ready.map((board) => apiFetchOrNull<BoardDetail>(`/api/boards/${board.slug}`)),
+    boards.map((board) => apiFetchOrNull<BoardDetail>(`/api/boards/${board.slug}`)),
   );
   return details
     .filter((detail): detail is BoardDetail => detail !== null)

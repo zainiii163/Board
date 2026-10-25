@@ -16,7 +16,10 @@ test("GET /api/boards returns the demo boards", async () => {
     const payload = await response.json();
 
     assert.equal(response.status, 200);
-    assert.equal(payload.length, 6);
+    // Demo catalog includes 6 curriculum boards plus Lahore / D.G. Khan (Punjab
+    // examination variants). Books & Notes UI filters to Federal + Punjab only;
+    // the API correctly exposes all boards for past papers and deep links.
+    assert.equal(payload.length, 8);
     assert.deepEqual(
         payload.map((board: { slug: string; title: string; ready: boolean; chapterCount: number }) => ({
             slug: board.slug,
@@ -31,6 +34,8 @@ test("GET /api/boards returns the demo boards", async () => {
             { slug: "sindh", title: "Sindh Board", ready: true, chapterCount: 8 },
             { slug: "oxford", title: "Oxford Board", ready: true, chapterCount: 8 },
             { slug: "cambridge", title: "Cambridge Board", ready: true, chapterCount: 8 },
+            { slug: "lahore", title: "Lahore Board", ready: true, chapterCount: 8 },
+            { slug: "d-g-khan", title: "D.G. Khan Board", ready: true, chapterCount: 8 },
         ],
     );
 

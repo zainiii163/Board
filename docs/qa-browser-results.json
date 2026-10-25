@@ -1,0 +1,835 @@
+{
+  "base": "http://127.0.0.1:3000",
+  "startedAt": "2026-10-24T13:00:47.786Z",
+  "results": [
+    {
+      "viewport": "mobile",
+      "path": "/",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <InnerLayoutRouter url=\"/\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>\n      <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n        <SegmentTrieNode>\n        <HomePage>\n          <PortalHome categories={[...]} latest={[...]} trending={[...]} categoryNameById={{1:\"Text Books\", ...}} ...>\n            <div>\n              <HeroSlider slides={[...]}>\n                <section aria-label=\"Featured\" className=\"relative i...\" onMouseEnter={function onMouseEnter} ...>\n                  <div>\n                  <div className=\"relative m...\">\n                    <HeroSearch>\n                      <div className=\"mx-auto ma...\">\n                        <motion.p>\n                        <motion.h1>\n                        <motion.p>\n                        <motion.div ref={{current:null}} initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} ...>\n                          <div className=\"relative m...\" style={{opacity:0, ...}} ref={function useMotionRef.useCallback}>\n                            <div className=\"glass-card...\">\n                              <Search>\n                              <input\n                                ref={{current:null}}\n                                value=\"\"\n                                onChange={function onChange}\n                                onFocus={function onFocus}\n                                onKeyDown={function onKeyDown}\n                                type=\"search\"\n                                role=\"combobox\"\n                                aria-expanded={false}\n                                aria-controls=\"hero-suggestions\"\n                                aria-autocomplete=\"list\"\n                                placeholder=\"Search books, notes, papers…\"\n                                className=\"w-full bg-transparent text-[15px] text-white outline-none placeholder:text-...\"\n-                               style={{caret-color:\"transparent\"}}\n                              >\n                              ...\n                            ...\n                        ...\n                  ...\n              ...\n      ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-home.png"
+    },
+    {
+      "viewport": "mobile",
+      "path": "/fbise",
+      "ok": true,
+      "title": "Federal Board - All Classes | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [],
+      "failedRequests": [],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-fbise.png"
+    },
+    {
+      "viewport": "mobile",
+      "path": "/punjab",
+      "ok": true,
+      "title": "Punjab Board - All Classes | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/_next/image?url=%2Fbook-covers%2Ffbise-10---------------------.jpg&w=256&q=75",
+          "status": 400
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-punjab.png"
+    },
+    {
+      "viewport": "mobile",
+      "path": "/fbise/9",
+      "ok": true,
+      "title": "Class 9 - Federal Board (FBISE) | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-fbise_9.png"
+    },
+    {
+      "viewport": "mobile",
+      "path": "/punjab/9",
+      "ok": true,
+      "title": "Class 9 - Punjab Board | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-punjab_9.png"
+    },
+    {
+      "viewport": "mobile",
+      "path": "/past-papers",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n      <LoadingBoundary name=\"past-papers/\" loading={null}>\n        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n          <RedirectBoundary>\n            <RedirectErrorBoundary router={{...}}>\n              <InnerLayoutRouter url=\"/past-papers\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>\n                <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n                  <SegmentTrieNode>\n                  <PastPapersPage>\n                    <section className=\"mx-auto ma...\">\n                      <div className=\"rounded-3x...\">\n                        <FbisePastPapersExplorer papers={[...]}>\n                          <section className=\"overflow-h...\">\n                            <div className=\"max-w-3xl\">\n                              <p>\n                              <h1>\n                              <p>\n                              <label className=\"mt-6 flex ...\" htmlFor=\"paper-search\">\n                                <Search>\n                                <input\n                                  id=\"paper-search\"\n                                  value=\"\"\n                                  onChange={function onChange}\n                                  placeholder=\"Search a subject, e.g. Physics\"\n                                  className=\"min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholde...\"\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                          ...\n                ...\n              ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-past_papers.png"
+    },
+    {
+      "viewport": "mobile",
+      "path": "/past-papers?board=fbise",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n      <LoadingBoundary name=\"past-papers/\" loading={null}>\n        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n          <RedirectBoundary>\n            <RedirectErrorBoundary router={{...}}>\n              <InnerLayoutRouter url=\"/past-pape...\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>\n                <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n                  <SegmentTrieNode>\n                  <PastPapersPage>\n                    <section className=\"mx-auto ma...\">\n                      <div className=\"rounded-3x...\">\n                        <FbisePastPapersExplorer papers={[...]}>\n                          <section className=\"overflow-h...\">\n                            <div className=\"max-w-3xl\">\n                              <p>\n                              <h1>\n                              <p>\n                              <label className=\"mt-6 flex ...\" htmlFor=\"paper-search\">\n                                <Search>\n                                <input\n                                  id=\"paper-search\"\n                                  value=\"\"\n                                  onChange={function onChange}\n                                  placeholder=\"Search a subject, e.g. Physics\"\n                                  className=\"min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholde...\"\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                          ...\n                ...\n              ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-past_papers_board_fbise.png"
+    },
+    {
+      "viewport": "mobile",
+      "path": "/books",
+      "ok": true,
+      "title": "Books & Notes Library | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <InnerScrollHandlerNew focusAndScrollRef={{scrollRef:null, ...}} cacheNode={{rsc:{...}, ...}}>\n      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n        <LoadingBoundary name=\"books/\" loading={null}>\n          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n            <RedirectBoundary>\n              <RedirectErrorBoundary router={{...}}>\n                <InnerLayoutRouter url=\"/books\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>\n                  <SegmentViewNode type=\"page\" pagePath=\"(public)/b...\">\n                    <SegmentTrieNode>\n                    <BooksPage>\n                      <section className=\"mx-auto ma...\">\n                        <div>\n                        <BooksListing initialResources={[...]} initialTotal={679} categories={[...]}>\n                          <div className=\"space-y-6\">\n                            <div className=\"flex flex-...\">\n                              <select>\n                              <select>\n                              <input\n                                type=\"text\"\n                                placeholder=\"Search chapters, exercises, topics\"\n                                className=\"rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold tex...\"\n                                value=\"\"\n                                onChange={function onChange}\n-                               style={{caret-color:\"transparent\"}}\n                              >\n                              ...\n                            ...\n                        ...\n                  ...\n                ...\n      ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/resources?limit=24&offset=0&sort=latest",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\mobile-books.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <InnerLayoutRouter url=\"/\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>\n      <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n        <SegmentTrieNode>\n        <HomePage>\n          <PortalHome categories={[...]} latest={[...]} trending={[...]} categoryNameById={{1:\"Text Books\", ...}} ...>\n            <div>\n              <HeroSlider slides={[...]}>\n                <section aria-label=\"Featured\" className=\"relative i...\" onMouseEnter={function onMouseEnter} ...>\n                  <div>\n                  <div className=\"relative m...\">\n                    <HeroSearch>\n                      <div className=\"mx-auto ma...\">\n                        <motion.p>\n                        <motion.h1>\n                        <motion.p>\n                        <motion.div ref={{current:null}} initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} ...>\n                          <div className=\"relative m...\" style={{opacity:0, ...}} ref={function useMotionRef.useCallback}>\n                            <div className=\"glass-card...\">\n                              <Search>\n                              <input\n                                ref={{current:null}}\n                                value=\"\"\n                                onChange={function onChange}\n                                onFocus={function onFocus}\n                                onKeyDown={function onKeyDown}\n                                type=\"search\"\n                                role=\"combobox\"\n                                aria-expanded={false}\n                                aria-controls=\"hero-suggestions\"\n                                aria-autocomplete=\"list\"\n                                placeholder=\"Search books, notes, papers…\"\n                                className=\"w-full bg-transparent text-[15px] text-white outline-none placeholder:text-...\"\n-                               style={{caret-color:\"transparent\"}}\n                              >\n                              ...\n                            ...\n                        ...\n                  ...\n              ...\n      ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/_next/image?url=%2Fbook-covers%2Ffbise-10---------------------.jpg&w=256&q=75",
+          "status": 400
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-home.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/fbise",
+      "ok": true,
+      "title": "Federal Board - All Classes | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/_next/image?url=%2Fbook-covers%2Ffbise-10---------------------.jpg&w=256&q=75",
+          "status": 400
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-fbise.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/punjab",
+      "ok": true,
+      "title": "Punjab Board - All Classes | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/_next/image?url=%2Fbook-covers%2Ffbise-10---------------------.jpg&w=256&q=75",
+          "status": 400
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-punjab.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/fbise/9",
+      "ok": true,
+      "title": "Class 9 - Federal Board (FBISE) | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-fbise_9.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/punjab/9",
+      "ok": true,
+      "title": "Class 9 - Punjab Board | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-punjab_9.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/past-papers",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n      <LoadingBoundary name=\"past-papers/\" loading={null}>\n        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n          <RedirectBoundary>\n            <RedirectErrorBoundary router={{...}}>\n              <InnerLayoutRouter url=\"/past-papers\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>\n                <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n                  <SegmentTrieNode>\n                  <PastPapersPage>\n                    <section className=\"mx-auto ma...\">\n                      <div className=\"rounded-3x...\">\n                        <FbisePastPapersExplorer papers={[...]}>\n                          <section className=\"overflow-h...\">\n                            <div className=\"max-w-3xl\">\n                              <p>\n                              <h1>\n                              <p>\n                              <label className=\"mt-6 flex ...\" htmlFor=\"paper-search\">\n                                <Search>\n                                <input\n                                  id=\"paper-search\"\n                                  value=\"\"\n                                  onChange={function onChange}\n                                  placeholder=\"Search a subject, e.g. Physics\"\n                                  className=\"min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholde...\"\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                          ...\n                ...\n              ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-past_papers.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/past-papers?board=fbise",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n      <LoadingBoundary name=\"past-papers/\" loading={null}>\n        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n          <RedirectBoundary>\n            <RedirectErrorBoundary router={{...}}>\n              <InnerLayoutRouter url=\"/past-pape...\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>\n                <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n                  <SegmentTrieNode>\n                  <PastPapersPage>\n                    <section className=\"mx-auto ma...\">\n                      <div className=\"rounded-3x...\">\n                        <FbisePastPapersExplorer papers={[...]}>\n                          <section className=\"overflow-h...\">\n                            <div className=\"max-w-3xl\">\n                              <p>\n                              <h1>\n                              <p>\n                              <label className=\"mt-6 flex ...\" htmlFor=\"paper-search\">\n                                <Search>\n                                <input\n                                  id=\"paper-search\"\n                                  value=\"\"\n                                  onChange={function onChange}\n                                  placeholder=\"Search a subject, e.g. Physics\"\n                                  className=\"min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholde...\"\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                          ...\n                ...\n              ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-past_papers_board_fbise.png"
+    },
+    {
+      "viewport": "tablet",
+      "path": "/books",
+      "ok": true,
+      "title": "Books & Notes Library | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <InnerScrollHandlerNew focusAndScrollRef={{scrollRef:null, ...}} cacheNode={{rsc:{...}, ...}}>\n      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n        <LoadingBoundary name=\"books/\" loading={null}>\n          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n            <RedirectBoundary>\n              <RedirectErrorBoundary router={{...}}>\n                <InnerLayoutRouter url=\"/books\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>\n                  <SegmentViewNode type=\"page\" pagePath=\"(public)/b...\">\n                    <SegmentTrieNode>\n                    <BooksPage>\n                      <section className=\"mx-auto ma...\">\n                        <div>\n                        <BooksListing initialResources={[...]} initialTotal={679} categories={[...]}>\n                          <div className=\"space-y-6\">\n                            <div className=\"flex flex-...\">\n                              <select>\n                              <select>\n                              <input\n                                type=\"text\"\n                                placeholder=\"Search chapters, exercises, topics\"\n                                className=\"rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold tex...\"\n                                value=\"\"\n                                onChange={function onChange}\n-                               style={{caret-color:\"transparent\"}}\n                              >\n                              ...\n                            ...\n                        ...\n                  ...\n                ...\n      ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/resources?limit=24&offset=0&sort=latest",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/resources?limit=24&offset=0&sort=latest",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\tablet-books.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <InnerLayoutRouter url=\"/\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>\n      <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n        <SegmentTrieNode>\n        <HomePage>\n          <PortalHome categories={[...]} latest={[...]} trending={[...]} categoryNameById={{1:\"Text Books\", ...}} ...>\n            <div>\n              <HeroSlider slides={[...]}>\n                <section aria-label=\"Featured\" className=\"relative i...\" onMouseEnter={function onMouseEnter} ...>\n                  <div>\n                  <div className=\"relative m...\">\n                    <HeroSearch>\n                      <div className=\"mx-auto ma...\">\n                        <motion.p>\n                        <motion.h1>\n                        <motion.p>\n                        <motion.div ref={{current:null}} initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} ...>\n                          <div className=\"relative m...\" style={{opacity:0, ...}} ref={function useMotionRef.useCallback}>\n                            <div className=\"glass-card...\">\n                              <Search>\n                              <input\n                                ref={{current:null}}\n                                value=\"\"\n                                onChange={function onChange}\n                                onFocus={function onFocus}\n                                onKeyDown={function onKeyDown}\n                                type=\"search\"\n                                role=\"combobox\"\n                                aria-expanded={false}\n                                aria-controls=\"hero-suggestions\"\n                                aria-autocomplete=\"list\"\n                                placeholder=\"Search books, notes, papers…\"\n                                className=\"w-full bg-transparent text-[15px] text-white outline-none placeholder:text-...\"\n-                               style={{caret-color:\"transparent\"}}\n                              >\n                              ...\n                            ...\n                        ...\n                  ...\n              ...\n      ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/_next/image?url=%2Fbook-covers%2Ffbise-10---------------------.jpg&w=256&q=75",
+          "status": 400
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-home.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/fbise",
+      "ok": true,
+      "title": "Federal Board - All Classes | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/_next/image?url=%2Fbook-covers%2Ffbise-10---------------------.jpg&w=256&q=75",
+          "status": 400
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-fbise.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/punjab",
+      "ok": true,
+      "title": "Punjab Board - All Classes | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/_next/image?url=%2Fbook-covers%2Ffbise-10---------------------.jpg&w=256&q=75",
+          "status": 400
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-punjab.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/fbise/9",
+      "ok": true,
+      "title": "Class 9 - Federal Board (FBISE) | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-fbise_9.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/punjab/9",
+      "ok": true,
+      "title": "Class 9 - Punjab Board | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-punjab_9.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/past-papers",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n      <LoadingBoundary name=\"past-papers/\" loading={null}>\n        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n          <RedirectBoundary>\n            <RedirectErrorBoundary router={{...}}>\n              <InnerLayoutRouter url=\"/past-papers\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>\n                <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n                  <SegmentTrieNode>\n                  <PastPapersPage>\n                    <section className=\"mx-auto ma...\">\n                      <div className=\"rounded-3x...\">\n                        <FbisePastPapersExplorer papers={[...]}>\n                          <section className=\"overflow-h...\">\n                            <div className=\"max-w-3xl\">\n                              <p>\n                              <h1>\n                              <p>\n                              <label className=\"mt-6 flex ...\" htmlFor=\"paper-search\">\n                                <Search>\n                                <input\n                                  id=\"paper-search\"\n                                  value=\"\"\n                                  onChange={function onChange}\n                                  placeholder=\"Search a subject, e.g. Physics\"\n                                  className=\"min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholde...\"\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                          ...\n                ...\n              ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-past_papers.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/past-papers?board=fbise",
+      "ok": true,
+      "title": "BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n      <LoadingBoundary name=\"past-papers/\" loading={null}>\n        <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n          <RedirectBoundary>\n            <RedirectErrorBoundary router={{...}}>\n              <InnerLayoutRouter url=\"/past-pape...\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} ...>\n                <SegmentViewNode type=\"page\" pagePath=\"(public)/p...\">\n                  <SegmentTrieNode>\n                  <PastPapersPage>\n                    <section className=\"mx-auto ma...\">\n                      <div className=\"rounded-3x...\">\n                        <FbisePastPapersExplorer papers={[...]}>\n                          <section className=\"overflow-h...\">\n                            <div className=\"max-w-3xl\">\n                              <p>\n                              <h1>\n                              <p>\n                              <label className=\"mt-6 flex ...\" htmlFor=\"paper-search\">\n                                <Search>\n                                <input\n                                  id=\"paper-search\"\n                                  value=\"\"\n                                  onChange={function onChange}\n                                  placeholder=\"Search a subject, e.g. Physics\"\n                                  className=\"min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholde...\"\n-                                 style={{caret-color:\"transparent\"}}\n                                >\n                          ...\n                ...\n              ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-past_papers_board_fbise.png"
+    },
+    {
+      "viewport": "desktop",
+      "path": "/books",
+      "ok": true,
+      "title": "Books & Notes Library | BoardNotes",
+      "overflowX": false,
+      "consoleErrors": [
+        "A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:\n\n- A server/client branch `if (typeof window !== 'undefined')`.\n- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.\n- Date formatting in a user's locale which doesn't match the server.\n- External changing data without sending a snapshot of it along with the HTML.\n- Invalid HTML tag nesting.\n\nIt can also happen if the client has a browser extension installed which messes with the HTML before React loaded.\n\n%s%s https://react.dev/link/hydration-mismatch \n\n  ...\n    <InnerScrollHandlerNew focusAndScrollRef={{scrollRef:null, ...}} cacheNode={{rsc:{...}, ...}}>\n      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>\n        <LoadingBoundary name=\"books/\" loading={null}>\n          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>\n            <RedirectBoundary>\n              <RedirectErrorBoundary router={{...}}>\n                <InnerLayoutRouter url=\"/books\" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>\n                  <SegmentViewNode type=\"page\" pagePath=\"(public)/b...\">\n                    <SegmentTrieNode>\n                    <BooksPage>\n                      <section className=\"mx-auto ma...\">\n                        <div>\n                        <BooksListing initialResources={[...]} initialTotal={679} categories={[...]}>\n                          <div className=\"space-y-6\">\n                            <div className=\"flex flex-...\">\n                              <select>\n                              <select>\n                              <input\n                                type=\"text\"\n                                placeholder=\"Search chapters, exercises, topics\"\n                                className=\"rounded-xl border border-border bg-card px-3 py-2 text-sm font-semibold tex...\"\n                                value=\"\"\n                                onChange={function onChange}\n-                               style={{caret-color:\"transparent\"}}\n                              >\n                              ...\n                            ...\n                        ...\n                  ...\n                ...\n      ...\n",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "failedRequests": [
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/resources?limit=24&offset=0&sort=latest",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/resources?limit=24&offset=0&sort=latest",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/nav",
+          "status": 404
+        },
+        {
+          "url": "http://127.0.0.1:3000/backend-api/api/api/portal/stats",
+          "status": 404
+        }
+      ],
+      "screenshot": "D:\\board\\docs\\qa-screenshots\\desktop-books.png"
+    }
+  ],
+  "finishedAt": "2026-10-24T13:02:06.099Z"
+}

@@ -1,6 +1,24 @@
 export const SITE_NAME = "BoardNotes";
 export const DEFAULT_BOARD = "fbise";
+
+/**
+ * Full platform board keys (notes trees, past papers, APIs). Kept for routing and
+ * deep links — do not delete DB rows for boards outside the Books & Notes allowlist.
+ */
 export const SUPPORTED_BOARDS = ["fbise", "punjab", "kpk", "sindh", "apsacs"] as const;
+
+/**
+ * Client Books & Notes interface (Study++-style): Federal and Punjab only.
+ * Lahore / D.G. Khan / KPK / Sindh / Oxford / Cambridge / APSACS stay in the DB
+ * and Past Papers, but are hidden from this specific navigation surface.
+ */
+export const BOOKS_NOTES_BOARD_SLUGS = ["fbise", "punjab"] as const;
+
+export type BooksNotesBoardSlug = (typeof BOOKS_NOTES_BOARD_SLUGS)[number];
+
+export function isBooksNotesBoard(slug: string): boolean {
+  return (BOOKS_NOTES_BOARD_SLUGS as readonly string[]).includes(slug);
+}
 
 // WhatsApp Contact/Chat - Direct chat with phone number
 export const WHATSAPP_CHAT_URL = "https://wa.me/923017521835";
@@ -27,6 +45,11 @@ export const NAV_BOARDS = [
   { slug: "o-level", label: "O Level" },
   { slug: "a-level", label: "A Level" },
 ] as const;
+
+/** Boards shown in Books & Notes menus and the Study++ home cover grid. */
+export const BOOKS_NOTES_NAV_BOARDS = NAV_BOARDS.filter((board) =>
+  isBooksNotesBoard(board.slug),
+);
 
 /** Boards that share the Punjab Board scheme of studies and textbooks. */
 export const PUNJAB_VARIANT_SLUGS = ["lahore", "d-g-khan"] as const;

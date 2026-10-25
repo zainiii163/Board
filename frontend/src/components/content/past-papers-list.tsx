@@ -10,10 +10,11 @@ import { NAV_BOARDS, sortSubjects } from "@/lib/constants";
 import { DownloadGate } from "@/components/content/download-gate";
 import { DriveLinkButton } from "@/components/content/drive-link-button";
 
-export type PastPaperType = "model" | "first-annual" | "second-annual" | "pba";
+export type PastPaperType = "model" | "paper-pattern" | "first-annual" | "second-annual" | "pba";
 
 export const PAPER_TYPE_LABELS: Record<PastPaperType, string> = {
   model: "Model Papers",
+  "paper-pattern": "Paper Pattern",
   "first-annual": "1st Annual",
   "second-annual": "2nd Annual",
   pba: "PBA",
@@ -23,6 +24,7 @@ export type PastPaperItem = {
   id: number;
   boardSlug: string;
   boardTitle: string;
+  classSlug: string;
   subjectTitle: string;
   classTitle: string;
   year: string;
@@ -34,7 +36,7 @@ export type PastPaperItem = {
   driveUrl: string | null;
 };
 
-const TYPE_CHIPS: ("all" | PastPaperType)[] = ["all", "second-annual", "model", "first-annual", "pba"];
+const TYPE_CHIPS: ("all" | PastPaperType)[] = ["all", "second-annual", "paper-pattern", "model", "first-annual", "pba"];
 
 /**
  * Display order within a single exam year: 2nd Annual → Model Paper → 1st Annual.
@@ -43,13 +45,15 @@ const TYPE_CHIPS: ("all" | PastPaperType)[] = ["all", "second-annual", "model", 
  */
 const TYPE_RANK: Record<PastPaperType, number> = {
   "second-annual": 0,
-  model: 1,
-  "first-annual": 2,
-  pba: 3,
+  "paper-pattern": 1,
+  model: 2,
+  "first-annual": 3,
+  pba: 4,
 };
 
 const TYPE_TITLES: Record<Exclude<PastPaperType, "pba">, string> = {
   "second-annual": "2nd Annual",
+  "paper-pattern": "Paper Pattern",
   model: "Model Paper",
   "first-annual": "1st Annual",
 };
@@ -72,6 +76,7 @@ function pbaBucket(subjectTitle: string): string | null {
 const CHIP_LABEL: Record<(typeof TYPE_CHIPS)[number], string> = {
   all: "All",
   "second-annual": "2nd Annual",
+  "paper-pattern": "Paper Pattern",
   model: "Model Papers",
   "first-annual": "1st Annual",
   pba: "PBA",
@@ -230,7 +235,13 @@ export function PastPapersList({
       </div>
       <div className="flex shrink-0 flex-wrap items-center gap-2">
         <span className="rounded-full bg-accent/12 px-3 py-1 text-sm font-bold text-accent">{paper.year}</span>
-        {paper.driveUrl && <DriveLinkButton href={paper.driveUrl} className="px-3 py-2 text-xs" />}
+        {paper.driveUrl && (
+          <DriveLinkButton
+            href={paper.driveUrl}
+            label={/fbisepastpapers\.com/i.test(paper.driveUrl) ? "View source" : undefined}
+            className="px-3 py-2 text-xs"
+          />
+        )}
         {paper.pdfUrl && <DownloadGate url={pdfUrl(paper.pdfUrl)} compact />}
       </div>
     </div>

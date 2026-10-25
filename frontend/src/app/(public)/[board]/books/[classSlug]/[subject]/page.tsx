@@ -56,12 +56,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const book = books?.[0];
   const subjectTitle = book?.subjectTitle ?? prettifySubject(subject);
   const boardTitle = boardDisplayTitle(book?.boardTitle ?? "Board", board, parseInt(classSlug, 10) || 0);
+  const availability = book?.pdfUrl || book?.driveUrl ? "Download or read online" : "PDF availability is being updated";
   return {
     title: `${subjectTitle} Book - Class ${classSlug} | ${boardTitle} | BoardNotes`,
-    description: `Download the official ${subjectTitle} textbook for Class ${classSlug} (${boardTitle}) — free PDF, read online or download.`,
+    description: `${availability}: ${subjectTitle} textbook for Class ${classSlug} (${boardTitle}).`,
     openGraph: {
       title: `${subjectTitle} Book - Class ${classSlug}`,
-      description: `Free ${subjectTitle} textbook PDF for Class ${classSlug}, ${boardTitle}.`,
+      description: `${availability}: ${subjectTitle} textbook for Class ${classSlug}, ${boardTitle}.`,
     },
   };
 }
@@ -84,7 +85,8 @@ export default async function BookDetailPage({ params }: PageProps) {
   const notesHref = book?.notesPath ?? `/${board}/${classSlug}/${subject}`;
   const fileIsDrive = !!fileUrl && (fileUrl.includes("drive.google.com") || fileUrl.includes("docs.google.com"));
   const canReadOnline = !!fileUrl && !fileIsDrive;
-  const hasDownload = !!fileUrl || !!driveLink;
+  const hasLocalPdf = !!fileUrl;
+  const hasStudySource = !!driveLink;
 
   if (!book && !cover) notFound();
 
@@ -134,7 +136,7 @@ export default async function BookDetailPage({ params }: PageProps) {
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
               <span className="rounded-md bg-accent px-2.5 py-1 text-xs font-bold text-white underline">
-                {book?.priceLabel ?? "Free PDF"}
+                {hasLocalPdf ? (book?.priceLabel ?? "Free PDF") : hasStudySource ? "Study notes source" : "PDF pending"}
               </span>
               <span className="rounded-md border-2 border-accent/40 px-2.5 py-1 text-xs font-bold text-accent underline">
                 Textbook
@@ -144,7 +146,7 @@ export default async function BookDetailPage({ params }: PageProps) {
               </span>
             </div>
 
-            {hasDownload ? (
+            {hasLocalPdf || hasStudySource ? (
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 {fileUrl && <DownloadGate url={pdfUrl(fileUrl)} showAd={false} />}
                 {canReadOnline && (
@@ -156,12 +158,15 @@ export default async function BookDetailPage({ params }: PageProps) {
                   </a>
                 )}
                 {(driveLink || fileIsDrive) && (
-                  <DriveLinkButton href={(driveLink ?? fileUrl)!} label="Open in Google Drive" />
+                  <DriveLinkButton
+                    href={(driveLink ?? fileUrl)!}
+                    label={/studyplusplus\.com/i.test(driveLink ?? fileUrl ?? "") ? "View notes source" : "Open in Google Drive"}
+                  />
                 )}
               </div>
             ) : (
               <div className="mt-6 rounded-xl border border-dashed border-border bg-card px-4 py-3 text-sm text-muted">
-                PDF coming soon — meanwhile, chapter-wise notes are ready.
+                PDF coming soon — chapter-wise notes will appear here when they are published.
               </div>
             )}
 
@@ -205,12 +210,15 @@ export default async function BookDetailPage({ params }: PageProps) {
             {subjectTitle} Book {classSlug} — {boardTitle}
           </h3>
           <p className="mb-3 text-sm leading-6 text-muted">
-            Get the official {subjectTitle} textbook for {classTitle} under {boardTitle}. Read the full book online
-            or download the PDF for free — organized per class so you always land on the right book.
+            {hasLocalPdf
+              ? `Get the official ${subjectTitle} textbook for ${classTitle} under ${boardTitle}. Read it online or download the PDF — organized per class so you always land on the right book.`
+              : hasStudySource
+                ? `Use the linked StudyPlusPlus source for chapter-wise notes, solved exercises, study guides, MCQs, and worksheets for ${subjectTitle} in ${classTitle}. This page does not claim that an external source is a locally uploaded PDF.`
+              : `The verified cover for ${subjectTitle} in ${classTitle} is listed here. The official PDF has not been uploaded yet, so no unrelated file is shown.`}
           </p>
           <p className="text-sm leading-6 text-muted">
-            Pair it with chapter-wise notes, solved exercises, and MCQs for {subjectTitle} {classSlug} to prepare
-            faster for exams in the {ACADEMIC_YEAR} session.
+            Use the chapter-wise notes, solved exercises, and MCQs for {subjectTitle} {classSlug} as they are
+            published for the {ACADEMIC_YEAR} session.
           </p>
         </div>
       </div>

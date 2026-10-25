@@ -10,9 +10,9 @@ type ResourcesPage = { resources: PortalResource[]; total: number };
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "All Resources | BoardNotes",
-  description: "Browse the complete library of free textbooks, notes, past papers, and study materials for all boards and classes.",
-  openGraph: { title: "All Resources | BoardNotes", description: "Free educational resources for students" },
+  title: "Books & Notes Library | BoardNotes",
+  description: "Browse textbooks and notes for Federal and Punjab Boards — separate from Past Papers.",
+  openGraph: { title: "Books & Notes Library | BoardNotes", description: "Textbooks and notes for Federal and Punjab Boards" },
 };
 
 export default async function BooksPage() {
@@ -24,9 +24,10 @@ export default async function BooksPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="mb-10">
-        <h1 className="font-serif text-3xl font-bold text-foreground sm:text-4xl">All Resources</h1>
+        <p className="text-[11px] font-bold uppercase tracking-widest text-accent">Books &amp; Notes</p>
+        <h1 className="mt-2 font-serif text-3xl font-bold text-foreground sm:text-4xl">Resource library</h1>
         <p className="mt-2 max-w-xl text-sm text-muted sm:text-base">
-          Browse the full library — pick a category or sort by popularity.
+          Textbooks and notes for Federal and Punjab Boards. Past papers live in their own section.
         </p>
       </div>
 

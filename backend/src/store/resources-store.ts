@@ -16,14 +16,15 @@ export type BookRecord = {
   notesPath: string | null;
 };
 
-export type PastPaperType = "model" | "first-annual" | "second-annual" | "pba";
+export type PastPaperType = "model" | "paper-pattern" | "first-annual" | "second-annual" | "pba";
 
 /** Display order inside a year: 2nd Annual → Model Paper → 1st Annual, PBA last. */
 const PAPER_TYPE_RANK: Record<PastPaperType, number> = {
   "second-annual": 0,
-  model: 1,
-  "first-annual": 2,
-  pba: 3,
+  "paper-pattern": 1,
+  model: 2,
+  "first-annual": 3,
+  pba: 4,
 };
 
 /** Newest year first, then the paper-type order above, then subject name. */

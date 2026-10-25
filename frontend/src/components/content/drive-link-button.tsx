@@ -11,7 +11,7 @@ interface DriveLinkButtonProps {
 
 export function DriveLinkButton({ href, label = "Open in Drive", className = "" }: DriveLinkButtonProps) {
   const reduceMotion = useReducedMotion();
-  const isValidLink = Boolean(href) && (href.includes("drive.google.com") || href.includes("docs.google.com"));
+  const isValidLink = /^https:\/\//i.test(href);
 
   if (!isValidLink) {
     return (

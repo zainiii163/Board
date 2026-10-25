@@ -1,7 +1,11 @@
 {
   "name": "boardnotes",
   "private": true,
-  "workspaces": ["frontend", "backend", "shared"],
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
   "scripts": {
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev -w backend",
@@ -11,5 +15,8 @@
     "test": "npm test -w backend",
     "db:migrate": "npm run db:migrate -w backend",
     "lint": "npm run lint -w frontend"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.1"
   }
 }
