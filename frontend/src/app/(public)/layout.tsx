@@ -12,13 +12,17 @@ import { ServiceWorkerRegister } from "@/components/layout/service-worker-regist
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { FloatingActions } from "@/components/layout/floating-actions";
 
+import "./public-shell.css";
+
 export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background font-sans text-foreground">
+    // Bottom padding clears the fixed mobile tab bar (+ iOS safe-area) so cards,
+    // chips, and footer links stay tappable. Desktop (lg+) hides the tab bar.
+    <div className="public-shell flex min-h-screen flex-col bg-background font-sans text-foreground">
       <ServiceWorkerRegister />
       <SearchShortcut />
       {/* Header reads the query string to mark the active board/class destination,
@@ -27,7 +31,7 @@ export default function PublicLayout({
         <Header />
       </Suspense>
       <OfflineBanner />
-      <main className="flex-1 pb-20 lg:pb-0">{children}</main>
+      <main className="flex-1">{children}</main>
       <PlatformIntro />
       <ProfessionalContent />
       <Footer />

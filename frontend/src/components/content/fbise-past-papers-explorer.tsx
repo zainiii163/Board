@@ -151,18 +151,19 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
 
   return (
     <>
-      <section className="overflow-hidden rounded-3xl border border-emerald-900/20 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 p-6 text-white shadow-sm sm:p-10">
-        <div className="max-w-3xl">
-          <p className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-amber-100">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-300" aria-hidden="true" />
+      <section className="rounded-3xl border border-emerald-900/20 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 p-5 text-white shadow-sm sm:p-8 lg:p-10">
+        <div className="min-w-0 max-w-3xl">
+          <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-amber-100">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-300" aria-hidden="true" />
             Updated for 2026–2027 exams
           </p>
-          <h1 className="mt-4 font-serif text-3xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="mt-4 break-words font-serif text-[1.55rem] font-bold leading-[1.15] tracking-tight text-balance sm:text-4xl lg:text-5xl">
             FBISE Past Papers,{" "}
             <span className="text-amber-300">All in One Place</span>
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
-            Download Federal Board past papers, model papers and paper patterns for Class 9–12 — organised by subject and year. 100% free.
+            Browse Federal Board past papers, model papers, and paper patterns for Class 9–12 by subject and year.
+            Open a verified source archive, or download a PDF when one has been uploaded here — free.
           </p>
           <label className="mt-6 flex max-w-xl items-center gap-3 rounded-2xl bg-white px-4 py-3 text-slate-900 shadow-sm" htmlFor="paper-search">
             <Search className="h-5 w-5 text-emerald-700" aria-hidden="true" />
@@ -178,7 +179,7 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
             <div><p className="text-xl font-black text-amber-300">4</p><p className="text-xs uppercase tracking-wide text-slate-300">Classes</p></div>
             <div><p className="text-xl font-black text-amber-300">25+</p><p className="text-xs uppercase tracking-wide text-slate-300">Subjects</p></div>
             <div><p className="text-xl font-black text-amber-300">New</p><p className="text-xs uppercase tracking-wide text-slate-300">Syllabus only</p></div>
-            <div><p className="text-xl font-black text-amber-300">Free</p><p className="text-xs uppercase tracking-wide text-slate-300">PDF / Source</p></div>
+            <div><p className="text-xl font-black text-amber-300">Free</p><p className="text-xs uppercase tracking-wide text-slate-300">Source / PDF</p></div>
           </div>
         </div>
       </section>
@@ -212,13 +213,13 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
         </p>
       ) : (
         <>
-          <section className="mt-8">
+          <section className="mt-8 scroll-mt-24">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-muted">2. Select subject</p>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-2 pb-1">
               <button
                 type="button"
                 onClick={() => setSubject("all")}
-                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${subject === "all" ? "border-emerald-700 bg-emerald-700 text-white" : "border-border bg-card text-foreground hover:border-emerald-600/50"}`}
+                className={`inline-flex min-h-11 items-center rounded-full border px-3.5 py-2.5 text-sm font-semibold transition sm:px-4 ${subject === "all" ? "border-emerald-700 bg-emerald-700 text-white" : "border-border bg-card text-foreground hover:border-emerald-600/50"}`}
               >
                 All subjects
               </button>
@@ -227,7 +228,7 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
                   key={name}
                   type="button"
                   onClick={() => setSubject(name)}
-                  className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${subject === name ? "border-emerald-700 bg-emerald-700 text-white" : "border-border bg-card text-foreground hover:border-emerald-600/50"}`}
+                  className={`inline-flex min-h-11 items-center rounded-full border px-3.5 py-2.5 text-sm font-semibold transition sm:px-4 ${subject === name ? "border-emerald-700 bg-emerald-700 text-white" : "border-border bg-card text-foreground hover:border-emerald-600/50"}`}
                 >
                   {name}
                 </button>

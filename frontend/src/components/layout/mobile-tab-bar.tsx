@@ -24,7 +24,7 @@ export function MobileTabBar() {
   return (
     <nav
       aria-label="Primary"
-      className="glass-bar fixed inset-x-0 bottom-0 z-40 border-t border-border/70 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_28px_-12px_rgba(15,23,42,0.35)] print:hidden lg:hidden"
+      className="glass-bar fixed inset-x-0 bottom-0 z-40 border-t border-border/70 pb-[max(0.35rem,env(safe-area-inset-bottom))] shadow-[0_-8px_28px_-12px_rgba(15,23,42,0.35)] print:hidden lg:hidden"
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between px-2 py-1.5">
         {TABS.map((tab) => {

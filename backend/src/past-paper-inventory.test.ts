@@ -9,6 +9,50 @@ import {
   CLASS_SOURCE_URLS,
   FBISE_SOURCE_ROW_COUNT,
 } from "./db/seed-fbise-past-paper-sources.js";
+import { mergeFbisePastPaperInventory } from "./modules/past-papers/past-papers.service.js";
+import type { PastPaperRecord } from "./store/resources-store.js";
+
+test("merge hides empty Class 9 Math 2026 model orphan and backfills archive driveUrl", () => {
+  const orphan: PastPaperRecord = {
+    id: 1,
+    boardSlug: "fbise",
+    boardTitle: "Federal Board (FBISE)",
+    classSlug: "9",
+    classTitle: "Class 9",
+    subjectSlug: "mathematics",
+    subjectTitle: "Mathematics",
+    year: "2026",
+    sessionType: "annual",
+    paperType: "model",
+    isSolved: false,
+    syllabus: "new",
+    pdfUrl: null,
+    driveUrl: null,
+  };
+  const catalogMatch: PastPaperRecord = {
+    ...orphan,
+    id: 2,
+    year: "2024",
+    paperType: "model",
+    driveUrl: null,
+  };
+
+  const merged = mergeFbisePastPaperInventory([orphan, catalogMatch]);
+  assert.equal(
+    merged.some((p) => p.classSlug === "9" && p.subjectTitle === "Mathematics" && p.year === "2026" && p.paperType === "model"),
+    false,
+    "unannotated empty orphan must not appear in public inventory",
+  );
+
+  const model2024 = merged.find(
+    (p) => p.classSlug === "9" && p.subjectTitle === "Mathematics" && p.year === "2024" && p.paperType === "model",
+  );
+  assert.ok(model2024);
+  assert.equal(model2024.pdfUrl, null);
+  assert.equal(model2024.driveUrl, CLASS_SOURCE_URLS["9"]);
+  assert.ok(merged.every((p) => p.pdfUrl === null || Boolean(p.pdfUrl)));
+  assert.ok(merged.every((p) => p.pdfUrl || p.driveUrl), "every public row needs pdf or archive source");
+});
 
 test("FBISE source catalog rows are archive links, never fabricated local PDFs", () => {
   const rows = buildFbiseSourceCatalog();
