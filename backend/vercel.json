@@ -5,7 +5,7 @@
   "buildCommand": "npx tsc -p tsconfig.json",
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }],
   "functions": {
-    "api/index.ts": {
+    "api/index.js": {
       "includeFiles": "dist/**",
       "maxDuration": 60
     }

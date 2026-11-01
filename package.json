@@ -2,7 +2,7 @@
   "name": "boardnotes",
   "private": true,
   "engines": {
-    "node": "26.x"
+    "node": "22.x"
   },
   "workspaces": [
     "frontend",
