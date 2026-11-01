@@ -4,15 +4,19 @@ import { bootstrap } from "./bootstrap.js";
 
 const app = createApp();
 
-// Finish DB migrate/seed before serving traffic (local + Vercel cold start).
-await bootstrap();
-
-// Vercel detects `src/server.ts` and uses this default export as the function.
+// Vercel detects `src/server.ts` and uses this default export.
 export default app;
 
-// Local / Docker / Render keep a long-lived process.
+// Local / Docker keep a long-lived process.
 if (!process.env.VERCEL) {
-  app.listen(env.port, () => {
-    console.log(`BoardNotes backend listening on port ${env.port}`);
-  });
+  bootstrap()
+    .then(() => {
+      app.listen(env.port, () => {
+        console.log(`BoardNotes backend listening on port ${env.port}`);
+      });
+    })
+    .catch((err) => {
+      console.error("[boot] Failed to start:", err);
+      process.exit(1);
+    });
 }

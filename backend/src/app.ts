@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { env } from "./config/env.js";
+import { bootstrap } from "./bootstrap.js";
 import { apiRouter } from "./routes/index.js";
 import { errorHandler } from "./utils/error-handler.js";
 import { isR2Enabled } from "./storage/r2-storage.js";
@@ -14,6 +15,16 @@ const PUBLIC_DIR = path.join(__dirname, "..", "public");
 
 export function createApp() {
   const app = express();
+
+  // Lazy boot (migrate/seed) — no top-level await (breaks Vercel cold start).
+  app.use(async (_req, _res, next) => {
+    try {
+      await bootstrap();
+      next();
+    } catch (err) {
+      next(err);
+    }
+  });
 
   // Legacy Next rewrite prefix: /backend-api/api/... → /api/...
   app.use((req, _res, next) => {
