@@ -1,0 +1,37 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "backend": {
+      "root": "backend",
+      "framework": "express",
+      "installCommand": "cd .. && npm ci",
+      "functions": {
+        "src/server.ts": {
+          "maxDuration": 60,
+          "includeFiles": "{src/db/migrations/**,public/**}"
+        }
+      }
+    },
+    "frontend": {
+      "root": "frontend",
+      "framework": "nextjs",
+      "installCommand": "cd .. && npm ci",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "backend",
+          "format": "url",
+          "env": "BACKEND_URL"
+        }
+      ]
+    }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": { "service": "backend" } },
+    { "source": "/uploads/(.*)", "destination": { "service": "backend" } },
+    { "source": "/demo-pdfs/(.*)", "destination": { "service": "backend" } },
+    { "source": "/book-covers/(.*)", "destination": { "service": "backend" } },
+    { "source": "/backend-api/(.*)", "destination": { "service": "backend" } },
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
+  ]
+}

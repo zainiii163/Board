@@ -1,13 +1,13 @@
 import type { NextConfig } from "next";
 
-// Must match lib/api-client.ts so relative asset paths (book covers, uploads,
-// demo PDFs) resolve against the API instead of 404ing on the Next origin.
+// Local `next dev` only — production routing is in root vercel.json services rewrites.
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1", "*.asse.devtunnels.ms"],
   async rewrites() {
     return [
+      { source: "/api/:path*", destination: `${API}/api/:path*` },
       { source: "/backend-api/:path*", destination: `${API}/:path*` },
       { source: "/book-covers/:path*", destination: `${API}/book-covers/:path*` },
       { source: "/uploads/:path*", destination: `${API}/uploads/:path*` },
@@ -30,13 +30,16 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "**.vercel.app",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "board-production-6505.up.railway.app",
         port: "",
         pathname: "/**",
       },
       {
-        // No `port` key: Next normalises numeric-looking port values, which then
-        // fail the strict string comparison in the remote-pattern matcher.
         protocol: "http",
         hostname: "localhost",
         pathname: "/**",

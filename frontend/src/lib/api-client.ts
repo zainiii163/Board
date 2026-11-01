@@ -1,18 +1,20 @@
-const SERVER_API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+function serverApiBase() {
+  // Vercel multi-service binding (runtime). Do not use NEXT_PUBLIC_* for this —
+  // bindings are not available at build time.
+  const fromBinding = process.env.BACKEND_URL?.replace(/\/$/, "");
+  if (fromBinding) return fromBinding;
+  return (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000").replace(/\/$/, "");
+}
 
-// A browser opened through a dev tunnel cannot reach the developer machine's
-// `localhost:4000`. Browser requests therefore use same-origin Next rewrites,
-// while server components still call the backend directly.
+// Browser: same-origin `/api/...` (Vercel routes `/api` → backend service).
+// Server: call backend directly via BACKEND_URL binding (or local NEXT_PUBLIC_API_URL).
 function apiBase() {
-  // Browser calls go through Next rewrites: /backend-api/* → API root.
-  // Paths already include `/api/...`, so the prefix must not add another `/api`.
-  return typeof window === "undefined" ? SERVER_API_BASE : "/backend-api";
+  return typeof window === "undefined" ? serverApiBase() : "";
 }
 
 export function getApiBaseUrl() {
-  // Asset URLs are proxied by Next rewrites. Keeping them relative on both the
-  // server and client prevents an SSR/client hydration mismatch and makes them
-  // work through development tunnels.
+  // Asset URLs stay relative so SSR/client markup matches and Vercel edge
+  // rewrites can send /uploads, /demo-pdfs, /book-covers to the backend.
   return "";
 }
 

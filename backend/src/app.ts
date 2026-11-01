@@ -15,6 +15,14 @@ const PUBLIC_DIR = path.join(__dirname, "..", "public");
 export function createApp() {
   const app = express();
 
+  // Legacy Next rewrite prefix: /backend-api/api/... → /api/...
+  app.use((req, _res, next) => {
+    if (req.url.startsWith("/backend-api")) {
+      req.url = req.url.slice("/backend-api".length) || "/";
+    }
+    next();
+  });
+
   app.use(
     cors({
       origin: env.corsOrigins,
