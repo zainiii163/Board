@@ -1,20 +1,28 @@
 function serverApiBase() {
-  // Vercel multi-service binding (runtime). Do not use NEXT_PUBLIC_* for this —
-  // bindings are not available at build time.
-  const fromBinding = process.env.BACKEND_URL?.replace(/\/$/, "");
-  if (fromBinding) return fromBinding;
-  return (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000").replace(/\/$/, "");
+  // Prefer explicit public API URL (separate Vercel backend project).
+  // BACKEND_URL remains supported if multi-service bindings are used later.
+  const fromEnv = (process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000").replace(
+    /\/$/,
+    "",
+  );
+  return fromEnv;
 }
 
-// Browser: same-origin `/api/...` (Vercel routes `/api` → backend service).
-// Server: call backend directly via BACKEND_URL binding (or local NEXT_PUBLIC_API_URL).
+// Browser: same-origin paths work when Next rewrites /api → backend.
+// If NEXT_PUBLIC_API_URL points at a separate API host, browser calls that host directly.
 function apiBase() {
-  return typeof window === "undefined" ? serverApiBase() : "";
+  if (typeof window === "undefined") return serverApiBase();
+  const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+  // Separate backend project → call it directly from the browser.
+  if (publicUrl && !publicUrl.includes("localhost")) return publicUrl;
+  // Local / same-origin proxy via next.config rewrites.
+  return "";
 }
 
 export function getApiBaseUrl() {
-  // Asset URLs stay relative so SSR/client markup matches and Vercel edge
-  // rewrites can send /uploads, /demo-pdfs, /book-covers to the backend.
+  if (typeof window === "undefined") return "";
+  const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+  if (publicUrl && !publicUrl.includes("localhost")) return publicUrl;
   return "";
 }
 
