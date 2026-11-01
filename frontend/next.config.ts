@@ -24,13 +24,22 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // `/_next/image` is incorrectly matched by App Router `/[board]/[classSlug]`
+    // (board="_next", classSlug="image") on this deployment, so optimized URLs
+    // return HTML instead of images. Serve covers/resources as plain <img>.
+    unoptimized: true,
     // The optimizer refuses upstreams that resolve to private IPs. Locally the
     // API is on http://localhost:4000, so dev needs this; production stays strict.
     dangerouslyAllowLocalIP: process.env.NODE_ENV === "development",
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**.vercel.app",
+        hostname: "*.vercel.app",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "board-gccf.vercel.app",
         pathname: "/**",
       },
       {

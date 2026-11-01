@@ -19,8 +19,8 @@ function apiBase() {
   return "";
 }
 
+/** Public API origin for absolute asset URLs (book covers, uploads). Empty = same-origin. */
 export function getApiBaseUrl() {
-  if (typeof window === "undefined") return "";
   const publicUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
   if (publicUrl && !publicUrl.includes("localhost")) return publicUrl;
   return "";
