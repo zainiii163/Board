@@ -83,6 +83,26 @@ export function createApp() {
     });
   });
 
+  // Override the lightweight health from vercel-app with DB diagnostics.
+  app.get("/api/health", async (_req, res) => {
+    const { isDbConfigured } = await import("./db/index.js");
+    const { useDb, initDbMode } = await import("./db/mode.js");
+    let connected = useDb();
+    if (isDbConfigured && !connected) {
+      connected = await initDbMode();
+    }
+    res.json({
+      status: "ok",
+      service: "boardnotes-backend",
+      timestamp: new Date().toISOString(),
+      vercel: Boolean(process.env.VERCEL),
+      database: {
+        configured: isDbConfigured,
+        connected,
+      },
+    });
+  });
+
   app.use("/api", apiRouter);
   app.use(errorHandler);
 
