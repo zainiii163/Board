@@ -1,6 +1,5 @@
 import type { Response } from "express";
 import { eq } from "drizzle-orm";
-import archiver from "archiver";
 
 import { getChapterBySlug } from "../../demo-data.js";
 import { db } from "../../db/index.js";
@@ -98,7 +97,9 @@ export async function streamChapterZip(
   res.setHeader("Content-Type", "application/zip");
   res.setHeader("Content-Disposition", `attachment; filename="${zipName}"`);
 
-  const archive = archiver("zip", { zlib: { level: 9 } });
+  // archiver@8 is ESM-only and exports ZipArchive (not the old callable default).
+  const { ZipArchive } = await import("archiver");
+  const archive = new ZipArchive({ zlib: { level: 9 } });
   archive.on("error", (error: Error) => {
     if (!res.headersSent) {
       res.status(500).json({ error: error.message });
