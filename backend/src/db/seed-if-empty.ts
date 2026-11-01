@@ -49,17 +49,20 @@ export async function seedIfEmpty() {
   const existing = await db.select({ id: schema.boards.id }).from(schema.boards).limit(1);
   if (existing.length > 0) {
     console.log("[db] Content already seeded — using PostgreSQL as source of truth.");
-    await runOptional("platform", seedPlatformContent);
-    await runOptional("classroom", seedDemoClassroom);
-    await runOptional("chapter-video", seedDemoChapterVideo);
-    await runOptional("regional-boards", seedRegionalBoardContent);
-    // Idempotent: Punjab variants before subject sync; FBISE sources last.
-    await runOptional("punjab-variant-boards", seedPunjabVariantBoards);
-    await runOptional("punjab-variant-papers", seedPunjabVariantPastPapers);
-    await runOptional("logarithms", seedLogarithmsEnrichment);
-    await runOptional("book-covers", seedBookCovers);
-    await runOptional("subjects-mcqs", seedSubjectsAndMCQs);
-    await runOptional("fbise-past-paper-sources", seedFbisePastPaperSources);
+    // Skip heavy optional backfills on every boot (especially Vercel cold starts).
+    // Set SEED_BACKFILL=true once if you need those enrichments re-applied.
+    if (process.env.SEED_BACKFILL === "true") {
+      await runOptional("platform", seedPlatformContent);
+      await runOptional("classroom", seedDemoClassroom);
+      await runOptional("chapter-video", seedDemoChapterVideo);
+      await runOptional("regional-boards", seedRegionalBoardContent);
+      await runOptional("punjab-variant-boards", seedPunjabVariantBoards);
+      await runOptional("punjab-variant-papers", seedPunjabVariantPastPapers);
+      await runOptional("logarithms", seedLogarithmsEnrichment);
+      await runOptional("book-covers", seedBookCovers);
+      await runOptional("subjects-mcqs", seedSubjectsAndMCQs);
+      await runOptional("fbise-past-paper-sources", seedFbisePastPaperSources);
+    }
     return;
   }
   console.log("[db] Empty database — seeding board content from demo catalog…");

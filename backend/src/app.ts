@@ -17,11 +17,16 @@ export function createApp() {
   const app = express();
 
   // Lazy boot (migrate/seed) — no top-level await (breaks Vercel cold start).
-  app.use(async (_req, _res, next) => {
+  // Health stays available even if bootstrap fails (shows demo/empty instead of 500).
+  app.use(async (req, _res, next) => {
+    if (req.path === "/api/health" || req.url.startsWith("/api/health")) {
+      return next();
+    }
     try {
       await bootstrap();
       next();
     } catch (err) {
+      console.error("[boot] bootstrap failed:", err);
       next(err);
     }
   });

@@ -22,6 +22,9 @@ const pool = new pg.Pool({
   connectionString: DATABASE_URL,
   max: Number.isFinite(poolMax) && poolMax > 0 ? poolMax : 5,
   statement_timeout: 5000,
+  connectionTimeoutMillis: 8000,
+  idleTimeoutMillis: process.env.VERCEL ? 1000 : 10000,
+  allowExitOnIdle: Boolean(process.env.VERCEL),
   ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
 });
 

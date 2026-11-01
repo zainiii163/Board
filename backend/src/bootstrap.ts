@@ -37,10 +37,18 @@ async function runBootstrap(): Promise<boolean> {
         console.warn("[db] Auto-migration failed:", err instanceof Error ? err.message : err);
       }
     }
-    try {
-      await seedIfEmpty();
-    } catch (err) {
-      console.warn("[db] Auto-seed skipped:", err instanceof Error ? err.message : err);
+    // Full catalog seed is too heavy for Vercel serverless cold starts (OOM / crash).
+    // Run once locally or set SEED_ON_BOOT=true for a single deploy.
+    const shouldSeed =
+      process.env.SEED_ON_BOOT === "true" || (!process.env.VERCEL && process.env.SEED_ON_BOOT !== "false");
+    if (shouldSeed) {
+      try {
+        await seedIfEmpty();
+      } catch (err) {
+        console.warn("[db] Auto-seed skipped:", err instanceof Error ? err.message : err);
+      }
+    } else if (process.env.VERCEL) {
+      console.log("[db] Skipping catalog seed on Vercel cold start (set SEED_ON_BOOT=true to force).");
     }
   } else {
     console.log(
