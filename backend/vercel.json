@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd .. && npm ci",
+  "functions": {
+    "src/server.ts": {
+      "maxDuration": 60,
+      "includeFiles": "{src/db/migrations/**,public/**}"
+    }
+  }
+}

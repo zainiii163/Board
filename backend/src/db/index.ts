@@ -6,10 +6,23 @@ import "dotenv/config";
 const DATABASE_URL =
   process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5433/boardnotes";
 
+const needsSsl =
+  /sslmode=require/i.test(DATABASE_URL) ||
+  /\.aivencloud\.com/i.test(DATABASE_URL) ||
+  Boolean(process.env.VERCEL);
+
+// Serverless (Vercel) should keep the pool tiny to avoid exhausting Aiven Free limits.
+const poolMax = process.env.DB_POOL_MAX
+  ? Number(process.env.DB_POOL_MAX)
+  : process.env.VERCEL
+    ? 1
+    : 5;
+
 const pool = new pg.Pool({
   connectionString: DATABASE_URL,
-  max: 5,
+  max: Number.isFinite(poolMax) && poolMax > 0 ? poolMax : 5,
   statement_timeout: 5000,
+  ...(needsSsl ? { ssl: { rejectUnauthorized: false } } : {}),
 });
 
 export const db = drizzle(pool, { schema });
