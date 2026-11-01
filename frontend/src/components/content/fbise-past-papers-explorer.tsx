@@ -307,7 +307,13 @@ function PaperGroup({ title, hint, rows }: { title: string; hint: string; rows: 
               </span>
               <div className="flex items-center gap-2">
                 {paper.driveUrl && <DriveLinkButton href={paper.driveUrl} label="View source" className="px-2.5 py-1.5 text-xs" />}
-                {paper.pdfUrl && <DownloadGate url={pdfUrl(paper.pdfUrl)} compact />}
+                {paper.pdfUrl ? (
+                  <DownloadGate url={pdfUrl(paper.pdfUrl)} compact />
+                ) : (
+                  <span className="rounded-lg border border-dashed border-border px-2.5 py-1.5 text-[11px] font-semibold text-muted">
+                    PDF pending
+                  </span>
+                )}
               </div>
             </div>
           ))

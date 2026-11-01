@@ -1,16 +1,19 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 import { ClassPageContent } from "@/components/content/hierarchy-pages";
-import { apiFetch, apiFetchOrNull } from "@/lib/api-client";
+import { apiFetchOrNull } from "@/lib/api-client";
 import { boardDisplayTitle, sortSubjects } from "@/lib/constants";
-import type { PastPaperItem } from "@/components/content/past-papers-list";
 
 export const dynamic = "force-dynamic";
 
 type ClassData = {
   board: { slug: string; title: string } | null;
-  class: { slug: string; title: string; subjects: { slug: string; title: string }[] } | null;
+  class: {
+    slug: string;
+    title: string;
+    subjects: { slug: string; title: string; chapters?: unknown[]; chapterCount?: number }[];
+  } | null;
 };
 
 type BookSummary = { subjectSlug: string | null; subjectTitle: string | null; pdfUrl: string | null };
@@ -41,10 +44,13 @@ export default async function ClassPage({
   const klass = data?.class;
   if (!data || !klass) notFound();
 
-  const [pastPapers, books] = await Promise.all([
-    apiFetch<PastPaperItem[]>(`/api/past-papers?board=${board}&class=${classSlug}`).catch(() => []),
-    apiFetchOrNull<BookSummary[]>(`/api/books?board=${board}&class=${classSlug}`),
-  ]);
+  const books = await apiFetchOrNull<BookSummary[]>(`/api/books?board=${board}&class=${classSlug}`);
+
+  // Client 123.pdf: Past Papers are not part of Books & Notes pages.
+  // Deep links with ?view=past-papers redirect to the dedicated archive.
+  if (view === "past-papers") {
+    redirect(`/past-papers?board=${encodeURIComponent(board)}&class=${encodeURIComponent(classSlug)}`);
+  }
 
   return (
     <ClassPageContent
@@ -52,9 +58,19 @@ export default async function ClassPage({
       classSlug={classSlug}
       boardTitle={data.board?.title ?? "Board"}
       classTitle={klass.title}
-      subjects={sortSubjects(klass.subjects)}
-      initialView={view === "books" ? "books" : view === "past-papers" ? "past-papers" : "notes"}
-      pastPapers={pastPapers}
+      subjects={sortSubjects(
+        klass.subjects.map((subject) => ({
+          slug: subject.slug,
+          title: subject.title,
+          chapterCount:
+            typeof subject.chapterCount === "number"
+              ? subject.chapterCount
+              : Array.isArray(subject.chapters)
+                ? subject.chapters.length
+                : 0,
+        })),
+      )}
+      initialView={view === "books" ? "books" : "notes"}
       books={books ?? []}
     />
   );

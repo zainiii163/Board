@@ -38,14 +38,11 @@ export function Footer() {
     { href: "/upload", label: tr("uploadTitle") },
   ];
 
+  // Client 123.pdf: Books & Notes boards are Federal + Punjab only.
   const boardLinks = [
     { href: "/fbise", label: "Federal Board" },
     { href: "/punjab", label: "Punjab Board" },
-    { href: "/apsacs", label: "APSACS" },
-    { href: "/o-level", label: "O Level" },
-    { href: "/a-level", label: "A Level" },
-    { href: "/oxford", label: "Oxford" },
-    { href: "/cambridge", label: "Cambridge" },
+    { href: "/past-papers", label: "FBISE Past Papers" },
   ];
 
   const companyLinks = [

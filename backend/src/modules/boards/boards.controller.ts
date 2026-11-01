@@ -17,8 +17,35 @@ import { useDb } from "../../db/mode.js";
 import { eq, and } from "drizzle-orm";
 import * as schema from "../../db/schema.js";
 import { ApiError } from "../../utils/api-error.js";
+import { publishedCurriculumSubjects } from "../../db/seed-book-covers.js";
 
 const asString = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] ?? "" : value ?? "";
+
+type SubjectLike = { id?: number; slug: string; title: string; chapters?: unknown[]; chapterCount?: number };
+
+function withChapterCount(subject: SubjectLike): SubjectLike {
+    const chapters = Array.isArray(subject.chapters) ? subject.chapters : [];
+    return { ...subject, chapters, chapterCount: chapters.length };
+}
+
+/**
+ * When Postgres only has a subset of curriculum subjects (e.g. Mathematics),
+ * merge the published Books & Notes catalog so Federal/Punjab class pages list
+ * every cover-backed subject. Synthetic rows have empty chapters until seeded.
+ */
+function mergeCurriculumSubjects(boardSlug: string, classSlug: string, subjects: SubjectLike[]): SubjectLike[] {
+    const bySlug = new Map(subjects.map((subject) => [subject.slug, withChapterCount(subject)]));
+    for (const catalog of publishedCurriculumSubjects(boardSlug, classSlug)) {
+        if (bySlug.has(catalog.slug)) continue;
+        bySlug.set(catalog.slug, withChapterCount({
+            id: -1 * (bySlug.size + 1),
+            slug: catalog.slug,
+            title: catalog.title,
+            chapters: [],
+        }));
+    }
+    return sortSubjects([...bySlug.values()]);
+}
 
 export const list = async (req: Request, res: Response) => {
     const full = String(req.query.full ?? "") === "1";
@@ -59,10 +86,14 @@ export const getBySlug = async (req: Request, res: Response) => {
                     classes: sortBoardHierarchy(
                         board.classes.map((klass) => ({
                             ...klass,
-                            subjects: klass.subjects.map((subject) => ({
-                                ...subject,
-                                chapters: subject.chapters.filter((ch) => ch.status === "published"),
-                            })),
+                            subjects: mergeCurriculumSubjects(
+                                board.slug,
+                                klass.slug,
+                                klass.subjects.map((subject) => ({
+                                    ...subject,
+                                    chapters: subject.chapters.filter((ch) => ch.status === "published"),
+                                })),
+                            ),
                         })),
                     ),
                 };
@@ -130,7 +161,10 @@ export const getBoardClass = async (req: Request, res: Response) => {
             if (klass) {
                 return res.json({
                     board: klass.board,
-                    class: { ...klass, subjects: sortSubjects(klass.subjects) },
+                    class: {
+                        ...klass,
+                        subjects: mergeCurriculumSubjects(slug, classSlug, klass.subjects),
+                    },
                 });
             }
             return res.status(404).json({ message: "Class not found" });
@@ -146,7 +180,10 @@ export const getBoardClass = async (req: Request, res: Response) => {
 
     return res.json({
         board: getBoardBySlug(slug),
-        class: { ...klass, subjects: sortSubjects(klass.subjects ?? []) },
+        class: {
+            ...klass,
+            subjects: mergeCurriculumSubjects(slug, classSlug, klass.subjects ?? []),
+        },
     });
 };
 
@@ -184,6 +221,21 @@ export const getBoardClassSubject = async (req: Request, res: Response) => {
                     },
                 });
             }
+
+            const catalog = publishedCurriculumSubjects(slug, classSlug).find((entry) => entry.slug === subjectSlug);
+            if (catalog) {
+                return res.json({
+                    board,
+                    class: klass,
+                    subject: {
+                        id: -1,
+                        classId: klass.id,
+                        slug: catalog.slug,
+                        title: catalog.title,
+                        chapters: [],
+                    },
+                });
+            }
             return res.status(404).json({ message: "Subject not found" });
         } catch (e) {
             console.error("DB read failed", e);
@@ -193,6 +245,14 @@ export const getBoardClassSubject = async (req: Request, res: Response) => {
     const subject = getSubjectBySlug(slug, classSlug, subjectSlug);
 
     if (!subject) {
+        const catalog = publishedCurriculumSubjects(slug, classSlug).find((entry) => entry.slug === subjectSlug);
+        if (catalog) {
+            return res.json({
+                board: getBoardBySlug(slug),
+                class: getClassBySlug(slug, classSlug),
+                subject: { slug: catalog.slug, title: catalog.title, chapters: [] },
+            });
+        }
         return res.status(404).json({ message: "Subject not found" });
     }
 

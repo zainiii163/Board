@@ -1,6 +1,6 @@
 import { env, isProduction, isR2Configured } from "./config/env.js";
 import { seedDefaultUsers } from "./modules/auth/auth.service.js";
-import { initDbMode } from "./db/mode.js";
+import { initDbMode, resetDbModeForTests } from "./db/mode.js";
 import { runCatalogBackfill, seedIfEmpty } from "./db/seed-if-empty.js";
 import { applyMigrations } from "./db/migrate.js";
 
@@ -84,4 +84,10 @@ export function bootstrap() {
     bootstrapPromise = runBootstrap();
   }
   return bootstrapPromise;
+}
+
+/** Test helper: allow a fresh bootstrap after forcing BOARDNOTES_DATA_MODE. */
+export function resetBootstrapForTests() {
+  bootstrapPromise = null;
+  resetDbModeForTests();
 }
