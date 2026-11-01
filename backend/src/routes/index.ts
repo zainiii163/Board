@@ -30,6 +30,7 @@ import { categoriesRouter } from "../modules/categories/categories.routes.js";
 import { resourcesRouter } from "../modules/resources/resources.routes.js";
 import { portalRouter } from "../modules/portal/portal.routes.js";
 import { testGeneratorRouter } from "../modules/test-generator/test-generator.routes.js";
+import { adminRouter } from "../modules/admin/admin.routes.js";
 
 export const apiRouter = Router();
 
@@ -71,3 +72,4 @@ apiRouter.use("/categories", categoriesRouter);
 apiRouter.use("/resources", resourcesRouter);
 apiRouter.use("/portal", portalRouter);
 apiRouter.use("/test-generator", testGeneratorRouter);
+apiRouter.use("/admin", adminRouter);

@@ -44,6 +44,21 @@ async function runOptional(label: string, fn: () => Promise<void>) {
   }
 }
 
+/** Light enrichments for an already-seeded DB (safe to re-run). */
+export async function runCatalogBackfill() {
+  await ensurePastPaperColumns();
+  await runOptional("platform", seedPlatformContent);
+  await runOptional("classroom", seedDemoClassroom);
+  await runOptional("chapter-video", seedDemoChapterVideo);
+  await runOptional("regional-boards", seedRegionalBoardContent);
+  await runOptional("punjab-variant-boards", seedPunjabVariantBoards);
+  await runOptional("punjab-variant-papers", seedPunjabVariantPastPapers);
+  await runOptional("logarithms", seedLogarithmsEnrichment);
+  await runOptional("book-covers", seedBookCovers);
+  await runOptional("subjects-mcqs", seedSubjectsAndMCQs);
+  await runOptional("fbise-past-paper-sources", seedFbisePastPaperSources);
+}
+
 export async function seedIfEmpty() {
   await ensurePastPaperColumns();
   const existing = await db.select({ id: schema.boards.id }).from(schema.boards).limit(1);
@@ -52,16 +67,7 @@ export async function seedIfEmpty() {
     // Skip heavy optional backfills on every boot (especially Vercel cold starts).
     // Set SEED_BACKFILL=true once if you need those enrichments re-applied.
     if (process.env.SEED_BACKFILL === "true") {
-      await runOptional("platform", seedPlatformContent);
-      await runOptional("classroom", seedDemoClassroom);
-      await runOptional("chapter-video", seedDemoChapterVideo);
-      await runOptional("regional-boards", seedRegionalBoardContent);
-      await runOptional("punjab-variant-boards", seedPunjabVariantBoards);
-      await runOptional("punjab-variant-papers", seedPunjabVariantPastPapers);
-      await runOptional("logarithms", seedLogarithmsEnrichment);
-      await runOptional("book-covers", seedBookCovers);
-      await runOptional("subjects-mcqs", seedSubjectsAndMCQs);
-      await runOptional("fbise-past-paper-sources", seedFbisePastPaperSources);
+      await runCatalogBackfill();
     }
     return;
   }

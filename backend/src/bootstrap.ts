@@ -1,7 +1,7 @@
 import { env, isProduction, isR2Configured } from "./config/env.js";
 import { seedDefaultUsers } from "./modules/auth/auth.service.js";
 import { initDbMode } from "./db/mode.js";
-import { seedIfEmpty } from "./db/seed-if-empty.js";
+import { runCatalogBackfill, seedIfEmpty } from "./db/seed-if-empty.js";
 import { applyMigrations } from "./db/migrate.js";
 
 let bootstrapPromise: Promise<boolean> | null = null;
@@ -39,16 +39,24 @@ async function runBootstrap(): Promise<boolean> {
     }
     // Full catalog seed is too heavy for Vercel serverless cold starts (OOM / crash).
     // Run once locally or set SEED_ON_BOOT=true for a single deploy.
+    // SEED_BACKFILL=true alone re-applies subject/book enrichments without a full empty-DB seed.
     const shouldSeed =
       process.env.SEED_ON_BOOT === "true" || (!process.env.VERCEL && process.env.SEED_ON_BOOT !== "false");
+    const shouldBackfill = process.env.SEED_BACKFILL === "true";
     if (shouldSeed) {
       try {
         await seedIfEmpty();
       } catch (err) {
         console.warn("[db] Auto-seed skipped:", err instanceof Error ? err.message : err);
       }
+    } else if (shouldBackfill) {
+      try {
+        await runCatalogBackfill();
+      } catch (err) {
+        console.warn("[db] Catalog backfill skipped:", err instanceof Error ? err.message : err);
+      }
     } else if (process.env.VERCEL) {
-      console.log("[db] Skipping catalog seed on Vercel cold start (set SEED_ON_BOOT=true to force).");
+      console.log("[db] Skipping catalog seed on Vercel cold start (set SEED_ON_BOOT / SEED_BACKFILL to force).");
     }
   } else {
     console.log(

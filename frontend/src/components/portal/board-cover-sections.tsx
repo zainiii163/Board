@@ -73,7 +73,7 @@ export function BoardCoverSections({ sections }: Props) {
                                 transition={{ duration: 0.45, delay: Math.min(i, 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
                               >
                                 <Link
-                                  href={`/${board.slug}/${klass.slug}/${subject.slug}`}
+                                  href={`/${board.slug}/books/${klass.slug}/${subject.slug}`}
                                   className="group relative block overflow-hidden rounded-xl border border-border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-lift"
                                 >
                                   {cover ? (

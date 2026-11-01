@@ -21,7 +21,48 @@ type BoardDetail = {
   classes: { slug: string; title: string; subjects?: { slug: string; title: string }[] }[];
 };
 
+type BookRow = {
+  boardSlug: string;
+  classSlug: string;
+  classTitle?: string | null;
+  subjectSlug: string | null;
+  subjectTitle: string | null;
+};
+
 export const dynamic = "force-dynamic";
+
+function mergeBookSubjects(
+  board: BoardDetail,
+  books: BookRow[],
+): BoardDetail {
+  const boardBooks = books.filter((book) => book.boardSlug === board.slug);
+  const classes = board.classes.map((klass) => {
+    const bySlug = new Map((klass.subjects ?? []).map((subject) => [subject.slug, subject]));
+    for (const book of boardBooks) {
+      if (book.classSlug !== klass.slug || !book.subjectSlug || !book.subjectTitle) continue;
+      if (!bySlug.has(book.subjectSlug)) {
+        bySlug.set(book.subjectSlug, { slug: book.subjectSlug, title: book.subjectTitle });
+      }
+    }
+    return { ...klass, subjects: [...bySlug.values()] };
+  });
+
+  // Add classes that exist only in books (shouldn't happen often, but keeps home complete).
+  const known = new Set(classes.map((klass) => klass.slug));
+  for (const book of boardBooks) {
+    if (!book.classSlug || known.has(book.classSlug)) continue;
+    known.add(book.classSlug);
+    classes.push({
+      slug: book.classSlug,
+      title: book.classTitle || `Class ${book.classSlug}`,
+      subjects: book.subjectSlug && book.subjectTitle
+        ? [{ slug: book.subjectSlug, title: book.subjectTitle }]
+        : [],
+    });
+  }
+
+  return { ...board, classes };
+}
 
 function buildSection(board: BoardDetail): HomeBoardSection | null {
   const seen = new Set<string>();
@@ -59,12 +100,16 @@ async function fetchHomeBoardSections(): Promise<HomeBoardSection[]> {
   );
   if (boards.length === 0) return [];
 
-  const details = await Promise.all(
-    boards.map((board) => apiFetchOrNull<BoardDetail>(`/api/boards/${board.slug}`)),
-  );
+  const [details, ...bookLists] = await Promise.all([
+    Promise.all(boards.map((board) => apiFetchOrNull<BoardDetail>(`/api/boards/${board.slug}`))),
+    ...boards.map((board) => apiFetchOrNull<BookRow[]>(`/api/books?board=${board.slug}`)),
+  ]);
+
+  const books = bookLists.flatMap((list) => list ?? []);
+
   return details
     .filter((detail): detail is BoardDetail => detail !== null)
-    .map(buildSection)
+    .map((detail) => buildSection(mergeBookSubjects(detail, books)))
     .filter((section): section is HomeBoardSection => section !== null);
 }
 

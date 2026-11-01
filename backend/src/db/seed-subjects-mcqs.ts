@@ -46,6 +46,50 @@ async function removePlaceholderSubject(subjectId: number, boardSlug: string, cl
   return true;
 }
 
+/** Ensure every textbook row in `books` has a matching hierarchy subject. */
+export async function syncSubjectsFromBooks() {
+  console.log("[db] Syncing hierarchy subjects from books catalog…");
+
+  const books = await db
+    .select({
+      boardSlug: schema.books.boardSlug,
+      classSlug: schema.books.classSlug,
+      subjectSlug: schema.books.subjectSlug,
+      subjectTitle: schema.books.subjectTitle,
+    })
+    .from(schema.books);
+
+  const boards = await db.query.boards.findMany({ with: { classes: true } });
+  const boardBySlug = new Map(boards.map((board) => [board.slug, board]));
+  const seen = new Set<string>();
+  let inserted = 0;
+
+  for (const book of books) {
+    if (!book.subjectSlug || !book.subjectTitle) continue;
+    const key = `${book.boardSlug}/${book.classSlug}/${book.subjectSlug}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    const board = boardBySlug.get(book.boardSlug);
+    const klass = board?.classes.find((entry) => entry.slug === book.classSlug);
+    if (!klass) continue;
+
+    const existing = await db.query.subjects.findFirst({
+      where: and(eq(schema.subjects.classId, klass.id), eq(schema.subjects.slug, book.subjectSlug)),
+    });
+    if (existing) continue;
+
+    await db.insert(schema.subjects).values({
+      classId: klass.id,
+      slug: book.subjectSlug,
+      title: book.subjectTitle,
+    });
+    inserted += 1;
+  }
+
+  console.log(`[db] Books→subjects sync complete (${inserted} inserted).`);
+}
+
 export async function seedSubjectsAndMCQs() {
   console.log("[db] Syncing the published curriculum catalog…");
 
@@ -107,6 +151,10 @@ export async function seedSubjectsAndMCQs() {
       }
     }
   }
+
+  // Books table already has the full multi-subject catalog on production —
+  // promote those rows into the board→class→subject hierarchy used by home.
+  await syncSubjectsFromBooks();
 
   console.log("[db] Published curriculum catalog synced.");
 }
