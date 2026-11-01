@@ -7,7 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "npx tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "test": "tsx --test --test-force-exit src/demo-api.test.ts src/fbise-past-papers.test.ts",
+    "test": "tsx --import ./src/test-setup.ts --test --test-force-exit src/demo-api.test.ts src/fbise-past-papers.test.ts src/curriculum-merge.test.ts src/past-paper-inventory.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx src/db/seed.ts"

@@ -5,6 +5,8 @@ import { useDb } from "../../db/mode.js";
 import * as schema from "../../db/schema.js";
 import {
   buildFbiseSourceCatalog,
+  CLASS_9_SUBJECTS,
+  CLASS_10_SUBJECTS,
   pastPaperSourceKey,
 } from "../../db/seed-fbise-past-paper-sources.js";
 import {
@@ -14,6 +16,9 @@ import {
   type PastPaperType,
 } from "../../store/resources-store.js";
 import { ApiError } from "../../utils/api-error.js";
+
+const CLASS_9_ALLOWED = new Set(CLASS_9_SUBJECTS.map((title) => title.toLowerCase()));
+const CLASS_10_ALLOWED = new Set(CLASS_10_SUBJECTS.map((title) => title.toLowerCase()));
 
 /** Prefer DB/CMS rows; fill any missing FBISE annotated sessions from the source catalog. */
 function withFbiseSourceInventory(rows: PastPaperRecord[]): PastPaperRecord[] {
@@ -25,6 +30,27 @@ function withFbiseSourceInventory(rows: PastPaperRecord[]): PastPaperRecord[] {
     byKey.set(key, { id: syntheticId--, ...source });
   }
   return sortPastPapers([...byKey.values()]);
+}
+
+/**
+ * Client 113/125.pdf: keep archival DB rows, but hide crossed-out subjects and
+ * old-syllabus entries from the public FBISE Class 9/10 experience unless an
+ * explicit syllabus filter requests them.
+ */
+function applyFbiseClientPolicy(rows: PastPaperRecord[], syllabus?: string): PastPaperRecord[] {
+  return rows.filter((paper) => {
+    if (paper.boardSlug !== "fbise") return true;
+    if (paper.classSlug === "9") {
+      if (!CLASS_9_ALLOWED.has(paper.subjectTitle.toLowerCase())) return false;
+    }
+    if (paper.classSlug === "10") {
+      if (!CLASS_10_ALLOWED.has(paper.subjectTitle.toLowerCase())) return false;
+    }
+    if (syllabus !== "old" && syllabus !== "all" && paper.syllabus === "old") {
+      if (paper.classSlug === "9" || paper.classSlug === "10") return false;
+    }
+    return true;
+  });
 }
 
 const PAPER_TYPES: PastPaperType[] = ["model", "paper-pattern", "first-annual", "second-annual", "pba"];
@@ -85,6 +111,7 @@ export async function listPastPapers(
   if (syllabus === "new" || syllabus === "old") mapped = mapped.filter((p) => p.syllabus === syllabus);
   if (solved === "solved") mapped = mapped.filter((p) => p.isSolved);
   if (solved === "unsolved") mapped = mapped.filter((p) => !p.isSolved);
+  mapped = applyFbiseClientPolicy(mapped, syllabus);
   return sortPastPapers(mapped);
 }
 

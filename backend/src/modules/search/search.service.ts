@@ -23,7 +23,7 @@ async function searchPastPapers(normalizedQuery: string): Promise<SearchResult[]
         classSlug: paper.classSlug,
         subject: paper.subjectTitle,
         subjectSlug: paper.subjectSlug,
-        path: `/${paper.boardSlug}/${paper.classSlug}?view=past-papers`,
+        path: `/past-papers?board=${encodeURIComponent(paper.boardSlug)}&class=${encodeURIComponent(paper.classSlug)}`,
         type: "paper",
       });
     }

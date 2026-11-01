@@ -121,12 +121,16 @@ const CLASS_TITLES: Record<number, string> = {
 export type CatalogSubject = { slug: string; title: string };
 
 const FBISE_SOURCE_SUBJECTS: Record<string, CatalogSubject[]> = {
-  // Confirmed by the supplied FBISE Class 9 past-paper archive. These subjects
-  // are available for notes/papers even when a textbook cover has not yet been
-  // uploaded to this project.
+  // Confirmed by client past-paper annotations + Study++-style Books & Notes.
+  // These fill gaps when a textbook cover asset is not yet in BOOK_COVERS.
+  // Pakistan Studies remains available for Class 9 Books & Notes (covers exist);
+  // Past Papers Class 9 policy excludes it separately.
   "9": [
     { slug: "computer-science", title: "Computer Science" },
-    { slug: "tarjuma-quran", title: "Tarjuma Quran" },
+    { slug: "tarjuma-tul-quran", title: "Tarjuma-tul-Quran" },
+  ],
+  "10": [
+    { slug: "computer-science", title: "Computer Science" },
   ],
 };
 

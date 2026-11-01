@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,7 +18,6 @@ import { MathText } from "@/components/content/math-text";
 import { PdfSection } from "@/components/content/pdf-section";
 import { DownloadGate } from "@/components/content/download-gate";
 import { DriveLinkButton } from "@/components/content/drive-link-button";
-import type { PastPaperItem } from "@/components/content/past-papers-list";
 import { AdBanner } from "@/components/portal/ad-banner";
 import { CoverArt } from "@/components/portal/cover-art";
 import { useLocale } from "@/lib/locale-context";
@@ -45,11 +44,10 @@ type BoardPageContentProps = {
   board: string;
   title: string;
   classes: BoardClass[];
-  pastPapers?: PastPaperItem[];
   books?: { classSlug: string; subjectSlug: string | null; subjectTitle: string | null }[];
 };
 
-export function BoardPageContent({ board, title, classes, pastPapers = [], books = [] }: BoardPageContentProps) {
+export function BoardPageContent({ board, title, classes, books = [] }: BoardPageContentProps) {
   const { tr } = useLocale();
   const displayTitle = boardDisplayTitle(title, board);
   const [view, setView] = useState<"notes" | "books">("notes");
@@ -210,20 +208,6 @@ alt={`${classLabelFromSlug(klass.slug)} ${subject.title}`}
         </>
       )}
 
-      {/* Client 123.pdf: keep Past Papers off the Books & Notes board page. */}
-      <div className="mt-12 rounded-2xl border border-border bg-card p-5">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Past Papers</p>
-        <p className="mt-2 text-sm text-muted">
-          Past papers live in a separate section — not mixed into Books &amp; Notes.
-        </p>
-        <Link
-          href="/past-papers"
-          className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-accent underline-offset-4 hover:underline"
-        >
-          Open FBISE Past Papers →
-        </Link>
-      </div>
-
       {/* SEO Content Block */}
       <div className="mt-12 rounded-2xl border border-border bg-card p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">
@@ -258,9 +242,8 @@ type ClassPageContentProps = {
   classSlug: string;
   boardTitle: string;
   classTitle: string;
-  subjects: { slug: string; title: string }[];
-  initialView?: "notes" | "books" | "past-papers";
-  pastPapers?: PastPaperItem[];
+  subjects: { slug: string; title: string; chapterCount?: number }[];
+  initialView?: "notes" | "books";
   books?: { subjectSlug: string | null; subjectTitle: string | null; pdfUrl: string | null }[];
 };
 
@@ -271,7 +254,6 @@ export function ClassPageContent({
   classTitle,
   subjects,
   initialView = "notes",
-  pastPapers = [],
   books = [],
 }: ClassPageContentProps) {
   const { tr } = useLocale();
@@ -311,13 +293,6 @@ export function ClassPageContent({
   const bookSubjects = books
     .filter((book): book is { subjectSlug: string; subjectTitle: string; pdfUrl: string | null } => Boolean(book.subjectSlug && book.subjectTitle))
     .map((book) => ({ slug: book.subjectSlug, title: book.subjectTitle }));
-
-  // `?view=past-papers` is a deep link: land on the dedicated past papers section
-  // instead of dropping the visitor at the top of the subject list.
-  useEffect(() => {
-    if (initialView !== "past-papers") return;
-    document.getElementById("past-papers")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [initialView]);
 
   const tabClass = (active: boolean) =>
     `inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-bold transition ${
@@ -432,12 +407,16 @@ export function ClassPageContent({
                     </span>
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">{tr("subjectLabel")}</p>
                     <h2 className="mt-1 text-lg font-black text-foreground transition-colors group-hover:text-accent">{subject.title}</h2>
-                    <p className="mt-1 text-sm text-muted">{tr("openChaptersNotes")}</p>
+                    <p className="mt-1 text-sm text-muted">
+                      {(subject.chapterCount ?? 0) > 0 ? tr("openChaptersNotes") : "Listed in curriculum — notes pending"}
+                    </p>
                     <div className="mt-3 flex items-center justify-between">
                       <span className="rounded-full border border-border bg-background px-2.5 py-0.5 text-[10px] font-bold text-muted">
-                        {ACADEMIC_YEAR}
+                        {(subject.chapterCount ?? 0) > 0 ? ACADEMIC_YEAR : "Pending"}
                       </span>
-                      <span className="text-xs font-semibold text-accent">Click More →</span>
+                      <span className="text-xs font-semibold text-accent">
+                        {(subject.chapterCount ?? 0) > 0 ? "Click More →" : "View status →"}
+                      </span>
                     </div>
                   </Link>
                 );
@@ -491,28 +470,11 @@ export function ClassPageContent({
         </>
       )}
 
-      {/* Client 123.pdf: Past Papers are separate from Books & Notes class pages. */}
-      <div id="past-papers" className="mt-12 scroll-mt-32 rounded-2xl border border-border bg-card p-5">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Past Papers</p>
-        <h2 className="mt-1 text-xl font-black text-foreground sm:text-2xl">
-          {classTitle} papers live under Past Papers
-        </h2>
-        <p className="mt-1 text-sm text-muted">
-          Books &amp; Notes stay focused on textbooks and chapter notes. Open the Federal Board archive for model papers and annual exams.
-        </p>
-        <Link
-          href={`/past-papers?board=fbise&class=${encodeURIComponent(classSlug)}`}
-          className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-accent underline-offset-4 hover:underline"
-        >
-          View {classTitle} past papers →
-        </Link>
-      </div>
-
       {/* SEO Content Block */}
       <div className="mt-12 rounded-2xl border border-border bg-card p-6">
         <h3 className="mb-3 text-lg font-bold text-foreground">{displayTitle} {classTitle} Study Resources</h3>
         <p className="mb-3 text-sm leading-6 text-muted">
-          Access comprehensive study materials for {displayTitle} {classTitle}, including textbooks, notes, past papers, and solved exercises.
+          Access comprehensive study materials for {displayTitle} {classTitle}, including textbooks, chapter-wise notes, and solved exercises.
           Our resources are aligned with the latest curriculum standards, ensuring students have access to high-quality educational content
           that supports their learning journey.
         </p>
@@ -622,15 +584,27 @@ export function SubjectPageContent({
         <BookmarkButton title={`${classTitle} ${subjectTitle} · ${displayTitle}`} path={`/${board}/${classSlug}/${subject}`} />
       </div>
 
-      {/* Quick Answer */}
-      <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/5 p-5">
-        <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-accent">Quick Answer</h2>
-        <p className="mt-2 text-sm leading-6 text-foreground/90">
-          These free {classTitle} {subjectTitle} notes for {displayTitle} cover all {chapters.length} chapters with
-          SLO-based explanations, solved exercises, key formulas, and downloadable PDFs — aligned with the{" "}
-          {ACADEMIC_YEAR} syllabus. Use the chapter cards below to jump straight into any exercise.
-        </p>
-      </div>
+      {/* Quick Answer / empty curriculum shell */}
+      {chapters.length === 0 ? (
+        <div className="mt-6 rounded-2xl border border-dashed border-amber-500/40 bg-amber-500/5 p-5">
+          <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-300">
+            Notes pending
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-foreground/90">
+            {classTitle} {subjectTitle} is listed for {displayTitle}, but chapter notes and exercises have not been
+            published yet. This is not a broken link — content will appear here once it is uploaded and verified.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/5 p-5">
+          <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-accent">Quick Answer</h2>
+          <p className="mt-2 text-sm leading-6 text-foreground/90">
+            These free {classTitle} {subjectTitle} notes for {displayTitle} cover all {chapters.length} chapters with
+            SLO-based explanations, solved exercises, key formulas, and downloadable PDFs — aligned with the{" "}
+            {ACADEMIC_YEAR} syllabus. Use the chapter cards below to jump straight into any exercise.
+          </p>
+        </div>
+      )}
 
       {/* Tags */}
       <div className="mt-6 flex flex-wrap gap-2">
@@ -644,8 +618,8 @@ export function SubjectPageContent({
         ))}
       </div>
 
-      {/* MCQ practice CTA — board exams 9/11/12 now heavy on MCQs */}
-      {isFbiseMcq && (
+      {/* MCQ practice CTA — only when chapter notes exist for this subject */}
+      {isFbiseMcq && chapters.length > 0 && (
         <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-300/50 bg-emerald-50/60 p-4 dark:border-emerald-800/40 dark:bg-emerald-950/30">
           <span className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
             {short} exams now feature ~50% MCQs in {classTitle} {subjectTitle}
@@ -672,8 +646,17 @@ export function SubjectPageContent({
         <h2 className="text-xl font-black text-foreground sm:text-2xl">
           Chapter-Wise {subjectTitle} Notes
         </h2>
-        <p className="mt-1 text-sm text-muted">SLO-based, exercise-wise, and numerical solutions for every chapter.</p>
+        <p className="mt-1 text-sm text-muted">
+          {chapters.length === 0
+            ? "No published chapters yet for this subject."
+            : "SLO-based, exercise-wise, and numerical solutions for every chapter."}
+        </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {chapters.length === 0 && (
+            <p className="rounded-2xl border border-dashed border-border bg-card p-6 text-sm text-muted md:col-span-2">
+              Curriculum placeholder only — chapter notes will appear after verified content is published.
+            </p>
+          )}
           {chapters.map((chapter) => {
             const exercises = chapter.exercises ?? [];
             const chapterHref = `/${board}/${classSlug}/${subject}/${chapter.slug}`;
@@ -723,8 +706,8 @@ export function SubjectPageContent({
         </div>
       </div>
 
-      {/* Chapter-wise MCQs — 9/11/12 board pattern is ~50% MCQs */}
-      {isFbiseMcq && (
+      {/* Chapter-wise MCQs — only when published chapters exist */}
+      {isFbiseMcq && chapters.length > 0 && (
         <div className="mt-10 rounded-2xl border border-border bg-card p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>

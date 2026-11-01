@@ -133,10 +133,8 @@ export function SearchPageContent({
             className="rounded-xl border border-border bg-background/80 px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
           >
             <option value="all">{tr("boardAll")}</option>
-            <option value="fbise">FBISE</option>
-            <option value="punjab">Punjab</option>
-            <option value="kpk">KPK</option>
-            <option value="sindh">Sindh</option>
+            <option value="fbise">Federal Board</option>
+            <option value="punjab">Punjab Board</option>
           </select>
 
           <select
