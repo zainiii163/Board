@@ -4,12 +4,28 @@ import { db } from "../../db/index.js";
 import { useDb } from "../../db/mode.js";
 import * as schema from "../../db/schema.js";
 import {
+  buildFbiseSourceCatalog,
+  pastPaperSourceKey,
+} from "../../db/seed-fbise-past-paper-sources.js";
+import {
   resourcesStore,
   sortPastPapers,
   type PastPaperRecord,
   type PastPaperType,
 } from "../../store/resources-store.js";
 import { ApiError } from "../../utils/api-error.js";
+
+/** Prefer DB/CMS rows; fill any missing FBISE annotated sessions from the source catalog. */
+function withFbiseSourceInventory(rows: PastPaperRecord[]): PastPaperRecord[] {
+  const byKey = new Map(rows.map((paper) => [pastPaperSourceKey(paper), paper]));
+  let syntheticId = -1;
+  for (const source of buildFbiseSourceCatalog()) {
+    const key = pastPaperSourceKey(source);
+    if (byKey.has(key)) continue;
+    byKey.set(key, { id: syntheticId--, ...source });
+  }
+  return sortPastPapers([...byKey.values()]);
+}
 
 const PAPER_TYPES: PastPaperType[] = ["model", "paper-pattern", "first-annual", "second-annual", "pba"];
 
@@ -52,19 +68,24 @@ export async function listPastPapers(
   syllabus?: string,
   solved?: string,
 ): Promise<PastPaperRecord[]> {
+  let mapped: PastPaperRecord[];
   if (useDb()) {
     const rows = await db.select().from(schema.pastPapers);
-    let mapped = rows.map(mapPastPaperRow);
-    if (boardSlug) mapped = mapped.filter((p) => p.boardSlug === boardSlug);
-    if (year) mapped = mapped.filter((p) => p.year === year);
-    if (paperType) mapped = mapped.filter((p) => p.paperType === paperType);
-    if (classSlug) mapped = mapped.filter((p) => p.classSlug === classSlug);
-    if (syllabus === "new" || syllabus === "old") mapped = mapped.filter((p) => p.syllabus === syllabus);
-    if (solved === "solved") mapped = mapped.filter((p) => p.isSolved);
-    if (solved === "unsolved") mapped = mapped.filter((p) => !p.isSolved);
-    return sortPastPapers(mapped);
+    mapped = withFbiseSourceInventory(rows.map(mapPastPaperRow));
+  } else {
+    mapped = withFbiseSourceInventory(
+      resourcesStore.listPastPapers(undefined, undefined, undefined, undefined, undefined, undefined),
+    );
   }
-  return resourcesStore.listPastPapers(boardSlug, year, paperType, classSlug, syllabus, solved);
+
+  if (boardSlug) mapped = mapped.filter((p) => p.boardSlug === boardSlug);
+  if (year) mapped = mapped.filter((p) => p.year === year);
+  if (paperType) mapped = mapped.filter((p) => p.paperType === paperType);
+  if (classSlug) mapped = mapped.filter((p) => p.classSlug === classSlug);
+  if (syllabus === "new" || syllabus === "old") mapped = mapped.filter((p) => p.syllabus === syllabus);
+  if (solved === "solved") mapped = mapped.filter((p) => p.isSolved);
+  if (solved === "unsolved") mapped = mapped.filter((p) => !p.isSolved);
+  return sortPastPapers(mapped);
 }
 
 export async function getPastPaper(id: number): Promise<PastPaperRecord> {

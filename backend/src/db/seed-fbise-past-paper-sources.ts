@@ -93,3 +93,56 @@ export async function seedFbisePastPaperSources() {
 
 /** Inventory size for regression tests (Class 9×7 + Class 10×3 + Chemistry PBA). */
 export const FBISE_SOURCE_ROW_COUNT = SOURCE_ROWS.length;
+
+export type FbiseSourceCatalogRow = {
+  boardSlug: "fbise";
+  boardTitle: "Federal Board (FBISE)";
+  classSlug: "9" | "10";
+  classTitle: string;
+  subjectSlug: string;
+  subjectTitle: string;
+  year: string;
+  sessionType: "annual" | "supply";
+  paperType: PaperSource["paperType"];
+  isSolved: false;
+  syllabus: "new" | "old";
+  pdfUrl: null;
+  driveUrl: string;
+};
+
+/** In-memory FBISE archive rows for API responses when DB seed has not run. */
+export function buildFbiseSourceCatalog(): FbiseSourceCatalogRow[] {
+  return SOURCE_ROWS.map((paper) => ({
+    boardSlug: "fbise",
+    boardTitle: "Federal Board (FBISE)",
+    classSlug: paper.classSlug,
+    classTitle: `Class ${paper.classSlug}`,
+    subjectSlug: slugify(paper.subjectTitle),
+    subjectTitle: paper.subjectTitle,
+    year: paper.year,
+    sessionType: paper.paperType === "second-annual" ? "supply" : "annual",
+    paperType: paper.paperType,
+    isSolved: false,
+    syllabus: paper.syllabus,
+    pdfUrl: null,
+    driveUrl: CLASS_SOURCE_URL[paper.classSlug],
+  }));
+}
+
+export function pastPaperSourceKey(paper: {
+  boardSlug: string;
+  classSlug: string;
+  subjectSlug: string;
+  year: string;
+  paperType: string;
+  syllabus: string;
+}) {
+  return [
+    paper.boardSlug,
+    paper.classSlug,
+    paper.subjectSlug,
+    paper.year,
+    paper.paperType,
+    paper.syllabus,
+  ].join("|");
+}
