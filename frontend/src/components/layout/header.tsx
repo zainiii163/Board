@@ -78,25 +78,21 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "2nd Year", href: "/categories/2nd-year-pairing-schemes" },
     ]},
   ]},
+  // Client 123.pdf + 111.pdf: dedicated Federal Board past-papers area with class links.
   { id: "past-papers", label: "Past Papers", icon: FileText, groups: [
     { items: [
       { label: "All Past Papers", href: "/past-papers" },
     ]},
-    { heading: "Pakistani Boards", items: [
-      { label: "Federal Board", href: "/past-papers?board=fbise" },
+    { heading: "Federal Board (FBISE)", items: [
+      { label: "Class 9", href: "/past-papers?board=fbise&class=9" },
+      { label: "Class 10", href: "/past-papers?board=fbise&class=10" },
+      { label: "Class 11", href: "/past-papers?board=fbise&class=11" },
+      { label: "Class 12", href: "/past-papers?board=fbise&class=12" },
+    ]},
+    { heading: "Other boards", items: [
       { label: "Punjab Board", href: "/past-papers?board=punjab" },
       { label: "KPK Board", href: "/past-papers?board=kpk" },
       { label: "Sindh Board", href: "/past-papers?board=sindh" },
-      { label: "APSACS", href: "/past-papers?board=apsacs" },
-    ]},
-    { heading: "International", items: [
-      { label: "Cambridge IGCSE", href: "/categories/cambridge-intl-notes" },
-      { label: "O Level", href: "/o-level" },
-      { label: "A Level", href: "/a-level" },
-      { label: "Pearson Edexcel", href: "/categories/pearson-edexcel-notes" },
-      { label: "OxfordAQA", href: "/categories/oxford-notes" },
-      { label: "City & Guilds", href: "/categories/city-guilds-notes" },
-      { label: "IB", href: "/categories/ib-notes" },
     ]},
   ]},
   { id: "test-generator", label: "Test Generator", icon: Sparkles, groups: [

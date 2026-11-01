@@ -16,16 +16,20 @@ async function getPastPapers() {
 export default async function PastPapersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ board?: string; year?: string; type?: string }>;
+  searchParams: Promise<{ board?: string; year?: string; type?: string; class?: string }>;
 }) {
-  const { board, year, type } = await searchParams;
+  const { board, year, type, class: classSlug } = await searchParams;
   const papers = await getPastPapers();
   const useFbiseExplorer = !board || board === "fbise";
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 dark:border-border dark:bg-card">
-        {useFbiseExplorer ? <FbisePastPapersExplorer papers={papers} /> : <PastPapersList papers={papers} initialBoard={board} initialYear={year} initialType={type} />}
+        {useFbiseExplorer ? (
+          <FbisePastPapersExplorer papers={papers} initialClass={classSlug} />
+        ) : (
+          <PastPapersList papers={papers} initialBoard={board} initialYear={year} initialType={type} />
+        )}
       </div>
     </section>
   );

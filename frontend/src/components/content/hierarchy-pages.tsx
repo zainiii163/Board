@@ -210,24 +210,18 @@ alt={`${classLabelFromSlug(klass.slug)} ${subject.title}`}
         </>
       )}
 
-      {/* Past papers — Drive-linked board exam papers */}
-      <div className="mt-12">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Exam Prep</p>
-            <h2 className="mt-1 text-2xl font-black text-foreground">Past Papers — {displayTitle}</h2>
-            <p className="mt-1 text-sm text-muted">Model papers, 1st &amp; 2nd annual, and PBAs with Drive links.</p>
-          </div>
-          <Link
-            href="/past-papers"
-            className="inline-flex items-center gap-2 rounded-md border-2 border-accent px-3 py-1.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
-          >
-            Browse all past papers →
-          </Link>
-        </div>
-        <div className="mt-4">
-          <PastPapersList papers={pastPapers} hideHeading />
-        </div>
+      {/* Client 123.pdf: keep Past Papers off the Books & Notes board page. */}
+      <div className="mt-12 rounded-2xl border border-border bg-card p-5">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Past Papers</p>
+        <p className="mt-2 text-sm text-muted">
+          Past papers live in a separate section — not mixed into Books &amp; Notes.
+        </p>
+        <Link
+          href="/past-papers"
+          className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-accent underline-offset-4 hover:underline"
+        >
+          Open FBISE Past Papers →
+        </Link>
       </div>
 
       {/* SEO Content Block */}
@@ -236,7 +230,7 @@ alt={`${classLabelFromSlug(klass.slug)} ${subject.title}`}
           {displayTitle} Books and Notes — Complete Study Material
         </h3>
         <p className="mb-3 text-sm leading-6 text-muted">
-          Access comprehensive study materials for {displayTitle}, including textbooks, chapter-wise notes, past papers,
+          Access comprehensive study materials for {displayTitle}, including textbooks, chapter-wise notes,
           and solved exercises. Choose a class above to jump straight to its Notes or Books section — every class
           page is bookmarkable for quick access during study sessions.
         </p>
@@ -497,28 +491,21 @@ export function ClassPageContent({
         </>
       )}
 
-      {/* Past papers — its own section, never mixed into the notes/books tabs */}
-      <div id="past-papers" className="mt-12 scroll-mt-32">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Exam Prep</p>
-            <h2 className="mt-1 text-xl font-black text-foreground sm:text-2xl">
-              Past Papers — {classTitle}
-            </h2>
-            <p className="mt-1 text-sm text-muted">
-              Model papers, 1st &amp; 2nd annual, and PBAs — filter by type and open from Google Drive.
-            </p>
-          </div>
-          <Link
-            href="/past-papers"
-            className="inline-flex items-center gap-2 rounded-full border-2 border-accent px-3 py-1.5 text-sm font-semibold text-foreground underline transition hover:bg-accent hover:text-white"
-          >
-            View all past papers →
-          </Link>
-        </div>
-        <div className="mt-4">
-          <PastPapersList papers={pastPapers} hideHeading />
-        </div>
+      {/* Client 123.pdf: Past Papers are separate from Books & Notes class pages. */}
+      <div id="past-papers" className="mt-12 scroll-mt-32 rounded-2xl border border-border bg-card p-5">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Past Papers</p>
+        <h2 className="mt-1 text-xl font-black text-foreground sm:text-2xl">
+          {classTitle} papers live under Past Papers
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Books &amp; Notes stay focused on textbooks and chapter notes. Open the Federal Board archive for model papers and annual exams.
+        </p>
+        <Link
+          href={`/past-papers?board=fbise&class=${encodeURIComponent(classSlug)}`}
+          className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-accent underline-offset-4 hover:underline"
+        >
+          View {classTitle} past papers →
+        </Link>
       </div>
 
       {/* SEO Content Block */}
