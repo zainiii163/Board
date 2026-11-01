@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "cd .. && npm ci --include=dev",
+  "installCommand": "cd .. && npm ci --include=dev && mkdir -p backend/node_modules/@types && ln -sfn ../../node_modules/@types/node backend/node_modules/@types/node && ln -sfn ../../node_modules/typescript backend/node_modules/typescript",
   "buildCommand": "npx tsc -p tsconfig.json"
 }
