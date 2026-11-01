@@ -11,7 +11,6 @@ import {
     sortSubjects,
 } from "../../demo-data.js";
 import * as boardsService from "./boards.service.js";
-import * as chapterZipService from "./chapter-zip.service.js";
 import type { AuthedRequest } from "../../middleware/auth.middleware.js";
 import { db } from "../../db/index.js";
 import { useDb } from "../../db/mode.js";
@@ -422,6 +421,7 @@ export const getBoardClassSubjectChapterZipInfo = async (
     next: NextFunction,
 ) => {
     try {
+        const chapterZipService = await import("./chapter-zip.service.js");
         const info = await chapterZipService.getChapterZipInfo(
             asString(req.params.slug),
             asString(req.params.classSlug),
@@ -440,6 +440,7 @@ export const downloadBoardClassSubjectChapterZip = async (
     next: NextFunction,
 ) => {
     try {
+        const chapterZipService = await import("./chapter-zip.service.js");
         await chapterZipService.streamChapterZip(
             asString(req.params.slug),
             asString(req.params.classSlug),

@@ -1,3 +1,4 @@
+import { createRequire } from "node:module";
 import type { Response } from "express";
 import { eq } from "drizzle-orm";
 
@@ -7,6 +8,14 @@ import { useDb } from "../../db/mode.js";
 import * as schema from "../../db/schema.js";
 import { readPdfBuffer } from "../../store/pdf-store.js";
 import { ApiError } from "../../utils/api-error.js";
+
+// archiver@5 is CommonJS — safe with createRequire under our ESM package.
+const require = createRequire(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const archiver = require("archiver") as (
+  format: "zip",
+  options?: { zlib?: { level: number } },
+) => import("archiver").Archiver;
 
 export type ChapterZipInfo = {
   chapterTitle: string;
@@ -97,9 +106,7 @@ export async function streamChapterZip(
   res.setHeader("Content-Type", "application/zip");
   res.setHeader("Content-Disposition", `attachment; filename="${zipName}"`);
 
-  // archiver@8 is ESM-only and exports ZipArchive (not the old callable default).
-  const { ZipArchive } = await import("archiver");
-  const archive = new ZipArchive({ zlib: { level: 9 } });
+  const archive = archiver("zip", { zlib: { level: 9 } });
   archive.on("error", (error: Error) => {
     if (!res.headersSent) {
       res.status(500).json({ error: error.message });
