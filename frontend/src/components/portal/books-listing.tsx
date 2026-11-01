@@ -14,9 +14,11 @@ type Props = {
   initialResources: PortalResource[];
   initialTotal: number;
   categories: PortalCategory[];
+  /** When true, requests Federal/Punjab textbooks+notes only (123.pdf). */
+  booksNotesScope?: boolean;
 };
 
-export function BooksListing({ initialResources, initialTotal, categories }: Props) {
+export function BooksListing({ initialResources, initialTotal, categories, booksNotesScope = false }: Props) {
   const { tr } = useLocale();
   const [filter, setFilter] = useState({ category: "", subcategory: "", sort: "latest", page: 1 });
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,6 +41,7 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
         const useCat = filter.subcategory || filter.category;
         if (useCat) params.set("category", useCat);
         if (searchQuery) params.set("q", searchQuery);
+        if (booksNotesScope) params.set("scope", "books-notes");
         const data = await apiFetch<{ resources: PortalResource[]; total: number }>(`/api/resources?${params}`);
         if (!cancelled) { setResources(data.resources); setTotal(data.total); }
       } catch {
@@ -48,7 +51,7 @@ export function BooksListing({ initialResources, initialTotal, categories }: Pro
       }
     })();
     return () => { cancelled = true; };
-  }, [filter.category, filter.subcategory, filter.sort, filter.page, searchQuery]);
+  }, [filter.category, filter.subcategory, filter.sort, filter.page, searchQuery, booksNotesScope]);
 
   const categoryNameById = Object.fromEntries(categories.map((c) => [String(c.id), c.name]));
 

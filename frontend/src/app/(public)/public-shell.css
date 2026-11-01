@@ -5,6 +5,14 @@ html {
 
 .public-shell {
   padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+.public-shell main {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 @media (min-width: 1024px) {

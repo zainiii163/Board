@@ -150,23 +150,23 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
   };
 
   return (
-    <>
-      <section className="rounded-3xl border border-emerald-900/20 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 p-5 text-white shadow-sm sm:p-8 lg:p-10">
-        <div className="min-w-0 max-w-3xl">
-          <p className="inline-flex max-w-full items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-amber-100">
+    <div className="min-w-0 w-full overflow-x-clip">
+      <section className="w-full min-w-0 overflow-hidden rounded-3xl border border-emerald-900/20 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 p-4 text-white shadow-sm sm:p-7 lg:p-10">
+        <div className="w-full min-w-0 max-w-3xl">
+          <p className="inline-flex max-w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-full border border-amber-300/40 bg-amber-300/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-amber-100 sm:px-3 sm:text-[11px] sm:tracking-[0.12em]">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-300" aria-hidden="true" />
-            Updated for 2026–2027 exams
+            <span className="min-w-0 break-words">Updated for 2026–2027 exams</span>
           </p>
-          <h1 className="mt-4 break-words font-serif text-[1.55rem] font-bold leading-[1.15] tracking-tight text-balance sm:text-4xl lg:text-5xl">
+          <h1 className="mt-4 max-w-full break-words font-serif text-[1.35rem] font-bold leading-[1.2] tracking-tight hyphens-auto sm:text-3xl sm:leading-[1.15] md:text-4xl lg:text-5xl">
             FBISE Past Papers,{" "}
             <span className="text-amber-300">All in One Place</span>
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-200 sm:text-base">
+          <p className="mt-3 max-w-full break-words text-sm leading-6 text-slate-200 sm:max-w-2xl sm:text-base">
             Browse Federal Board past papers, model papers, and paper patterns for Class 9–12 by subject and year.
             Open a verified source archive, or download a PDF when one has been uploaded here — free.
           </p>
-          <label className="mt-6 flex max-w-xl items-center gap-3 rounded-2xl bg-white px-4 py-3 text-slate-900 shadow-sm" htmlFor="paper-search">
-            <Search className="h-5 w-5 text-emerald-700" aria-hidden="true" />
+          <label className="mt-6 flex w-full min-w-0 max-w-xl items-center gap-2 rounded-2xl bg-white px-3 py-3 text-slate-900 shadow-sm sm:gap-3 sm:px-4" htmlFor="paper-search">
+            <Search className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
             <input
               id="paper-search"
               value={query}
@@ -175,11 +175,11 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
               className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:text-slate-400"
             />
           </label>
-          <div className="mt-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-            <div><p className="text-xl font-black text-amber-300">4</p><p className="text-xs uppercase tracking-wide text-slate-300">Classes</p></div>
-            <div><p className="text-xl font-black text-amber-300">25+</p><p className="text-xs uppercase tracking-wide text-slate-300">Subjects</p></div>
-            <div><p className="text-xl font-black text-amber-300">New</p><p className="text-xs uppercase tracking-wide text-slate-300">Syllabus only</p></div>
-            <div><p className="text-xl font-black text-amber-300">Free</p><p className="text-xs uppercase tracking-wide text-slate-300">Source / PDF</p></div>
+          <div className="mt-6 grid w-full min-w-0 grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+            <div className="min-w-0"><p className="text-xl font-black text-amber-300">4</p><p className="text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">Classes</p></div>
+            <div className="min-w-0"><p className="text-xl font-black text-amber-300">25+</p><p className="text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">Subjects</p></div>
+            <div className="min-w-0"><p className="text-xl font-black text-amber-300">New</p><p className="text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">Syllabus only</p></div>
+            <div className="min-w-0"><p className="text-xl font-black text-amber-300">Free</p><p className="text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">Source / PDF</p></div>
           </div>
         </div>
       </section>
@@ -278,11 +278,11 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
         </>
       )}
 
-      <p className="mt-8 flex items-start gap-2 text-xs leading-5 text-muted">
+      <p className="mt-8 flex min-w-0 items-start gap-2 break-words text-xs leading-5 text-muted">
         <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
         Source links open the corresponding FBISE Past Papers archive. A Download button appears only after a PDF has been uploaded to this site.
       </p>
-    </>
+    </div>
   );
 }
 

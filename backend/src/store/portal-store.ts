@@ -1,6 +1,8 @@
 // Taleem360-style resource portal store (in-memory demo catalog).
 // Categories + resources live here so the portal works even without PostgreSQL.
 
+import { isBooksNotesPublicResource } from "../utils/books-notes-filter.js";
+
 export type CategoryStatus = "published" | "hidden";
 
 export type PortalCategory = {
@@ -712,7 +714,13 @@ export const portalStore = {
 
   getTrail: (categoryId: number) => buildTrail(categoryId),
 
-  listResources: (options: { categorySlug?: string; q?: string; sort?: "latest" | "popular" | "a-z" }) => {
+  listResources: (options: {
+    categorySlug?: string;
+    q?: string;
+    sort?: "latest" | "popular" | "a-z";
+    /** When true, keep Federal/Punjab textbooks+notes only (123.pdf); no DB deletes. */
+    booksNotesOnly?: boolean;
+  }) => {
     let rows = [...resources];
     const categorySlug = options.categorySlug?.trim();
     if (categorySlug) {
@@ -732,6 +740,15 @@ export const portalStore = {
       );
     }
     rows = rows.filter((r) => r.status === "published");
+    if (options.booksNotesOnly) {
+      rows = rows.filter((r) =>
+        isBooksNotesPublicResource({
+          board: r.board,
+          title: r.title,
+          categoryTrailSlugs: buildTrail(r.categoryId).map((c) => c.slug),
+        }),
+      );
+    }
     const sort = options.sort ?? "latest";
     rows.sort((a, b) => {
       if (sort === "popular") return b.downloads - a.downloads;
