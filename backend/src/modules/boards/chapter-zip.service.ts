@@ -1,6 +1,6 @@
-import { createRequire } from "node:module";
 import type { Response } from "express";
 import { eq } from "drizzle-orm";
+import archiver from "archiver";
 
 import { getChapterBySlug } from "../../demo-data.js";
 import { db } from "../../db/index.js";
@@ -8,13 +8,6 @@ import { useDb } from "../../db/mode.js";
 import * as schema from "../../db/schema.js";
 import { readPdfBuffer } from "../../store/pdf-store.js";
 import { ApiError } from "../../utils/api-error.js";
-
-const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const archiver = require("archiver") as (
-  format: "zip",
-  options?: { zlib?: { level: number } },
-) => import("archiver").Archiver;
 
 export type ChapterZipInfo = {
   chapterTitle: string;
