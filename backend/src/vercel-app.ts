@@ -3,14 +3,17 @@ import type { Express, Request, Response, NextFunction } from "express";
 
 const app = express();
 
-app.get(["/", "/api/health"], (_req, res) => {
+const health = (_req: Request, res: Response) => {
   res.json({
     status: "ok",
     service: "boardnotes-backend",
     timestamp: new Date().toISOString(),
     vercel: Boolean(process.env.VERCEL),
   });
-});
+};
+
+// Vercel rewrites `/` → `/api`, so health must match both original and rewritten paths.
+app.get(["/", "/api", "/api/health"], health);
 
 let fullAppPromise: Promise<Express> | null = null;
 
@@ -27,7 +30,7 @@ function loadFullApp() {
 }
 
 app.use(async (req: Request, res: Response, next: NextFunction) => {
-  if (req.path === "/" || req.path === "/api/health" || req.url.startsWith("/api/health")) {
+  if (req.path === "/" || req.path === "/api" || req.path === "/api/health" || req.url.startsWith("/api/health")) {
     return next();
   }
   try {
