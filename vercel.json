@@ -4,7 +4,8 @@
     "backend": {
       "root": "backend/",
       "framework": "express",
-      "installCommand": "cd .. && npm ci",
+      "installCommand": "cd .. && npm ci --include=dev",
+      "buildCommand": "npx tsc -p tsconfig.json",
       "functions": {
         "src/server.ts": {
           "maxDuration": 60,
@@ -15,7 +16,7 @@
     "frontend": {
       "root": "frontend/",
       "framework": "nextjs",
-      "installCommand": "cd .. && npm ci",
+      "installCommand": "cd .. && npm ci --include=dev",
       "bindings": [
         {
           "type": "service",
