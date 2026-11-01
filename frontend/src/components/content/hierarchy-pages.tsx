@@ -18,7 +18,7 @@ import { MathText } from "@/components/content/math-text";
 import { PdfSection } from "@/components/content/pdf-section";
 import { DownloadGate } from "@/components/content/download-gate";
 import { DriveLinkButton } from "@/components/content/drive-link-button";
-import { PastPapersList, type PastPaperItem } from "@/components/content/past-papers-list";
+import type { PastPaperItem } from "@/components/content/past-papers-list";
 import { AdBanner } from "@/components/portal/ad-banner";
 import { CoverArt } from "@/components/portal/cover-art";
 import { useLocale } from "@/lib/locale-context";
