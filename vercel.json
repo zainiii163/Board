@@ -9,7 +9,7 @@
       "functions": {
         "src/server.ts": {
           "maxDuration": 60,
-          "includeFiles": "{src/db/migrations/**,public/**}"
+          "includeFiles": "{src/db/migrations/**,public/**,dist/**}"
         }
       }
     },
