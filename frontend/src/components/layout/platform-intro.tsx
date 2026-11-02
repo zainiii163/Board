@@ -13,7 +13,7 @@ const FEATURES = [
   {
     icon: "\uD83D\uDCCB",
     title: "Past Papers & Pairing",
-    desc: "Past papers, pairing schemes, and model papers for all boards \u2014 know exactly what to expect.",
+    desc: "Past papers, pairing schemes, and model papers for Federal and Punjab \u2014 know exactly what to expect.",
     gradient: "from-sky-500 to-blue-600",
     href: "/categories",
   },
@@ -33,9 +33,10 @@ const FEATURES = [
   },
 ];
 
+// Client 123.pdf: Books & Notes = Federal + Punjab only (live books-notes ≈ 104).
 const STATS = [
-  { value: "679+", label: "Resources" },
-  { value: "8", label: "Boards" },
+  { value: "100+", label: "Resources" },
+  { value: "2", label: "Boards" },
   { value: "5\u201312", label: "Classes" },
   { value: "100%", label: "Free" },
 ];
