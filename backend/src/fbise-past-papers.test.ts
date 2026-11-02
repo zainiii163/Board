@@ -5,19 +5,30 @@ import { createApp } from "./app.js";
 import {
   CLASS_9_SUBJECTS,
   CLASS_10_SUBJECTS,
+  CLASS_11_SUBJECTS,
+  CLASS_12_SUBJECTS,
   CLASS_SOURCE_URLS,
   FBISE_SOURCE_ROW_COUNT,
 } from "./db/seed-fbise-past-paper-sources.js";
 
-test("FBISE Class 9/10 source inventory matches client subject policy", () => {
+test("FBISE Class 9–12 source inventory matches subject policy", () => {
   assert.ok(CLASS_9_SUBJECTS.includes("Tarjuma-tul-Quran"));
   assert.ok(!CLASS_9_SUBJECTS.includes("Pakistan Studies"));
   assert.ok(CLASS_10_SUBJECTS.includes("Pakistan Studies"));
   assert.ok(!CLASS_10_SUBJECTS.includes("Islamiat"));
+  assert.ok(CLASS_11_SUBJECTS.includes("Islamiat"));
+  assert.ok(!CLASS_11_SUBJECTS.includes("Pakistan Studies"));
+  assert.ok(CLASS_12_SUBJECTS.includes("Pakistan Studies"));
+  assert.ok(!CLASS_12_SUBJECTS.includes("Islamiat"));
   assert.equal(CLASS_SOURCE_URLS["9"], "https://fbisepastpapers.com/class-9-fbise-past-papers/");
   assert.equal(CLASS_SOURCE_URLS["10"], "https://fbisepastpapers.com/class-10-fbise-past-papers/");
-  // 9 subjects × 7 sessions + 8 subjects × 3 sessions + 1 Chemistry PBA = 88
-  assert.equal(FBISE_SOURCE_ROW_COUNT, CLASS_9_SUBJECTS.length * 7 + CLASS_10_SUBJECTS.length * 3 + 1);
+  assert.equal(CLASS_SOURCE_URLS["11"], "https://fbisepastpapers.com/class-11-fbise-past-papers/");
+  assert.equal(CLASS_SOURCE_URLS["12"], "https://fbisepastpapers.com/class-12-fbise-past-papers/");
+  // 9×7 + 10×3+PBA + 11×3 + 12×3 = 88 + 24 + 24 = 136
+  assert.equal(
+    FBISE_SOURCE_ROW_COUNT,
+    CLASS_9_SUBJECTS.length * 7 + CLASS_10_SUBJECTS.length * 3 + 1 + CLASS_11_SUBJECTS.length * 3 + CLASS_12_SUBJECTS.length * 3,
+  );
 });
 
 test("GET /api/past-papers returns arrays and never claims source rows as local PDFs in demo mode", async () => {

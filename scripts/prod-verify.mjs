@@ -28,14 +28,20 @@ const papers = await api.json();
 const arr = Array.isArray(papers) ? papers : papers.data || [];
 const c9 = arr.filter((p) => p.classSlug === "9");
 const c10 = arr.filter((p) => p.classSlug === "10");
+const c11 = arr.filter((p) => p.classSlug === "11");
+const c12 = arr.filter((p) => p.classSlug === "12");
 console.log(
   JSON.stringify({
     pastPapersApi: api.status,
     total: arr.length,
     c9Subjects: [...new Set(c9.map((p) => p.subjectTitle))].sort(),
     c10Subjects: [...new Set(c10.map((p) => p.subjectTitle))].sort(),
+    c11Subjects: [...new Set(c11.map((p) => p.subjectTitle))].sort(),
+    c12Subjects: [...new Set(c12.map((p) => p.subjectTitle))].sort(),
     c9Pak: c9.filter((p) => /pakistan/i.test(p.subjectTitle || "")).length,
     c10Islam: c10.filter((p) => /islam/i.test(p.subjectTitle || "")).length,
+    c11: c11.length,
+    c12: c12.length,
     withPdf: arr.filter((p) => p.pdfUrl).length,
     old: arr.filter((p) => p.syllabus === "old").length,
   }),

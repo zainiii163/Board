@@ -6,6 +6,8 @@ import {
   buildFbiseSourceCatalog,
   CLASS_9_SUBJECTS,
   CLASS_10_SUBJECTS,
+  CLASS_11_SUBJECTS,
+  CLASS_12_SUBJECTS,
   CLASS_SOURCE_URLS,
   FBISE_SOURCE_ROW_COUNT,
 } from "./db/seed-fbise-past-paper-sources.js";
@@ -60,8 +62,12 @@ test("FBISE source catalog rows are archive links, never fabricated local PDFs",
 
   const class9 = rows.filter((r) => r.classSlug === "9");
   const class10 = rows.filter((r) => r.classSlug === "10");
+  const class11 = rows.filter((r) => r.classSlug === "11");
+  const class12 = rows.filter((r) => r.classSlug === "12");
   assert.equal(class9.length, CLASS_9_SUBJECTS.length * 7);
   assert.equal(class10.length, CLASS_10_SUBJECTS.length * 3 + 1);
+  assert.equal(class11.length, CLASS_11_SUBJECTS.length * 3);
+  assert.equal(class12.length, CLASS_12_SUBJECTS.length * 3);
 
   for (const row of rows) {
     assert.equal(row.pdfUrl, null, `${row.subjectTitle} ${row.year} ${row.paperType} must not invent pdfUrl`);
@@ -73,6 +79,14 @@ test("FBISE source catalog rows are archive links, never fabricated local PDFs",
     }
     if (row.classSlug === "10") {
       assert.equal(row.driveUrl, CLASS_SOURCE_URLS["10"]);
+      assert.notEqual(row.subjectTitle, "Islamiat");
+    }
+    if (row.classSlug === "11") {
+      assert.equal(row.driveUrl, CLASS_SOURCE_URLS["11"]);
+      assert.notEqual(row.subjectTitle, "Pakistan Studies");
+    }
+    if (row.classSlug === "12") {
+      assert.equal(row.driveUrl, CLASS_SOURCE_URLS["12"]);
       assert.notEqual(row.subjectTitle, "Islamiat");
     }
   }

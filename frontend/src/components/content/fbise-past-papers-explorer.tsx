@@ -17,20 +17,22 @@ const CLASS_CARDS = [
   { slug: "12", title: "Class 12", subtitle: "HSSC Part II" },
 ] as const;
 
-/** Client 113.pdf — Class 9 excludes Pakistan Studies; includes Tarjuma-tul-Quran. */
+/** Client 113/125.pdf + Class 11/12 archive IA (same source as SSC). */
 const REQUIRED_SUBJECTS: Record<string, string[]> = {
   "9": ["Biology", "Chemistry", "Physics", "Computer Science", "Mathematics", "English", "Urdu", "Islamiat", "Tarjuma-tul-Quran"],
   "10": ["Biology", "Chemistry", "Physics", "Computer Science", "Mathematics", "English", "Urdu", "Pakistan Studies"],
+  "11": ["Biology", "Chemistry", "Physics", "Computer Science", "Mathematics", "English", "Urdu", "Islamiat"],
+  "12": ["Biology", "Chemistry", "Physics", "Computer Science", "Mathematics", "English", "Urdu", "Pakistan Studies"],
 };
 
 const CLASS_SOURCE_URL: Record<string, string> = {
   "9": "https://fbisepastpapers.com/class-9-fbise-past-papers/",
   "10": "https://fbisepastpapers.com/class-10-fbise-past-papers/",
-  "11": "https://fbisepastpapers.com/",
-  "12": "https://fbisepastpapers.com/",
+  "11": "https://fbisepastpapers.com/class-11-fbise-past-papers/",
+  "12": "https://fbisepastpapers.com/class-12-fbise-past-papers/",
 };
 
-/** Expected new-syllabus sessions from client annotations (113.pdf / 125.pdf). */
+/** Expected new-syllabus sessions from client annotations (113/125) + HSSC archive pages. */
 const EXPECTED_SESSIONS: Record<string, { year: string; paperType: PastPaperItem["paperType"] }[]> = {
   "9": [
     { year: "2027", paperType: "paper-pattern" },
@@ -45,6 +47,16 @@ const EXPECTED_SESSIONS: Record<string, { year: string; paperType: PastPaperItem
     { year: "2026", paperType: "second-annual" },
     { year: "2026", paperType: "first-annual" },
     { year: "2025", paperType: "model" },
+  ],
+  "11": [
+    { year: "2026", paperType: "first-annual" },
+    { year: "2025", paperType: "second-annual" },
+    { year: "2025", paperType: "first-annual" },
+  ],
+  "12": [
+    { year: "2026", paperType: "first-annual" },
+    { year: "2025", paperType: "first-annual" },
+    { year: "2024", paperType: "first-annual" },
   ],
 };
 
@@ -238,7 +250,11 @@ export function FbisePastPapersExplorer({ papers, initialClass }: Props) {
               <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" aria-hidden="true" />
               {classSlug === "9"
                 ? "Pakistan Studies removed for Class 9 (client 113.pdf). Tarjuma-tul-Quran included."
-                : "Islamiat removed for Class 10 (client 125.pdf). New syllabus only."}
+                : classSlug === "10"
+                  ? "Islamiat removed for Class 10 (client 125.pdf). New syllabus only."
+                  : classSlug === "11"
+                    ? "HSSC-I archive subjects · new syllabus · View source until PDFs are uploaded."
+                    : "HSSC-II archive subjects · new syllabus · View source until PDFs are uploaded."}
             </p>
           </section>
 

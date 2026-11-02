@@ -4,7 +4,7 @@ import { db } from "./index.js";
 import * as schema from "./schema.js";
 
 type PaperSource = {
-  classSlug: "9" | "10";
+  classSlug: "9" | "10" | "11" | "12";
   subjectTitle: string;
   year: string;
   paperType: "model" | "paper-pattern" | "first-annual" | "second-annual" | "pba";
@@ -14,6 +14,8 @@ type PaperSource = {
 const CLASS_SOURCE_URL: Record<PaperSource["classSlug"], string> = {
   "9": "https://fbisepastpapers.com/class-9-fbise-past-papers/",
   "10": "https://fbisepastpapers.com/class-10-fbise-past-papers/",
+  "11": "https://fbisepastpapers.com/class-11-fbise-past-papers/",
+  "12": "https://fbisepastpapers.com/class-12-fbise-past-papers/",
 };
 
 // These lists reflect the handwritten client annotations, not the broader
@@ -23,6 +25,13 @@ const CLASS_SOURCE_URL: Record<PaperSource["classSlug"], string> = {
 export const CLASS_9_SUBJECTS = ["Biology", "Chemistry", "Computer Science", "English", "Islamiat", "Mathematics", "Physics", "Tarjuma-tul-Quran", "Urdu"];
 /** Exported for regression tests — Class 10 excludes Islamiat. */
 export const CLASS_10_SUBJECTS = ["Biology", "Chemistry", "Computer Science", "English", "Mathematics", "Pakistan Studies", "Physics", "Urdu"];
+/**
+ * Class 11–12 subjects from the same FBISE archive IA as Class 9/10
+ * (fbisepastpapers.com class pages referenced by client 111.pdf). New syllabus
+ * only — no invented pdfUrl.
+ */
+export const CLASS_11_SUBJECTS = ["Biology", "Chemistry", "Computer Science", "English", "Islamiat", "Mathematics", "Physics", "Urdu"];
+export const CLASS_12_SUBJECTS = ["Biology", "Chemistry", "Computer Science", "English", "Mathematics", "Pakistan Studies", "Physics", "Urdu"];
 export const CLASS_SOURCE_URLS = CLASS_SOURCE_URL;
 
 function slugify(value: string) {
@@ -44,6 +53,18 @@ const SOURCE_ROWS: PaperSource[] = [
     { classSlug: "10" as const, subjectTitle, year: "2026", paperType: "first-annual" as const, syllabus: "new" as const },
     { classSlug: "10" as const, subjectTitle, year: "2025", paperType: "model" as const, syllabus: "new" as const },
     ...(subjectTitle === "Chemistry" ? [{ classSlug: "10" as const, subjectTitle, year: "2026", paperType: "pba" as const, syllabus: "new" as const }] : []),
+  ]),
+  // Class 11 new syllabus sessions from class-11 archive page.
+  ...CLASS_11_SUBJECTS.flatMap((subjectTitle) => [
+    { classSlug: "11" as const, subjectTitle, year: "2026", paperType: "first-annual" as const, syllabus: "new" as const },
+    { classSlug: "11" as const, subjectTitle, year: "2025", paperType: "second-annual" as const, syllabus: "new" as const },
+    { classSlug: "11" as const, subjectTitle, year: "2025", paperType: "first-annual" as const, syllabus: "new" as const },
+  ]),
+  // Class 12 annual sessions from class-12 archive page (no 2nd-annual listed).
+  ...CLASS_12_SUBJECTS.flatMap((subjectTitle) => [
+    { classSlug: "12" as const, subjectTitle, year: "2026", paperType: "first-annual" as const, syllabus: "new" as const },
+    { classSlug: "12" as const, subjectTitle, year: "2025", paperType: "first-annual" as const, syllabus: "new" as const },
+    { classSlug: "12" as const, subjectTitle, year: "2024", paperType: "first-annual" as const, syllabus: "new" as const },
   ]),
 ];
 
@@ -91,13 +112,13 @@ export async function seedFbisePastPaperSources() {
   }
 }
 
-/** Inventory size for regression tests (Class 9×7 + Class 10×3 + Chemistry PBA). */
+/** Inventory size for regression tests (9+10 annotated + 11+12 archive IA). */
 export const FBISE_SOURCE_ROW_COUNT = SOURCE_ROWS.length;
 
 export type FbiseSourceCatalogRow = {
   boardSlug: "fbise";
   boardTitle: "Federal Board (FBISE)";
-  classSlug: "9" | "10";
+  classSlug: "9" | "10" | "11" | "12";
   classTitle: string;
   subjectSlug: string;
   subjectTitle: string;
