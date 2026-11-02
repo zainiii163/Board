@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { and, eq } from "drizzle-orm";
 
 import { db } from "./index.js";
@@ -17,6 +20,32 @@ const CLASS_SOURCE_URL: Record<PaperSource["classSlug"], string> = {
   "11": "https://fbisepastpapers.com/class-11-fbise-past-papers/",
   "12": "https://fbisepastpapers.com/class-12-fbise-past-papers/",
 };
+
+type DeepLinkRow = {
+  classSlug: string;
+  subjectTitle: string;
+  year: string;
+  paperType: string;
+  syllabus: string;
+  driveUrl: string;
+};
+
+/** Scraped per-paper pages from the FBISE archive (not hosted BoardNotes PDFs). */
+const DEEP_LINKS: DeepLinkRow[] = JSON.parse(
+  readFileSync(join(dirname(fileURLToPath(import.meta.url)), "fbise-paper-deep-links.json"), "utf8"),
+) as DeepLinkRow[];
+
+const DEEP_LINK_BY_KEY = new Map(
+  DEEP_LINKS.map((row) => [
+    [row.classSlug, row.subjectTitle, row.year, row.paperType, row.syllabus].join("|"),
+    row.driveUrl,
+  ]),
+);
+
+function resolveDriveUrl(paper: PaperSource): string {
+  const key = [paper.classSlug, paper.subjectTitle, paper.year, paper.paperType, paper.syllabus].join("|");
+  return DEEP_LINK_BY_KEY.get(key) ?? CLASS_SOURCE_URL[paper.classSlug];
+}
 
 // These lists reflect the handwritten client annotations, not the broader
 // source-site archive. Exclusions are class-specific: Pakistan Studies is not
@@ -86,9 +115,13 @@ export async function seedFbisePastPaperSources() {
       ),
     });
 
-    const sourceUrl = CLASS_SOURCE_URL[paper.classSlug];
+    const sourceUrl = resolveDriveUrl(paper);
     if (existing) {
-      if (!existing.driveUrl) {
+      // Prefer per-paper deep links over class-archive URLs; never invent pdfUrl.
+      const shouldUpgrade =
+        !existing.driveUrl ||
+        (existing.driveUrl === CLASS_SOURCE_URL[paper.classSlug] && sourceUrl !== existing.driveUrl);
+      if (shouldUpgrade) {
         await db.update(schema.pastPapers).set({ driveUrl: sourceUrl }).where(eq(schema.pastPapers.id, existing.id));
       }
       continue;
@@ -146,8 +179,15 @@ export function buildFbiseSourceCatalog(): FbiseSourceCatalogRow[] {
     isSolved: false,
     syllabus: paper.syllabus,
     pdfUrl: null,
-    driveUrl: CLASS_SOURCE_URL[paper.classSlug],
+    driveUrl: resolveDriveUrl(paper),
   }));
+}
+
+/** Count of catalog rows that resolve to a per-paper page (not class archive). */
+export function countFbiseDeepLinkedRows(): number {
+  return buildFbiseSourceCatalog().filter(
+    (row) => row.driveUrl !== CLASS_SOURCE_URL[row.classSlug],
+  ).length;
 }
 
 export function pastPaperSourceKey(paper: {

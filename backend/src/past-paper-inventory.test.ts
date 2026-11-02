@@ -69,27 +69,23 @@ test("FBISE source catalog rows are archive links, never fabricated local PDFs",
   assert.equal(class11.length, CLASS_11_SUBJECTS.length * 3);
   assert.equal(class12.length, CLASS_12_SUBJECTS.length * 3);
 
+  let deepLinked = 0;
   for (const row of rows) {
     assert.equal(row.pdfUrl, null, `${row.subjectTitle} ${row.year} ${row.paperType} must not invent pdfUrl`);
     assert.equal(row.syllabus, "new");
     assert.ok(row.driveUrl?.startsWith("https://"));
-    if (row.classSlug === "9") {
-      assert.equal(row.driveUrl, CLASS_SOURCE_URLS["9"]);
-      assert.notEqual(row.subjectTitle, "Pakistan Studies");
+    const archive = CLASS_SOURCE_URLS[row.classSlug as "9" | "10" | "11" | "12"];
+    if (row.driveUrl !== archive) {
+      deepLinked += 1;
+      assert.match(row.driveUrl!, /fbisepastpapers\.com\/class-/);
+      assert.ok(!row.driveUrl!.endsWith(`class-${row.classSlug}-fbise-past-papers/`));
     }
-    if (row.classSlug === "10") {
-      assert.equal(row.driveUrl, CLASS_SOURCE_URLS["10"]);
-      assert.notEqual(row.subjectTitle, "Islamiat");
-    }
-    if (row.classSlug === "11") {
-      assert.equal(row.driveUrl, CLASS_SOURCE_URLS["11"]);
-      assert.notEqual(row.subjectTitle, "Pakistan Studies");
-    }
-    if (row.classSlug === "12") {
-      assert.equal(row.driveUrl, CLASS_SOURCE_URLS["12"]);
-      assert.notEqual(row.subjectTitle, "Islamiat");
-    }
+    if (row.classSlug === "9") assert.notEqual(row.subjectTitle, "Pakistan Studies");
+    if (row.classSlug === "10") assert.notEqual(row.subjectTitle, "Islamiat");
+    if (row.classSlug === "11") assert.notEqual(row.subjectTitle, "Pakistan Studies");
+    if (row.classSlug === "12") assert.notEqual(row.subjectTitle, "Islamiat");
   }
+  assert.ok(deepLinked >= 40, `expected many per-paper deep links, got ${deepLinked}`);
 
   const pba = rows.filter((r) => r.paperType === "pba");
   assert.equal(pba.length, 1);

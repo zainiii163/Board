@@ -76,8 +76,16 @@ export function mergeFbisePastPaperInventory(rows: PastPaperRecord[]): PastPaper
     const key = pastPaperSourceKey(source);
     const existing = byKey.get(key);
     if (existing) {
-      if (!existing.driveUrl && !existing.pdfUrl) {
-        byKey.set(key, { ...existing, driveUrl: source.driveUrl });
+      if (!existing.pdfUrl) {
+        const classArchive = isFbiseCatalogClass(existing.classSlug)
+          ? CLASS_SOURCE_URLS[existing.classSlug]
+          : null;
+        const shouldUpgradeDrive =
+          !existing.driveUrl ||
+          (classArchive && existing.driveUrl === classArchive && source.driveUrl !== classArchive);
+        if (shouldUpgradeDrive) {
+          byKey.set(key, { ...existing, driveUrl: source.driveUrl });
+        }
       }
       continue;
     }

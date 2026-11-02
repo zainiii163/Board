@@ -12,8 +12,11 @@ test("FBISE Class 9 and Punjab Class 10 curriculum subjects are not Math-only", 
   assert.ok(fbise9.some((s) => s.slug === "mathematics"));
   assert.ok(fbise9.some((s) => s.slug === "physics" || s.title === "Physics"));
   assert.ok(fbise9.some((s) => /biology/i.test(s.title)));
-  assert.ok(punjab10.length >= 1);
-  assert.ok(punjab10.some((s) => /biology|chemistry|mathematics/i.test(s.title)));
+  assert.ok(punjab10.length >= 8, `expected full Punjab 10 subject shells, got ${punjab10.length}`);
+  assert.ok(punjab10.some((s) => /biology/i.test(s.title)));
+  assert.ok(punjab10.some((s) => /chemistry/i.test(s.title)));
+  assert.ok(punjab10.some((s) => /mathematics/i.test(s.title)));
+  assert.ok(punjab10.some((s) => /physics/i.test(s.title)));
 
   const app = createApp();
   const server = app.listen(0);
@@ -41,7 +44,7 @@ test("FBISE Class 9 and Punjab Class 10 curriculum subjects are not Math-only", 
   assert.equal(punjabRes.status, 200);
   const punjabPayload = await punjabRes.json();
   const punjabSubjects = punjabPayload.class.subjects as { slug: string; title: string }[];
-  assert.ok(punjabSubjects.length >= 1);
+  assert.ok(punjabSubjects.length >= 8, `API Punjab 10 should list shells, got ${punjabSubjects.length}`);
 
   await new Promise<void>((resolve, reject) => {
     server.close((error) => (error ? reject(error) : resolve()));

@@ -206,7 +206,7 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
     10: {
       Physics: "/book-covers/fbise-10-10th-Class-Physics--NBF.jpg",
       Chemistry: "/book-covers/fbise-10-Chemistry-10-NBF.webp",
-      Mathematics: "/book-covers/fbise-10---------------------.jpg",
+      Mathematics: "/book-covers/fbise-10-------------------------------------.jpg",
       Biology: "/book-covers/fbise-10-Biology-10-NBF.webp",
       English: "/book-covers/fbise-10-class-10-english-book-pdf-federal-board.webp",
       "Computer Science": "/book-covers/fbise-10-NBF-COMPUTER-SCIENCE-10.jpg",
