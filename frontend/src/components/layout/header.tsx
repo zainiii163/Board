@@ -9,7 +9,6 @@ import {
   BookOpen,
   ChevronDown,
   FileText,
-  GraduationCap,
   Layers,
   LayoutGrid,
   LogOut,
@@ -48,26 +47,13 @@ type DropdownDef = {
   soon?: boolean;
 };
 
-/** Books & Notes entry points — Federal + Punjab only (client 123.pdf). */
-const BOARDS_ITEM: DropdownDef = {
-  id: "boards",
-  label: "Boards",
-  icon: GraduationCap,
-  groups: [
-    {
-      heading: "Books & Notes",
-      items: BOOKS_NOTES_NAV_BOARDS.map((board) => ({
-        label: board.label,
-        href: `/${board.slug}`,
-      })),
-    },
-  ],
-};
-
 /**
  * Static, always-visible menus. The board-aware "Books & Notes" menu is built
  * separately (see `buildBooksAndNotesNav`) so its id stays constant while its
  * contents follow the active board.
+ *
+ * Client 123.pdf: remove top-level "Boards" mega-menu (Books & Notes already
+ * lists Federal + Punjab). Past Papers menu is Federal-first with class links.
  */
 const OTHER_NAV_ITEMS: DropdownDef[] = [
   { id: "pairing-schemes", label: "Pairing Schemes", icon: LayoutGrid, groups: [
@@ -84,15 +70,13 @@ const OTHER_NAV_ITEMS: DropdownDef[] = [
       { label: "All Past Papers", href: "/past-papers" },
     ]},
     { heading: "Federal Board (FBISE)", items: [
-      { label: "Class 9", href: "/past-papers?board=fbise&class=9" },
-      { label: "Class 10", href: "/past-papers?board=fbise&class=10" },
-      { label: "Class 11", href: "/past-papers?board=fbise&class=11" },
-      { label: "Class 12", href: "/past-papers?board=fbise&class=12" },
+      { label: "9th Class Past Papers", href: "/past-papers?board=fbise&class=9" },
+      { label: "10th Class Past Papers", href: "/past-papers?board=fbise&class=10" },
+      { label: "11th Class Past Papers", href: "/past-papers?board=fbise&class=11" },
+      { label: "12th Class Past Papers", href: "/past-papers?board=fbise&class=12" },
     ]},
     { heading: "Other boards", items: [
       { label: "Punjab Board", href: "/past-papers?board=punjab" },
-      { label: "KPK Board", href: "/past-papers?board=kpk" },
-      { label: "Sindh Board", href: "/past-papers?board=sindh" },
     ]},
   ]},
   { id: "test-generator", label: "Test Generator", icon: Sparkles, groups: [
@@ -380,10 +364,10 @@ export function Header() {
     return first && KNOWN_BOARD_SLUGS.has(first) ? first : null;
   }, [pathname]);
 
-  // Fixed set of visible menus: Boards, Books & Notes, Pairing Schemes,
-  // Past Papers, Test Generator, Tuitions. Nothing hides behind a "More".
+  // Fixed set of visible menus: Books & Notes, Pairing Schemes, Past Papers,
+  // Test Generator, Tuition. (Boards mega-menu removed — client 123.pdf.)
   const navItems = useMemo<DropdownDef[]>(
-    () => [BOARDS_ITEM, buildBooksAndNotesNav(activeBoard), ...OTHER_NAV_ITEMS],
+    () => [buildBooksAndNotesNav(activeBoard), ...OTHER_NAV_ITEMS],
     [activeBoard],
   );
 
@@ -398,7 +382,6 @@ export function Header() {
   /** Destination that should render as "current" inside a given menu. */
   const activeHrefFor = useCallback(
     (item: DropdownDef): string | undefined => {
-      if (item.id === BOARDS_ITEM.id) return boardsHref;
       if (item.id === BOOKS_AND_NOTES_ID) {
         if (!activeBoard) return undefined;
         const segments = (pathname ?? "").split("/").filter(Boolean);
