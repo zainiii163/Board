@@ -23,8 +23,8 @@ export default async function PastPapersPage({
   const useFbiseExplorer = !board || board === "fbise";
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 dark:border-border dark:bg-card">
+    <section className="mx-auto w-full min-w-0 max-w-6xl overflow-x-clip px-3 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div className="min-w-0 w-full overflow-x-clip rounded-3xl border border-slate-200 bg-white p-3 shadow-sm sm:p-6 md:p-8 dark:border-border dark:bg-card">
         {useFbiseExplorer ? (
           <FbisePastPapersExplorer papers={papers} initialClass={classSlug} />
         ) : (

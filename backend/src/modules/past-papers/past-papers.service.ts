@@ -7,6 +7,7 @@ import {
   buildFbiseSourceCatalog,
   CLASS_9_SUBJECTS,
   CLASS_10_SUBJECTS,
+  CLASS_SOURCE_URLS,
   pastPaperSourceKey,
 } from "../../db/seed-fbise-past-paper-sources.js";
 import {
@@ -20,13 +21,62 @@ import { ApiError } from "../../utils/api-error.js";
 const CLASS_9_ALLOWED = new Set(CLASS_9_SUBJECTS.map((title) => title.toLowerCase()));
 const CLASS_10_ALLOWED = new Set(CLASS_10_SUBJECTS.map((title) => title.toLowerCase()));
 
-/** Prefer DB/CMS rows; fill any missing FBISE annotated sessions from the source catalog. */
-function withFbiseSourceInventory(rows: PastPaperRecord[]): PastPaperRecord[] {
-  const byKey = new Map(rows.map((paper) => [pastPaperSourceKey(paper), paper]));
+function isFbiseSscClass(classSlug: string): classSlug is "9" | "10" {
+  return classSlug === "9" || classSlug === "10";
+}
+
+/**
+ * Prefer DB/CMS rows; fill any missing FBISE annotated sessions from the source catalog.
+ * API-layer only (no DB writes):
+ * - Backfill class-archive `driveUrl` when a hosted `pdfUrl` is absent.
+ * - Hide unannotated empty SSC orphans (e.g. Class 9 Math 2026 model) until staff
+ *   attach a real `pdfUrl` or approve a DB change — never invent PDF URLs.
+ */
+export function mergeFbisePastPaperInventory(rows: PastPaperRecord[]): PastPaperRecord[] {
+  const catalog = buildFbiseSourceCatalog();
+  const catalogKeys = new Set(catalog.map((source) => pastPaperSourceKey(source)));
+  const byKey = new Map<string, PastPaperRecord>();
+
+  for (const paper of rows) {
+    const key = pastPaperSourceKey(paper);
+    let next = paper;
+
+    if (
+      paper.boardSlug === "fbise" &&
+      isFbiseSscClass(paper.classSlug) &&
+      !paper.driveUrl &&
+      !paper.pdfUrl
+    ) {
+      next = { ...paper, driveUrl: CLASS_SOURCE_URLS[paper.classSlug] };
+    }
+
+    if (
+      paper.boardSlug === "fbise" &&
+      isFbiseSscClass(paper.classSlug) &&
+      !catalogKeys.has(key) &&
+      !paper.pdfUrl
+    ) {
+      continue;
+    }
+
+    if (byKey.has(key)) {
+      const existing = byKey.get(key)!;
+      if (!existing.driveUrl && next.driveUrl) byKey.set(key, { ...existing, driveUrl: next.driveUrl });
+      continue;
+    }
+    byKey.set(key, next);
+  }
+
   let syntheticId = -1;
-  for (const source of buildFbiseSourceCatalog()) {
+  for (const source of catalog) {
     const key = pastPaperSourceKey(source);
-    if (byKey.has(key)) continue;
+    const existing = byKey.get(key);
+    if (existing) {
+      if (!existing.driveUrl && !existing.pdfUrl) {
+        byKey.set(key, { ...existing, driveUrl: source.driveUrl });
+      }
+      continue;
+    }
     byKey.set(key, { id: syntheticId--, ...source });
   }
   return sortPastPapers([...byKey.values()]);
@@ -97,9 +147,9 @@ export async function listPastPapers(
   let mapped: PastPaperRecord[];
   if (useDb()) {
     const rows = await db.select().from(schema.pastPapers);
-    mapped = withFbiseSourceInventory(rows.map(mapPastPaperRow));
+    mapped = mergeFbisePastPaperInventory(rows.map(mapPastPaperRow));
   } else {
-    mapped = withFbiseSourceInventory(
+    mapped = mergeFbisePastPaperInventory(
       resourcesStore.listPastPapers(undefined, undefined, undefined, undefined, undefined, undefined),
     );
   }

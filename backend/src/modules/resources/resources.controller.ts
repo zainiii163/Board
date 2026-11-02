@@ -52,14 +52,21 @@ export const list = (req: Request, res: Response) => {
   const sort = (req.query.sort as "latest" | "popular" | "a-z") ?? "latest";
   const categorySlug = req.query.category ? String(req.query.category) : undefined;
   const q = req.query.q ? String(req.query.q) : undefined;
-  const limit = Number(req.query.limit) || 60;
+  const limit = Math.min(Math.max(Number(req.query.limit) || 60, 1), 200);
+  const offset = Math.max(Number(req.query.offset) || 0, 0);
+  // Public /books library — Federal + Punjab textbooks/notes only (client 123.pdf).
+  const booksNotesOnly =
+    req.query.scope === "books-notes" ||
+    req.query.booksNotes === "1" ||
+    req.query.booksNotes === "true";
 
-  const rows = portalStore.listResources({ categorySlug, q, sort }).slice(0, limit);
+  const filtered = portalStore.listResources({ categorySlug, q, sort, booksNotesOnly });
+  const rows = filtered.slice(offset, offset + limit);
 
   const category = categorySlug ? portalStore.getCategoryBySlug(categorySlug) : null;
   res.json({
     resources: rows.map(toPublicResource),
-    total: portalStore.listResources({ categorySlug, q, sort }).length,
+    total: filtered.length,
     category: category
       ? { id: category.id, slug: category.slug, name: category.name, nameUr: category.nameUr, icon: category.icon, gradient: category.gradient }
       : null,
