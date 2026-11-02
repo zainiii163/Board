@@ -7,6 +7,8 @@ import {
   buildFbiseSourceCatalog,
   CLASS_9_SUBJECTS,
   CLASS_10_SUBJECTS,
+  CLASS_11_SUBJECTS,
+  CLASS_12_SUBJECTS,
   CLASS_SOURCE_URLS,
   pastPaperSourceKey,
 } from "../../db/seed-fbise-past-paper-sources.js";
@@ -20,17 +22,19 @@ import { ApiError } from "../../utils/api-error.js";
 
 const CLASS_9_ALLOWED = new Set(CLASS_9_SUBJECTS.map((title) => title.toLowerCase()));
 const CLASS_10_ALLOWED = new Set(CLASS_10_SUBJECTS.map((title) => title.toLowerCase()));
+const CLASS_11_ALLOWED = new Set(CLASS_11_SUBJECTS.map((title) => title.toLowerCase()));
+const CLASS_12_ALLOWED = new Set(CLASS_12_SUBJECTS.map((title) => title.toLowerCase()));
 
-function isFbiseSscClass(classSlug: string): classSlug is "9" | "10" {
-  return classSlug === "9" || classSlug === "10";
+function isFbiseCatalogClass(classSlug: string): classSlug is "9" | "10" | "11" | "12" {
+  return classSlug === "9" || classSlug === "10" || classSlug === "11" || classSlug === "12";
 }
 
 /**
  * Prefer DB/CMS rows; fill any missing FBISE annotated sessions from the source catalog.
  * API-layer only (no DB writes):
  * - Backfill class-archive `driveUrl` when a hosted `pdfUrl` is absent.
- * - Hide unannotated empty SSC orphans (e.g. Class 9 Math 2026 model) until staff
- *   attach a real `pdfUrl` or approve a DB change — never invent PDF URLs.
+ * - Hide unannotated empty catalog orphans until staff attach a real `pdfUrl`
+ *   or approve a DB change — never invent PDF URLs.
  */
 export function mergeFbisePastPaperInventory(rows: PastPaperRecord[]): PastPaperRecord[] {
   const catalog = buildFbiseSourceCatalog();
@@ -43,7 +47,7 @@ export function mergeFbisePastPaperInventory(rows: PastPaperRecord[]): PastPaper
 
     if (
       paper.boardSlug === "fbise" &&
-      isFbiseSscClass(paper.classSlug) &&
+      isFbiseCatalogClass(paper.classSlug) &&
       !paper.driveUrl &&
       !paper.pdfUrl
     ) {
@@ -52,7 +56,7 @@ export function mergeFbisePastPaperInventory(rows: PastPaperRecord[]): PastPaper
 
     if (
       paper.boardSlug === "fbise" &&
-      isFbiseSscClass(paper.classSlug) &&
+      isFbiseCatalogClass(paper.classSlug) &&
       !catalogKeys.has(key) &&
       !paper.pdfUrl
     ) {
@@ -83,9 +87,9 @@ export function mergeFbisePastPaperInventory(rows: PastPaperRecord[]): PastPaper
 }
 
 /**
- * Client 113/125.pdf: keep archival DB rows, but hide crossed-out subjects and
- * old-syllabus entries from the public FBISE Class 9/10 experience unless an
- * explicit syllabus filter requests them.
+ * Client 113/125.pdf + Class 11/12 archive IA: keep archival DB rows, but hide
+ * crossed-out subjects and old-syllabus entries from the public FBISE experience
+ * unless an explicit syllabus filter requests them.
  */
 function applyFbiseClientPolicy(rows: PastPaperRecord[], syllabus?: string): PastPaperRecord[] {
   return rows.filter((paper) => {
@@ -96,8 +100,14 @@ function applyFbiseClientPolicy(rows: PastPaperRecord[], syllabus?: string): Pas
     if (paper.classSlug === "10") {
       if (!CLASS_10_ALLOWED.has(paper.subjectTitle.toLowerCase())) return false;
     }
+    if (paper.classSlug === "11") {
+      if (!CLASS_11_ALLOWED.has(paper.subjectTitle.toLowerCase())) return false;
+    }
+    if (paper.classSlug === "12") {
+      if (!CLASS_12_ALLOWED.has(paper.subjectTitle.toLowerCase())) return false;
+    }
     if (syllabus !== "old" && syllabus !== "all" && paper.syllabus === "old") {
-      if (paper.classSlug === "9" || paper.classSlug === "10") return false;
+      if (isFbiseCatalogClass(paper.classSlug)) return false;
     }
     return true;
   });
