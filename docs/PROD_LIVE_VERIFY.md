@@ -24,7 +24,11 @@
 | 125 Class 10 subjects / PBA inventory | Pass |
 | 123 Books Federal+Punjab + Past Papers separation | Pass |
 
+## Class 11–12 (shipped `e9cf633` / PR #4)
+
+- Catalog: **136** rows (88 SSC + 24 HSSC-I + 24 HSSC-II)
+- `driveUrl` → class-11 / class-12 archive pages; **`pdfUrl` still null** (no invented downloads)
+
 ## Remaining content (not inventable)
 
-- Hosted exam Word/PDF files still missing (`pdfUrl` null)
-- Class 11–12 past-paper inventory empty until annotated sources supplied
+- Hosted exam Word/PDF files still missing (`pdfUrl` null) — needs client uploads via admin
