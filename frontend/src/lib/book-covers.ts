@@ -48,7 +48,7 @@ const BOOK_COVERS: Record<string, Record<number, Record<string, string>>> = {
       Islamiat: "/book-covers/fbise-9-Islamiat-Lazmi-Class-9-NBF.webp",
     },
     10: {
-      Mathematics: "/book-covers/fbise-10---------------------.jpg",
+      Mathematics: "/book-covers/fbise-10-------------------------------------.jpg",
       Physics: "/book-covers/fbise-10-10th-Class-Physics--NBF.jpg",
       Chemistry: "/book-covers/fbise-10-Chemistry-10-NBF.webp",
       Biology: "/book-covers/fbise-10-Biology-10-NBF.webp",

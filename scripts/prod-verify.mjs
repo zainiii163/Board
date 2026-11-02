@@ -44,6 +44,12 @@ console.log(
     c12: c12.length,
     withPdf: arr.filter((p) => p.pdfUrl).length,
     old: arr.filter((p) => p.syllabus === "old").length,
+    deepLinked: arr.filter(
+      (p) =>
+        p.driveUrl &&
+        /fbisepastpapers\.com\/class-\d+-/.test(p.driveUrl) &&
+        !/class-\d+-fbise-past-papers\/?$/.test(p.driveUrl),
+    ).length,
   }),
 );
 

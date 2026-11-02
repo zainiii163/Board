@@ -1,4 +1,4 @@
-import { sql, eq } from "drizzle-orm";
+import { sql, eq, and } from "drizzle-orm";
 import { db } from "./index.js";
 import * as schema from "./schema.js";
 
@@ -49,7 +49,7 @@ export const BOOK_COVERS: Record<string, Record<number, Record<string, string>>>
     10: {
       Physics: "/book-covers/fbise-10-10th-Class-Physics--NBF.jpg",
       Chemistry: "/book-covers/fbise-10-Chemistry-10-NBF.webp",
-      Mathematics: "/book-covers/fbise-10---------------------.jpg",
+      Mathematics: "/book-covers/fbise-10-------------------------------------.jpg",
       Biology: "/book-covers/fbise-10-Biology-10-NBF.webp",
       English: "/book-covers/fbise-10-class-10-english-book-pdf-federal-board.webp",
       "Computer Science": "/book-covers/fbise-10-NBF-COMPUTER-SCIENCE-10.jpg",
@@ -93,6 +93,8 @@ export const BOOK_COVERS: Record<string, Record<number, Record<string, string>>>
     10: {
       Biology: "/book-covers/punjab-10-10-biology.jpg",
       Chemistry: "/book-covers/punjab-10-10th-Class-Chemistry.jpg",
+      // Class 10 PTB covers not yet supplied for remaining subjects — curriculum
+      // shells still list them via PUNJAB_SOURCE_SUBJECTS below.
     },
   },
   Oxford: {
@@ -134,6 +136,19 @@ const FBISE_SOURCE_SUBJECTS: Record<string, CatalogSubject[]> = {
   ],
 };
 
+/** Punjab Class 10 SSC-II subject shells until PTB covers/notes are uploaded. */
+const PUNJAB_SOURCE_SUBJECTS: Record<string, CatalogSubject[]> = {
+  "10": [
+    { slug: "mathematics", title: "Mathematics" },
+    { slug: "physics", title: "Physics" },
+    { slug: "english", title: "English" },
+    { slug: "urdu", title: "Urdu" },
+    { slug: "computer-science", title: "Computer Science" },
+    { slug: "islamiat", title: "Islamiat" },
+    { slug: "pakistan-studies", title: "Pakistan Studies" },
+  ],
+};
+
 /**
  * Subjects for which this project has a verified, class-specific book cover.
  * Do not invent a curriculum for a board/class that is not represented here:
@@ -154,11 +169,17 @@ export function publishedBookSubjects(boardSlug: string, classSlug: string): Cat
 /** The visible curriculum is the union of verified book and source subjects. */
 export function publishedCurriculumSubjects(boardSlug: string, classSlug: string): CatalogSubject[] {
   const subjects = publishedBookSubjects(boardSlug, classSlug);
-  if (boardSlug !== "fbise") return subjects;
-
   const bySlug = new Map(subjects.map((subject) => [subject.slug, subject]));
-  for (const subject of FBISE_SOURCE_SUBJECTS[classSlug] ?? []) {
-    bySlug.set(subject.slug, subject);
+
+  if (boardSlug === "fbise") {
+    for (const subject of FBISE_SOURCE_SUBJECTS[classSlug] ?? []) {
+      bySlug.set(subject.slug, subject);
+    }
+  }
+  if (boardSlug === "punjab") {
+    for (const subject of PUNJAB_SOURCE_SUBJECTS[classSlug] ?? []) {
+      bySlug.set(subject.slug, subject);
+    }
   }
   return [...bySlug.values()];
 }
@@ -217,6 +238,37 @@ async function clearRetiredCovers() {
   }
 }
 
+/** Fix known broken cover paths and sync catalog cover_url onto existing books. */
+async function syncCoverUrlsFromCatalog() {
+  const legacyMath = "/book-covers/fbise-10---------------------.jpg";
+  const fixedMath = "/book-covers/fbise-10-------------------------------------.jpg";
+  await db
+    .update(schema.books)
+    .set({ coverUrl: fixedMath })
+    .where(eq(schema.books.coverUrl, legacyMath));
+
+  for (const [boardName, classes] of Object.entries(BOOK_COVERS)) {
+    const board = BOARD_SLUGS[boardName];
+    if (!board) continue;
+    for (const [classNumStr, subjects] of Object.entries(classes)) {
+      const classSlug = String(classNumStr);
+      for (const [subject, coverPath] of Object.entries(subjects)) {
+        const subjectSlug = subject.toLowerCase().replace(/\s+/g, "-");
+        await db
+          .update(schema.books)
+          .set({ coverUrl: coverPath })
+          .where(
+            and(
+              eq(schema.books.boardSlug, board.slug),
+              eq(schema.books.classSlug, classSlug),
+              eq(schema.books.subjectSlug, subjectSlug),
+            ),
+          );
+      }
+    }
+  }
+}
+
 /** Remove old fake PDFs while leaving PDFs uploaded through the CMS untouched. */
 async function clearDemoBookPdfs() {
   const result = await db.execute(sql`
@@ -239,10 +291,11 @@ export async function seedBookCovers() {
   await clearDemoBookPdfs();
   await renameLegacyClassFiveSocialStudies();
   await attachVerifiedStudyPlusSource();
+  await syncCoverUrlsFromCatalog();
 
   const existing = await db.select({ id: schema.books.id }).from(schema.books).limit(1);
   if (existing.length > 0) {
-    console.log("[db] Books already seeded — skipping cover seed.");
+    console.log("[db] Books already seeded — cover paths synced; skipping insert.");
     return;
   }
 
